@@ -4,17 +4,16 @@ import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId } from "@/lib/db/queries/users";
 import { getLeadsByUser, getLeadCountByUser } from "@/lib/db/queries/leads";
 import { LeadCard } from "@/components/leads/LeadCard";
-import { Button } from "@/components/ui/Button";
 import type { IntentScore, LeadStatus } from "@/types";
 
 export const metadata = { title: "Leads — Venn" };
 
-const FILTERS: Array<{ label: string; value: string | undefined }> = [
+const INTENT_FILTERS = [
   { label: "All", value: undefined },
-  { label: "Complete", value: "complete" },
-  { label: "Processing", value: "scraping" },
-  { label: "Failed", value: "failed" },
-];
+  { label: "High", value: "high" },
+  { label: "Medium", value: "medium" },
+  { label: "Low", value: "low" },
+] as const;
 
 export default async function LeadsPage({
   searchParams,
@@ -30,69 +29,129 @@ export default async function LeadsPage({
 
   const [leads, total] = await Promise.all([
     getLeadsByUser(user.id, {
-      status: filter as LeadStatus | undefined,
+      status: "complete" as LeadStatus,
       limit: 100,
     }),
     getLeadCountByUser(user.id),
   ]);
 
+  const filtered = filter
+    ? leads.filter((l) => l.intentScore === filter)
+    : leads;
+
   return (
-    <div className="max-w-4xl">
-      <div className="flex items-start justify-between mb-8">
+    <div className="max-w-2xl">
+      <div className="flex items-start justify-between mb-6">
         <div>
-          <p className="text-[11px] text-[#444] uppercase tracking-[0.1em] font-medium mb-2">
-            Prospect Pipeline
-          </p>
-          <h1 className="text-[2.25rem] leading-tight font-serif text-[#FFFDF8]">
+          <h1
+            className="mb-1"
+            style={{
+              fontSize: 28,
+              color: "#FFFDF8",
+              fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif",
+              lineHeight: 1.2,
+            }}
+          >
             Leads
           </h1>
-          <p className="text-sm text-[#555] mt-1">
+          <p style={{ fontSize: 12, color: "#555250", fontFamily: "var(--font-inter), Inter, system-ui, sans-serif" }}>
             {total} prospect{total !== 1 ? "s" : ""} researched
           </p>
         </div>
-        <div className="mt-2">
-          <Link href="/search">
-            <Button>+ New Search</Button>
-          </Link>
-        </div>
+        <Link
+          href="/search"
+          className="px-3 py-2 rounded transition-opacity hover:opacity-90"
+          style={{
+            background: "#C4973F",
+            color: "#0A0907",
+            fontSize: 13,
+            fontWeight: 500,
+            fontFamily: "var(--font-inter)",
+            textDecoration: "none",
+            borderRadius: 6,
+            marginTop: 4,
+          }}
+        >
+          + New Search
+        </Link>
       </div>
 
       {total === 0 ? (
-        <div className="border border-dashed border-[#2A2720] rounded-lg p-14 text-center">
-          <p className="text-[#FFFDF8] text-sm font-medium mb-1.5">
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div
+            className="mb-5 flex items-center justify-center"
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: 12,
+              background: "#C4973F10",
+              border: "0.5px solid #C4973F30",
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4973F" strokeWidth="1.5" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m16.5 16.5 4 4" />
+            </svg>
+          </div>
+          <p
+            className="mb-2"
+            style={{ fontSize: 20, color: "#FFFDF8", fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif" }}
+          >
             No leads yet
           </p>
-          <p className="text-[#444] text-xs mb-6">
-            Research your first prospect to get started.
+          <p
+            className="mb-6 max-w-xs"
+            style={{ fontSize: 13, color: "#555250", fontFamily: "var(--font-inter)", lineHeight: 1.5 }}
+          >
+            Run your first search to start building your intelligence pipeline
           </p>
-          <Link href="/search">
-            <Button>Research your first prospect</Button>
+          <Link
+            href="/search"
+            className="px-4 py-2 rounded transition-opacity hover:opacity-90"
+            style={{
+              background: "#C4973F",
+              color: "#0A0907",
+              fontSize: 13,
+              fontWeight: 500,
+              fontFamily: "var(--font-inter)",
+              textDecoration: "none",
+              borderRadius: 6,
+            }}
+          >
+            Start searching
           </Link>
         </div>
       ) : (
         <>
-          <div className="flex items-center gap-2 mb-5">
-            {FILTERS.map((f) => (
-              <Link
-                key={f.label}
-                href={f.value ? `/leads?filter=${f.value}` : "/leads"}
-                className={[
-                  "px-3 py-1 text-xs rounded transition-all",
-                  filter === f.value || (!filter && !f.value)
-                    ? "bg-[#C4973F] text-[#0A0907] font-semibold"
-                    : "bg-[#1A1814] text-[#666] border border-[#2A2720] hover:text-[#FFFDF8] hover:border-[#444]",
-                ].join(" ")}
-              >
-                {f.label}
-              </Link>
-            ))}
-            <span className="ml-auto text-xs text-[#444]">
-              {leads.length} shown
-            </span>
+          {/* Intent filter pills */}
+          <div
+            className="flex items-center gap-0.5 p-0.5 rounded-full mb-5 w-fit"
+            style={{ background: "#0F0E0B", border: "0.5px solid #1E1C18" }}
+          >
+            {INTENT_FILTERS.map((f) => {
+              const isActive = filter === f.value || (!filter && !f.value);
+              return (
+                <Link
+                  key={f.label}
+                  href={f.value ? `/leads?filter=${f.value}` : "/leads"}
+                  className="px-3 py-1 rounded-full transition-all"
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 500,
+                    fontFamily: "var(--font-inter)",
+                    background: isActive ? "#C4973F" : "transparent",
+                    color: isActive ? "#0A0907" : "#555250",
+                    textDecoration: "none",
+                  }}
+                >
+                  {f.label}
+                </Link>
+              );
+            })}
           </div>
 
           <div className="space-y-2">
-            {leads.map((lead) => (
+            {filtered.map((lead) => (
               <LeadCard
                 key={lead.id}
                 id={lead.id}
@@ -108,6 +167,11 @@ export default async function LeadsPage({
                 createdAt={lead.createdAt}
               />
             ))}
+            {filtered.length === 0 && (
+              <p style={{ fontSize: 13, color: "#555250", fontFamily: "var(--font-inter)", textAlign: "center", padding: "40px 0" }}>
+                No {filter} intent leads found.
+              </p>
+            )}
           </div>
         </>
       )}

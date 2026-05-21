@@ -19,6 +19,7 @@
     "@playwright/browser-chromium": "^1.60.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@tabler/icons-react": "^3.44.0",
     "@types/pg": "^8.20.0",
     "bullmq": "^5.76.10",
     "framer-motion": "^12.39.0",

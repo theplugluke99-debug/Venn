@@ -13,22 +13,34 @@ export default async function SettingsPage() {
   if (!user) redirect("/sign-in");
 
   const identity = await getCardIdentity(user.id);
+  const plan = user.subscription?.plan ?? "starter";
 
   return (
     <div className="max-w-xl">
-      <div className="mb-10">
-        <p className="text-[11px] text-[#444] uppercase tracking-[0.1em] font-medium mb-3">
-          Configuration
-        </p>
-        <h1 className="text-[2.25rem] leading-tight font-serif text-[#FFFDF8] mb-3">
-          Card identity.
+      <div className="mb-8">
+        <h1
+          className="mb-2"
+          style={{
+            fontSize: 28,
+            color: "#FFFDF8",
+            fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif",
+            lineHeight: 1.2,
+          }}
+        >
+          Settings
         </h1>
-        <p className="text-sm text-[#555] leading-relaxed">
-          This shapes how your prospect cards are written and presented. Claude
-          uses this to write in your voice — every opening line, every card.
+        <p
+          style={{
+            fontSize: 13,
+            color: "#555250",
+            fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
+            lineHeight: 1.5,
+          }}
+        >
+          Card identity shapes how your prospect cards are written. Claude uses this to match your voice.
         </p>
       </div>
-      <SettingsForm initialData={identity} />
+      <SettingsForm initialData={identity} plan={plan} />
     </div>
   );
 }

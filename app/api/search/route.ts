@@ -1,14 +1,13 @@
 import { NextRequest } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { getUserByClerkId } from "@/lib/db/queries/users";
 import { createLead } from "@/lib/db/queries/leads";
 import { addScrapeJob } from "@/lib/queue";
+import { authenticateRequest } from "@/lib/auth/apiAuth";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId: clerkId } = await auth();
-    if (!clerkId) {
+    const authResult = await authenticateRequest(request);
+    if (!authResult) {
       return Response.json({ error: "Unauthorised" }, { status: 401 });
     }
 
@@ -22,13 +21,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await getUserByClerkId(clerkId);
-    if (!user) {
-      return Response.json({ error: "User not found" }, { status: 404 });
-    }
-
     const lead = await createLead({
-      userId: user.id,
+      userId: authResult.userId,
       businessName: businessName.trim(),
       location: location.trim(),
       niche: niche.trim(),
@@ -41,7 +35,7 @@ export async function POST(request: NextRequest) {
       location: lead.location,
       niche: lead.niche,
       website: lead.website ?? undefined,
-      userId: user.id,
+      userId: authResult.userId,
     });
 
     await db.lead.update({

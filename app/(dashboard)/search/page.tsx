@@ -4,18 +4,28 @@ export const metadata = { title: "New Search — Venn" };
 
 export default function SearchPage() {
   return (
-    <div className="max-w-xl">
-      <div className="mb-10">
-        <p className="text-[11px] text-[#444] uppercase tracking-[0.1em] font-medium mb-3">
-          Prospect Research
-        </p>
-        <h1 className="text-[2.25rem] leading-tight font-serif text-[#FFFDF8] mb-3">
-          Research a business.
+    <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+      <div className="w-full max-w-lg text-center mb-10">
+        <h1
+          className="mb-3"
+          style={{
+            fontSize: 32,
+            color: "#FFFDF8",
+            fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif",
+            lineHeight: 1.2,
+          }}
+        >
+          Find your next clients
         </h1>
-        <p className="text-sm text-[#555] leading-relaxed">
-          Enter a business name and location. We'll pull their Google data, audit
-          their website, and generate a complete AI intelligence profile in about
-          60 seconds.
+        <p
+          style={{
+            fontSize: 14,
+            color: "#555250",
+            fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
+            lineHeight: 1.5,
+          }}
+        >
+          Enter a business name, niche and location. Venn does the rest.
         </p>
       </div>
 

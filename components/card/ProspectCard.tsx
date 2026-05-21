@@ -1,8 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CardSection } from "./CardSection";
-import { CardCTA } from "./CardCTA";
 
 interface Observation {
   title: string;
@@ -24,6 +22,64 @@ interface ProspectCardProps {
   location: string;
 }
 
+function AgencyLogo({ logoUrl, agencyName, brandColour }: { logoUrl: string | null; agencyName: string | null; brandColour: string }) {
+  if (logoUrl) {
+    return <img src={logoUrl} alt={agencyName ?? "Agency"} style={{ height: 28, objectFit: "contain" }} />;
+  }
+  return (
+    <span
+      style={{
+        fontSize: 15,
+        fontWeight: 700,
+        color: brandColour,
+        fontFamily: "Georgia, serif",
+        letterSpacing: "-0.02em",
+      }}
+    >
+      {agencyName ?? "Agency"}
+    </span>
+  );
+}
+
+function CTAButton({ ctaText, ctaType, ctaValue, brandColour }: {
+  ctaText: string;
+  ctaType: string;
+  ctaValue: string | null;
+  brandColour: string;
+}) {
+  function getHref() {
+    if (!ctaValue) return "#";
+    if (ctaType === "reply") return `mailto:${ctaValue}`;
+    if (ctaType === "calendly") return ctaValue;
+    if (ctaType === "video") return ctaValue;
+    return ctaValue;
+  }
+
+  return (
+    <a
+      href={getHref()}
+      target={ctaType !== "reply" ? "_blank" : undefined}
+      rel="noopener noreferrer"
+      style={{
+        display: "block",
+        width: "100%",
+        background: brandColour,
+        color: "#fff",
+        textAlign: "center",
+        padding: "16px 24px",
+        borderRadius: 10,
+        fontSize: 16,
+        fontWeight: 600,
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        textDecoration: "none",
+        letterSpacing: "-0.01em",
+      }}
+    >
+      {ctaText}
+    </a>
+  );
+}
+
 export function ProspectCard({
   businessName,
   headline,
@@ -39,110 +95,192 @@ export function ProspectCard({
   location,
 }: ProspectCardProps) {
   return (
-    <div className="min-h-screen bg-white font-sans">
-      <div className="max-w-2xl mx-auto px-6">
+    <div style={{ minHeight: "100vh", background: "#FAFAF8", fontFamily: "system-ui, -apple-system, sans-serif" }}>
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px" }}>
+
+        {/* Header */}
         <motion.header
-          initial={{ opacity: 0, y: -16 }}
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="pt-14 pb-8 flex items-center justify-between"
+          style={{
+            paddingTop: 40,
+            paddingBottom: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderBottom: "1px solid #F0EDE8",
+          }}
         >
-          {logoUrl ? (
-            <img src={logoUrl} alt={agencyName ?? "Agency"} className="h-8 object-contain" />
-          ) : (
-            <span
-              className="text-sm font-semibold tracking-tight"
-              style={{ color: brandColour }}
-            >
-              {agencyName ?? "Agency"}
-            </span>
-          )}
-          <span className="text-xs text-gray-400">
-            {niche} · {location}
-          </span>
+          <AgencyLogo logoUrl={logoUrl} agencyName={agencyName} brandColour={brandColour} />
+          <p style={{ fontSize: 12, color: "#999", fontWeight: 400 }}>
+            Put this together specifically for you
+          </p>
         </motion.header>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+        {/* Business name hero */}
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="py-10 border-b border-gray-100"
+          transition={{ delay: 0.08 }}
+          style={{ paddingTop: 48, paddingBottom: 40 }}
         >
-          <p className="text-xs text-gray-400 mb-3 uppercase tracking-widest">
-            Prepared for
+          <p style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
+            {niche} · {location}
           </p>
-          <h1 className="text-4xl font-serif text-gray-900 leading-tight mb-4">
+          <h1
+            style={{
+              fontSize: 40,
+              lineHeight: 1.1,
+              color: "#1a1a18",
+              marginBottom: 20,
+              fontFamily: "Georgia, 'Times New Roman', serif",
+              fontWeight: 400,
+              letterSpacing: "-0.02em",
+            }}
+          >
             {businessName}
           </h1>
-          <p className="text-lg text-gray-700 leading-relaxed font-serif">
+          <p
+            style={{
+              fontSize: 18,
+              lineHeight: 1.6,
+              color: "#4a4a48",
+              fontFamily: "Georgia, 'Times New Roman', serif",
+              fontWeight: 400,
+            }}
+          >
             {headline}
           </p>
-        </motion.div>
+        </motion.section>
 
-        {observations.length > 0 ? (
-          <CardSection title="What we found" accentColour={brandColour}>
-            <div className="space-y-6">
+        {/* Divider */}
+        <div style={{ height: 1, background: "#F0EDE8" }} />
+
+        {/* Observations */}
+        {observations.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.16 }}
+            style={{ paddingTop: 40, paddingBottom: 40 }}
+          >
+            <p style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 28 }}>
+              What we found
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
               {observations.map((obs, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 + i * 0.06 }}
-                  className="flex gap-4"
+                  transition={{ delay: 0.2 + i * 0.07 }}
+                  style={{ display: "flex", gap: 20 }}
                 >
                   <div
-                    className="w-0.5 shrink-0 mt-1 rounded-full"
-                    style={{ backgroundColor: brandColour, height: "auto", minHeight: "100%" }}
+                    style={{
+                      width: 2,
+                      flexShrink: 0,
+                      background: brandColour,
+                      borderRadius: 2,
+                      alignSelf: "stretch",
+                      minHeight: 40,
+                    }}
                   />
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "#1a1a18", marginBottom: 6, lineHeight: 1.3 }}>
                       {obs.title}
                     </h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p style={{ fontSize: 14, color: "#666", lineHeight: 1.65 }}>
                       {obs.detail}
                     </p>
                   </div>
                 </motion.div>
               ))}
             </div>
-          </CardSection>
-        ) : null}
+          </motion.section>
+        )}
 
-        {revenueLoss ? (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="py-8 border-y border-gray-100"
-          >
-            <p className="text-xs text-gray-400 mb-2 uppercase tracking-widest">
-              Estimated monthly impact
-            </p>
-            <p
-              className="text-3xl font-serif"
-              style={{ color: brandColour }}
+        {/* Revenue impact */}
+        {revenueLoss && (
+          <>
+            <div style={{ height: 1, background: "#F0EDE8" }} />
+            <motion.section
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              style={{ paddingTop: 36, paddingBottom: 36 }}
             >
-              {revenueLoss}
-            </p>
-          </motion.div>
-        ) : null}
+              <p style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
+                We estimate this is costing you approximately
+              </p>
+              <p
+                style={{
+                  fontSize: 42,
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  color: brandColour,
+                  lineHeight: 1,
+                  marginBottom: 6,
+                }}
+              >
+                {revenueLoss}
+              </p>
+              <p style={{ fontSize: 13, color: "#999" }}>per month in missed revenue</p>
+            </motion.section>
+          </>
+        )}
 
-        <motion.div
+        {/* Demo placeholder */}
+        <div style={{ height: 1, background: "#F0EDE8" }} />
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          style={{ paddingTop: 36, paddingBottom: 36 }}
+        >
+          <p style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 16 }}>
+            See it in action
+          </p>
+          <div
+            style={{
+              borderRadius: 10,
+              overflow: "hidden",
+              background: "#F5F3F0",
+              height: 200,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <p style={{ fontSize: 13, color: "#bbb" }}>Product demo</p>
+          </div>
+        </motion.section>
+
+        {/* CTA */}
+        <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.55 }}
+          style={{ paddingTop: 8, paddingBottom: 48 }}
         >
-          <CardCTA
+          <CTAButton
             ctaText={ctaText}
             ctaType={ctaType}
             ctaValue={ctaValue}
             brandColour={brandColour}
-            agencyName={agencyName}
           />
-        </motion.div>
+        </motion.section>
 
-        <footer className="py-8 border-t border-gray-100">
-          <p className="text-xs text-center text-gray-300">
-            This analysis was prepared specifically for {businessName}.
+        {/* Footer */}
+        <footer
+          style={{
+            paddingTop: 24,
+            paddingBottom: 32,
+            borderTop: "1px solid #F0EDE8",
+            textAlign: "center",
+          }}
+        >
+          <p style={{ fontSize: 12, color: "#ccc" }}>
+            {agencyName ?? "Venn"} · This analysis was prepared specifically for {businessName}
           </p>
         </footer>
       </div>

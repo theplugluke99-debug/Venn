@@ -1,13 +1,13 @@
 export type IntentScore = "high" | "medium" | "low";
 export type DefaultAngle = "pain" | "opportunity" | "compliment";
 export type CTAType = "reply" | "calendly" | "video" | "link";
+export type Plan = "starter" | "growth" | "pro" | "enterprise";
 export type LeadStatus =
   | "pending"
   | "scraping"
   | "enriching"
   | "complete"
   | "failed";
-export type Plan = "starter" | "growth" | "pro";
 
 export interface ReviewSummary {
   averageRating: number;

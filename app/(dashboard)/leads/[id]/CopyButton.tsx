@@ -11,27 +11,35 @@ export function CopyButton({ text }: { text: string }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // silent fail — clipboard may be blocked in some envs
+      // silent fail
     }
   }
 
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] text-[#555] hover:text-[#FFFDF8] border border-[#2A2720] hover:border-[#444] rounded transition-all shrink-0"
+      className="flex items-center gap-1.5 px-2.5 py-1 rounded transition-all shrink-0"
+      style={{
+        background: copied ? "#4CAF5015" : "#1A1814",
+        border: `0.5px solid ${copied ? "#4CAF5040" : "#1E1C18"}`,
+        color: copied ? "#4CAF50" : "#555250",
+        fontSize: 11,
+        fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
+        cursor: "pointer",
+      }}
     >
       {copied ? (
         <>
-          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M1.5 5.5L4 8L9.5 2.5" />
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <path d="M2 6l3 3 5-5" />
           </svg>
           Copied
         </>
       ) : (
         <>
-          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3.5" y="1.5" width="6" height="7" rx="1" />
-            <path d="M1.5 3.5V9.5H7.5" />
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <rect x="8" y="8" width="12" height="12" rx="2" />
+            <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
           </svg>
           Copy
         </>
