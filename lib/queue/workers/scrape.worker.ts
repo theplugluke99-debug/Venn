@@ -2,9 +2,18 @@ import { Worker, Job } from "bullmq";
 import { redis } from "@/lib/queue";
 import { scrapeGoogleBusiness } from "@/lib/scraper/google";
 import { scrapeWebsite } from "@/lib/scraper/website";
+import { findEmail } from "@/lib/scraper/email";
 import { generateIntelligence } from "@/lib/intelligence";
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+
+function parseDayOffset(scheduledAt: string): Date {
+  const match = scheduledAt.match(/day\s+(\d+)/i);
+  const days = match ? parseInt(match[1], 10) : 0;
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date;
+}
 
 export const scrapeWorker = new Worker(
   "scrape",
@@ -18,11 +27,13 @@ export const scrapeWorker = new Worker(
     await job.updateProgress(35);
 
     const websiteUrl = website || googleData?.website;
-    const websiteAudit = websiteUrl
-      ? await scrapeWebsite(websiteUrl).catch(() => null)
-      : null;
-    await job.updateProgress(60);
+    const [websiteAudit, emailFound] = await Promise.all([
+      websiteUrl ? scrapeWebsite(websiteUrl).catch(() => null) : null,
+      websiteUrl ? findEmail(websiteUrl).catch(() => null) : null,
+    ]);
+    await job.updateProgress(55);
 
+    // Save partial data immediately so it's preserved even if intelligence fails
     await db.lead.update({
       where: { id: leadId },
       data: {
@@ -35,11 +46,14 @@ export const scrapeWorker = new Worker(
           : Prisma.JsonNull,
         website: websiteUrl,
         phone: googleData?.phone,
+        email: emailFound ?? undefined,
         websiteAudit: websiteAudit
           ? (websiteAudit as unknown as Prisma.InputJsonValue)
           : Prisma.JsonNull,
       },
     });
+
+    await job.updateProgress(60);
 
     const user = await db.user.findUnique({
       where: { id: userId },
@@ -50,6 +64,8 @@ export const scrapeWorker = new Worker(
       { businessName, niche, location, googleData, websiteAudit },
       user?.cardIdentity
     );
+
+    await job.updateProgress(80);
 
     await db.lead.update({
       where: { id: leadId },
@@ -64,6 +80,31 @@ export const scrapeWorker = new Worker(
         suggestedAngle: intelligence.suggestedAngle,
       },
     });
+
+    // Save sequence if generated
+    if (intelligence.sequence && intelligence.sequence.length > 0) {
+      try {
+        await db.sequence.create({
+          data: {
+            leadId,
+            userId,
+            nextActionAt: parseDayOffset(intelligence.sequence[0]?.scheduledAt ?? "day 0"),
+            steps: {
+              create: intelligence.sequence.map((step) => ({
+                stepNumber: step.stepNumber,
+                channel: step.channel,
+                subject: step.subject ?? null,
+                message: step.message,
+                angle: step.angle,
+                scheduledAt: parseDayOffset(step.scheduledAt),
+              })),
+            },
+          },
+        });
+      } catch (err) {
+        console.error(`[Worker] Sequence save failed for ${leadId}:`, err);
+      }
+    }
 
     await job.updateProgress(100);
     return { leadId, status: "complete" };

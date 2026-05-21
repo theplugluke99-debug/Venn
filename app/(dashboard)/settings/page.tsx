@@ -16,7 +16,7 @@ export default async function SettingsPage() {
   const plan = user.subscription?.plan ?? "starter";
 
   return (
-    <div className="max-w-xl">
+    <div>
       <div className="mb-8">
         <h1
           className="mb-2"

@@ -1,7 +1,7 @@
 export const SCORING_PROMPT = (data: unknown, cardIdentity: unknown) => `
 You are an expert business analyst and outreach strategist.
 
-Analyse this business and produce a structured intelligence report.
+Analyse this business and produce a structured intelligence report INCLUDING a four-step outreach sequence.
 
 BUSINESS DATA:
 ${JSON.stringify(data, null, 2)}
@@ -35,7 +35,38 @@ Respond ONLY with valid JSON in this exact structure:
   ],
   "openingLine": "A single personalised opening line written in the agency's voice and angle. Must reference something specific found in the data. Maximum 30 words.",
   "recommendedChannel": "email" | "whatsapp" | "instagram" | "linkedin",
-  "suggestedAngle": "pain" | "opportunity" | "compliment"
+  "suggestedAngle": "pain" | "opportunity" | "compliment",
+  "sequence": [
+    {
+      "stepNumber": 1,
+      "channel": "instagram",
+      "angle": "pain",
+      "message": "Twelve words max referencing one specific observation. Include [CARD_URL] placeholder.",
+      "scheduledAt": "day 0"
+    },
+    {
+      "stepNumber": 2,
+      "channel": "email",
+      "subject": "Specific subject line referencing their business name and one problem",
+      "angle": "opportunity",
+      "message": "Three sentences. Reference a different observation than step 1. Show the upside. Keep under 60 words.",
+      "scheduledAt": "day 3"
+    },
+    {
+      "stepNumber": 3,
+      "channel": "linkedin",
+      "angle": "compliment",
+      "message": "Twelve word LinkedIn connection note. Acknowledge something specific they do well.",
+      "scheduledAt": "day 7"
+    },
+    {
+      "stepNumber": 4,
+      "channel": "whatsapp",
+      "angle": "pain",
+      "message": "Voice note script — 30 seconds spoken. Reference what was found. End with a soft close.",
+      "scheduledAt": "day 14"
+    }
+  ]
 }
 
 Rules:
@@ -44,6 +75,8 @@ Rules:
 - Low intent: mostly positive, thriving business — compliment angle
 - Opening line MUST be specific. Never generic. Sound like a human who did research.
 - Write in the agency's voice based on the writing style sample provided.
+- Each sequence step must reference something SPECIFIC from the business data — never generic.
+- sequence[0] message must be under 12 words plus [CARD_URL].
 `;
 
 export const CARD_PROMPT = (lead: unknown, cardIdentity: unknown) => `

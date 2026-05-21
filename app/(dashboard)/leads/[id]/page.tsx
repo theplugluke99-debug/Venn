@@ -423,14 +423,15 @@ export default async function LeadDetailPage({
         </div>
       )}
 
-      {/* Generate card CTA */}
+      {/* Card analytics + CTA */}
       <div style={{ borderTop: "0.5px solid #1E1C18", paddingTop: 24, marginTop: 8 }}>
         {lead.card ? (
-          <div className="flex items-center gap-3">
+          <div>
+            <CardAnalytics card={lead.card} />
             <Link
               href={`/card/${lead.card.slug}`}
               target="_blank"
-              className="flex-1 text-center py-3 rounded transition-opacity hover:opacity-90"
+              className="flex w-full items-center justify-center py-3 rounded transition-opacity hover:opacity-90"
               style={{
                 background: "#C4973F",
                 color: "#0A0907",
@@ -439,18 +440,146 @@ export default async function LeadDetailPage({
                 fontFamily: "var(--font-inter)",
                 textDecoration: "none",
                 borderRadius: 8,
+                marginTop: 16,
               }}
             >
               View prospect card →
             </Link>
-            <p style={{ fontSize: 12, color: "#444", fontFamily: "var(--font-inter)" }}>
-              {lead.card.viewCount} view{lead.card.viewCount !== 1 ? "s" : ""}
-            </p>
           </div>
         ) : (
           <GenerateCardButton leadId={id} />
         )}
       </div>
+    </div>
+  );
+}
+
+function timeAgo(date: Date): string {
+  const ms = Date.now() - date.getTime();
+  const mins = Math.floor(ms / 60_000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+function CardAnalytics({
+  card,
+}: {
+  card: { viewCount: number; lastViewed: Date | null };
+}) {
+  const isHot = card.lastViewed
+    ? Date.now() - card.lastViewed.getTime() < 86_400_000
+    : false;
+
+  return (
+    <div
+      style={{
+        background: "#0F0E0B",
+        border: isHot ? "0.5px solid #C4973F40" : "0.5px solid #1E1C18",
+        borderRadius: 8,
+        padding: 16,
+      }}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <p
+          style={{
+            fontSize: 10,
+            color: "#444",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            fontWeight: 500,
+            fontFamily: "var(--font-inter)",
+          }}
+        >
+          Card analytics
+        </p>
+        {isHot && (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              background: "#C4973F",
+              color: "#0A0907",
+              padding: "2px 7px",
+              borderRadius: 10,
+              fontFamily: "var(--font-inter)",
+              letterSpacing: "0.05em",
+            }}
+          >
+            HOT
+          </span>
+        )}
+      </div>
+
+      <div className="flex gap-6">
+        <div>
+          <p
+            style={{
+              fontSize: 28,
+              color: isHot ? "#C4973F" : "#FFFDF8",
+              fontFamily: "var(--font-instrument-serif)",
+              lineHeight: 1,
+              marginBottom: 4,
+            }}
+          >
+            {card.viewCount}
+          </p>
+          <p style={{ fontSize: 11, color: "#555250", fontFamily: "var(--font-inter)" }}>
+            view{card.viewCount !== 1 ? "s" : ""}
+          </p>
+        </div>
+
+        {card.lastViewed && (
+          <div>
+            <p
+              style={{
+                fontSize: 15,
+                color: isHot ? "#C4973F" : "#888",
+                fontFamily: "var(--font-instrument-serif)",
+                lineHeight: 1,
+                marginBottom: 4,
+              }}
+            >
+              {timeAgo(card.lastViewed as Date)}
+            </p>
+            <p style={{ fontSize: 11, color: "#555250", fontFamily: "var(--font-inter)" }}>
+              last viewed
+            </p>
+          </div>
+        )}
+
+        {!card.lastViewed && (
+          <div>
+            <p
+              style={{
+                fontSize: 13,
+                color: "#333230",
+                fontFamily: "var(--font-inter)",
+                lineHeight: 1.4,
+                marginTop: 4,
+              }}
+            >
+              Not viewed yet
+            </p>
+          </div>
+        )}
+      </div>
+
+      {isHot && (
+        <p
+          style={{
+            fontSize: 11,
+            color: "#C4973F",
+            fontFamily: "var(--font-inter)",
+            marginTop: 10,
+            lineHeight: 1.5,
+          }}
+        >
+          This prospect viewed your card recently — reach out now while you&apos;re top of mind.
+        </p>
+      )}
     </div>
   );
 }

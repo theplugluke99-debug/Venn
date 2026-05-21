@@ -54,6 +54,15 @@ export interface SocialProofItem {
   context: string;
 }
 
+export interface SequenceStepData {
+  stepNumber: number;
+  channel: string;
+  subject?: string;
+  message: string;
+  angle: string;
+  scheduledAt: string;
+}
+
 export interface IntelligenceProfile {
   businessBio: string;
   observations: Observation[];
@@ -62,6 +71,7 @@ export interface IntelligenceProfile {
   suggestedAngle: string;
   intentScore: IntentScore;
   intentSignals: string[];
+  sequence?: SequenceStepData[];
 }
 
 export interface SearchParams {

@@ -62,9 +62,9 @@ model CardIdentity {
 }
 
 model Lead {
-  id                 String   @id @default(cuid())
+  id                 String    @id @default(cuid())
   userId             String
-  user               User     @relation(fields: [userId], references: [id])
+  user               User      @relation(fields: [userId], references: [id])
   businessName       String
   ownerName          String?
   location           String
@@ -80,18 +80,48 @@ model Lead {
   instagramData      Json?
   websiteAudit       Json?
   techStack          Json?
-  intentScore        String   @default("medium")
+  intentScore        String    @default("medium")
   intentSignals      Json?
   businessBio        String?
   observations       Json?
   openingLine        String?
   recommendedChannel String?
   suggestedAngle     String?
-  status             String   @default("pending")
+  status             String    @default("pending")
+  pipelineStage      String    @default("new")
   jobId              String?
   card               Card?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  sequence           Sequence?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Sequence {
+  id           String         @id @default(cuid())
+  leadId       String         @unique
+  lead         Lead           @relation(fields: [leadId], references: [id])
+  userId       String
+  status       String         @default("active")
+  currentStep  Int            @default(0)
+  nextActionAt DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  steps        SequenceStep[]
+}
+
+model SequenceStep {
+  id          String    @id @default(cuid())
+  sequenceId  String
+  sequence    Sequence  @relation(fields: [sequenceId], references: [id])
+  stepNumber  Int
+  channel     String
+  subject     String?
+  message     String
+  angle       String
+  status      String    @default("pending")
+  scheduledAt DateTime
+  sentAt      DateTime?
+  repliedAt   DateTime?
 }
 
 model Card {
