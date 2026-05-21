@@ -1,21 +1,24 @@
 import { SearchForm } from "@/components/leads/SearchForm";
 
-export const metadata = {
-  title: "Search — Venn",
-};
+export const metadata = { title: "New Search — Venn" };
 
 export default function SearchPage() {
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-xl">
       <div className="mb-10">
-        <h1 className="text-3xl font-serif text-[#FFFDF8] mb-2">
-          Research a Prospect
+        <p className="text-[11px] text-[#444] uppercase tracking-[0.1em] font-medium mb-3">
+          Prospect Research
+        </p>
+        <h1 className="text-[2.25rem] leading-tight font-serif text-[#FFFDF8] mb-3">
+          Research a business.
         </h1>
-        <p className="text-[#555] text-sm leading-relaxed">
-          Enter a business and we&apos;ll pull their Google data, audit their website,
-          and build a full intelligence profile using AI.
+        <p className="text-sm text-[#555] leading-relaxed">
+          Enter a business name and location. We'll pull their Google data, audit
+          their website, and generate a complete AI intelligence profile in about
+          60 seconds.
         </p>
       </div>
+
       <SearchForm />
     </div>
   );

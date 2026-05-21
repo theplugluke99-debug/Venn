@@ -17,12 +17,15 @@ export default async function SettingsPage() {
   return (
     <div className="max-w-xl">
       <div className="mb-10">
-        <h1 className="text-3xl font-serif text-[#FFFDF8] mb-2">
-          Card Identity
+        <p className="text-[11px] text-[#444] uppercase tracking-[0.1em] font-medium mb-3">
+          Configuration
+        </p>
+        <h1 className="text-[2.25rem] leading-tight font-serif text-[#FFFDF8] mb-3">
+          Card identity.
         </h1>
-        <p className="text-[#555] text-sm leading-relaxed">
-          This shapes how your prospect cards look and how Claude writes for you.
-          Every card, every outreach line — written in your voice.
+        <p className="text-sm text-[#555] leading-relaxed">
+          This shapes how your prospect cards are written and presented. Claude
+          uses this to write in your voice — every opening line, every card.
         </p>
       </div>
       <SettingsForm initialData={identity} />

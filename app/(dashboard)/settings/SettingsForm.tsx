@@ -64,9 +64,11 @@ export function SettingsForm({ initialData }: { initialData: CardIdentity | null
   }
 
   return (
-    <form onSubmit={handleSave} className="space-y-8">
-      <section className="space-y-4">
-        <h2 className="text-xs text-[#555] uppercase tracking-wider">Agency Identity</h2>
+    <form onSubmit={handleSave} className="space-y-10">
+      <fieldset className="space-y-4">
+        <legend className="text-[11px] text-[#444] uppercase tracking-[0.1em] font-medium mb-4">
+          Agency Identity
+        </legend>
         <Input
           label="Agency Name"
           placeholder="e.g. Apex Digital"
@@ -74,75 +76,91 @@ export function SettingsForm({ initialData }: { initialData: CardIdentity | null
           onChange={(e) => update("agencyName", e.target.value)}
         />
         <Input
-          label="Tagline (optional)"
+          label="Tagline"
           placeholder="e.g. We grow local service businesses"
           value={form.agencyTagline}
           onChange={(e) => update("agencyTagline", e.target.value)}
         />
         <Input
-          label="Logo URL (optional)"
-          placeholder="https://cdn.your-agency.com/logo.svg"
+          label="Logo URL"
+          placeholder="https://cdn.youragency.com/logo.svg"
           value={form.logoUrl}
           onChange={(e) => update("logoUrl", e.target.value)}
         />
-      </section>
+      </fieldset>
 
-      <section className="space-y-4">
-        <h2 className="text-xs text-[#555] uppercase tracking-wider">Brand Colours</h2>
+      <fieldset className="space-y-4">
+        <legend className="text-[11px] text-[#444] uppercase tracking-[0.1em] font-medium mb-4">
+          Brand Colours
+        </legend>
         <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-[#888] uppercase tracking-wider">
-              Brand Colour
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-[#888] uppercase tracking-wider block">
+              Primary
             </label>
-            <div className="flex gap-2">
-              <input
-                type="color"
-                value={form.brandColour}
-                onChange={(e) => update("brandColour", e.target.value)}
-                className="w-10 h-10 rounded cursor-pointer bg-transparent border-0"
-              />
+            <div className="flex gap-2 items-center">
+              <div className="relative">
+                <input
+                  type="color"
+                  value={form.brandColour}
+                  onChange={(e) => update("brandColour", e.target.value)}
+                  className="w-9 h-9 cursor-pointer rounded opacity-0 absolute inset-0"
+                />
+                <div
+                  className="w-9 h-9 rounded border border-[#2A2720]"
+                  style={{ background: form.brandColour }}
+                />
+              </div>
               <Input
                 value={form.brandColour}
                 onChange={(e) => update("brandColour", e.target.value)}
-                className="flex-1"
                 placeholder="#C4973F"
+                className="flex-1"
               />
             </div>
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-[#888] uppercase tracking-wider">
-              Accent Colour
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-[#888] uppercase tracking-wider block">
+              Accent
             </label>
-            <div className="flex gap-2">
-              <input
-                type="color"
-                value={form.accentColour}
-                onChange={(e) => update("accentColour", e.target.value)}
-                className="w-10 h-10 rounded cursor-pointer bg-transparent border-0"
-              />
+            <div className="flex gap-2 items-center">
+              <div className="relative">
+                <input
+                  type="color"
+                  value={form.accentColour}
+                  onChange={(e) => update("accentColour", e.target.value)}
+                  className="w-9 h-9 cursor-pointer rounded opacity-0 absolute inset-0"
+                />
+                <div
+                  className="w-9 h-9 rounded border border-[#2A2720]"
+                  style={{ background: form.accentColour }}
+                />
+              </div>
               <Input
                 value={form.accentColour}
                 onChange={(e) => update("accentColour", e.target.value)}
-                className="flex-1"
                 placeholder="#E8B44B"
+                className="flex-1"
               />
             </div>
           </div>
         </div>
-      </section>
+      </fieldset>
 
-      <section className="space-y-4">
-        <h2 className="text-xs text-[#555] uppercase tracking-wider">Voice & Angle</h2>
+      <fieldset className="space-y-4">
+        <legend className="text-[11px] text-[#444] uppercase tracking-[0.1em] font-medium mb-4">
+          Voice &amp; Angle
+        </legend>
         <Textarea
           label="Writing Style"
-          placeholder="Paste a sample of how you write cold outreach. The more specific, the better Claude can match your voice."
+          placeholder="Paste a sample of your cold outreach writing. The more specific, the better Claude can match your voice."
           value={form.writingStyle}
           onChange={(e) => update("writingStyle", e.target.value)}
-          rows={4}
-          hint="Claude will mimic this style when writing opening lines and card copy."
+          rows={5}
+          hint="Claude mimics this style when writing opening lines and card copy."
         />
         <div>
-          <label className="text-xs font-medium text-[#888] uppercase tracking-wider block mb-2">
+          <label className="text-xs font-medium text-[#888] uppercase tracking-wider block mb-2.5">
             Default Angle
           </label>
           <div className="flex gap-2">
@@ -152,10 +170,10 @@ export function SettingsForm({ initialData }: { initialData: CardIdentity | null
                 type="button"
                 onClick={() => update("defaultAngle", a)}
                 className={[
-                  "px-3 py-1.5 text-xs rounded capitalize transition-colors",
+                  "px-3 py-1.5 text-xs rounded capitalize transition-all",
                   form.defaultAngle === a
-                    ? "bg-[#C4973F] text-[#0A0907] font-medium"
-                    : "bg-[#1A1814] text-[#888] border border-[#2A2720] hover:text-[#FFFDF8]",
+                    ? "bg-[#C4973F] text-[#0A0907] font-semibold"
+                    : "bg-[#1A1814] text-[#666] border border-[#2A2720] hover:text-[#FFFDF8] hover:border-[#444]",
                 ].join(" ")}
               >
                 {a}
@@ -163,12 +181,14 @@ export function SettingsForm({ initialData }: { initialData: CardIdentity | null
             ))}
           </div>
         </div>
-      </section>
+      </fieldset>
 
-      <section className="space-y-4">
-        <h2 className="text-xs text-[#555] uppercase tracking-wider">Call to Action</h2>
+      <fieldset className="space-y-4">
+        <legend className="text-[11px] text-[#444] uppercase tracking-[0.1em] font-medium mb-4">
+          Call to Action
+        </legend>
         <div>
-          <label className="text-xs font-medium text-[#888] uppercase tracking-wider block mb-2">
+          <label className="text-xs font-medium text-[#888] uppercase tracking-wider block mb-2.5">
             CTA Type
           </label>
           <div className="flex gap-2">
@@ -178,10 +198,10 @@ export function SettingsForm({ initialData }: { initialData: CardIdentity | null
                 type="button"
                 onClick={() => update("ctaType", t)}
                 className={[
-                  "px-3 py-1.5 text-xs rounded capitalize transition-colors",
+                  "px-3 py-1.5 text-xs rounded capitalize transition-all",
                   form.ctaType === t
-                    ? "bg-[#C4973F] text-[#0A0907] font-medium"
-                    : "bg-[#1A1814] text-[#888] border border-[#2A2720] hover:text-[#FFFDF8]",
+                    ? "bg-[#C4973F] text-[#0A0907] font-semibold"
+                    : "bg-[#1A1814] text-[#666] border border-[#2A2720] hover:text-[#FFFDF8] hover:border-[#444]",
                 ].join(" ")}
               >
                 {t}
@@ -201,15 +221,17 @@ export function SettingsForm({ initialData }: { initialData: CardIdentity | null
           }
           placeholder={
             form.ctaType === "reply"
-              ? "hello@your-agency.com"
+              ? "hello@youragency.com"
               : "https://"
           }
           value={form.ctaValue}
           onChange={(e) => update("ctaValue", e.target.value)}
         />
-      </section>
+      </fieldset>
 
-      {error ? <p className="text-sm text-red-400">{error}</p> : null}
+      {error ? (
+        <p className="text-sm text-red-400">{error}</p>
+      ) : null}
 
       <div className="flex items-center gap-3 pt-2">
         <Button type="submit" loading={saving}>

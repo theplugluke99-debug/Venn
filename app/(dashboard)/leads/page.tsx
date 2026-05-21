@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId } from "@/lib/db/queries/users";
 import { getLeadsByUser, getLeadCountByUser } from "@/lib/db/queries/leads";
 import { LeadCard } from "@/components/leads/LeadCard";
@@ -8,6 +8,13 @@ import { Button } from "@/components/ui/Button";
 import type { IntentScore, LeadStatus } from "@/types";
 
 export const metadata = { title: "Leads — Venn" };
+
+const FILTERS: Array<{ label: string; value: string | undefined }> = [
+  { label: "All", value: undefined },
+  { label: "Complete", value: "complete" },
+  { label: "Processing", value: "scraping" },
+  { label: "Failed", value: "failed" },
+];
 
 export default async function LeadsPage({
   searchParams,
@@ -29,30 +36,34 @@ export default async function LeadsPage({
     getLeadCountByUser(user.id),
   ]);
 
-  const filters: Array<{ label: string; value: string | undefined }> = [
-    { label: "All", value: undefined },
-    { label: "High Intent", value: "complete" },
-    { label: "Processing", value: "scraping" },
-    { label: "Failed", value: "failed" },
-  ];
-
   return (
-    <div>
+    <div className="max-w-4xl">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-serif text-[#FFFDF8] mb-1">Leads</h1>
-          <p className="text-[#555] text-sm">{total} total prospects researched</p>
+          <p className="text-[11px] text-[#444] uppercase tracking-[0.1em] font-medium mb-2">
+            Prospect Pipeline
+          </p>
+          <h1 className="text-[2.25rem] leading-tight font-serif text-[#FFFDF8]">
+            Leads
+          </h1>
+          <p className="text-sm text-[#555] mt-1">
+            {total} prospect{total !== 1 ? "s" : ""} researched
+          </p>
         </div>
-        <Link href="/search">
-          <Button>+ New Search</Button>
-        </Link>
+        <div className="mt-2">
+          <Link href="/search">
+            <Button>+ New Search</Button>
+          </Link>
+        </div>
       </div>
 
       {total === 0 ? (
-        <div className="border border-dashed border-[#2A2720] rounded-lg p-12 text-center">
-          <p className="text-[#FFFDF8] font-medium mb-2">No leads yet</p>
-          <p className="text-[#555] text-sm mb-6">
-            Start by researching a prospect.
+        <div className="border border-dashed border-[#2A2720] rounded-lg p-14 text-center">
+          <p className="text-[#FFFDF8] text-sm font-medium mb-1.5">
+            No leads yet
+          </p>
+          <p className="text-[#444] text-xs mb-6">
+            Research your first prospect to get started.
           </p>
           <Link href="/search">
             <Button>Research your first prospect</Button>
@@ -60,21 +71,24 @@ export default async function LeadsPage({
         </div>
       ) : (
         <>
-          <div className="flex items-center gap-2 mb-6">
-            {filters.map((f) => (
+          <div className="flex items-center gap-2 mb-5">
+            {FILTERS.map((f) => (
               <Link
                 key={f.label}
                 href={f.value ? `/leads?filter=${f.value}` : "/leads"}
                 className={[
-                  "px-3 py-1 text-xs rounded transition-colors",
-                  (filter === f.value || (!filter && !f.value))
-                    ? "bg-[#C4973F] text-[#0A0907] font-medium"
-                    : "bg-[#1A1814] text-[#888] hover:text-[#FFFDF8] border border-[#2A2720]",
+                  "px-3 py-1 text-xs rounded transition-all",
+                  filter === f.value || (!filter && !f.value)
+                    ? "bg-[#C4973F] text-[#0A0907] font-semibold"
+                    : "bg-[#1A1814] text-[#666] border border-[#2A2720] hover:text-[#FFFDF8] hover:border-[#444]",
                 ].join(" ")}
               >
                 {f.label}
               </Link>
             ))}
+            <span className="ml-auto text-xs text-[#444]">
+              {leads.length} shown
+            </span>
           </div>
 
           <div className="space-y-2">

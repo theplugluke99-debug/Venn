@@ -1,47 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { UserButton } from "@clerk/nextjs";
 import { upsertUser } from "@/lib/db/queries/users";
-
-async function DashboardNav() {
-  const navItems = [
-    { href: "/dashboard", label: "Overview" },
-    { href: "/search", label: "Search" },
-    { href: "/leads", label: "Leads" },
-    { href: "/settings", label: "Settings" },
-  ];
-
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#1A1814] bg-[#0A0907]/95 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <Link href="/dashboard" className="text-sm font-semibold tracking-tight">
-            <span className="text-[#C4973F]">venn</span>
-          </Link>
-          <div className="flex items-center gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="px-3 py-1.5 text-sm text-[#888] hover:text-[#FFFDF8] transition-colors rounded hover:bg-[#1A1814]"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-        <UserButton
-          appearance={{
-            elements: {
-              avatarBox: "w-7 h-7",
-            },
-          }}
-        />
-      </div>
-    </nav>
-  );
-}
+import { SidebarNav } from "./SidebarNav";
 
 export default async function DashboardLayout({
   children,
@@ -49,24 +9,48 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { userId: clerkId } = await auth();
-
-  if (!clerkId) {
-    redirect("/sign-in");
-  }
+  if (!clerkId) redirect("/sign-in");
 
   const user = await currentUser();
+  let userName: string | undefined;
+  let userEmail: string | undefined;
+
   if (user) {
     await upsertUser({
       clerkId: user.id,
       email: user.emailAddresses[0]?.emailAddress ?? "",
       name: user.fullName ?? undefined,
     });
+    userName = user.firstName ?? user.fullName?.split(" ")[0] ?? undefined;
+    userEmail = user.emailAddresses[0]?.emailAddress;
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0907]">
-      <DashboardNav />
-      <main className="pt-14 max-w-7xl mx-auto px-6 py-8">{children}</main>
+    <div className="flex h-screen overflow-hidden bg-[#0A0907]">
+      <aside className="fixed inset-y-0 left-0 w-[220px] flex flex-col bg-[#0A0907] border-r border-[#131210] z-20">
+        <div className="flex items-center gap-3 px-5 h-[60px] border-b border-[#131210] shrink-0">
+          <div
+            className="w-[28px] h-[28px] rounded flex items-center justify-center shrink-0"
+            style={{ background: "#C4973F" }}
+          >
+            <span
+              className="text-[#0A0907] font-bold text-[13px] leading-none"
+              style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}
+            >
+              V
+            </span>
+          </div>
+          <span className="text-[#FFFDF8] text-sm font-semibold tracking-tight">
+            venn
+          </span>
+        </div>
+
+        <SidebarNav userName={userName} userEmail={userEmail} />
+      </aside>
+
+      <main className="ml-[220px] flex-1 overflow-y-auto">
+        <div className="px-8 py-10 min-h-screen">{children}</div>
+      </main>
     </div>
   );
 }
