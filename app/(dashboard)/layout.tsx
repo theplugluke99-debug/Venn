@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { upsertUser } from "@/lib/db/queries/users";
+import { upsertUser, getCardIdentity } from "@/lib/db/queries/users";
 import { getLeadsByUser } from "@/lib/db/queries/leads";
 import { getCardsByUser } from "@/lib/db/queries/cards";
 import { DashboardProvider } from "@/components/layout/DashboardProvider";
@@ -45,6 +46,21 @@ export default async function DashboardLayout({
     userName = clerkUser.firstName ?? clerkUser.fullName?.split(" ")[0] ?? undefined;
     userEmail = clerkUser.emailAddresses[0]?.emailAddress;
     userId = user.id;
+  }
+
+  // Check onboarding: skip if cookie present, otherwise check DB
+  if (userId) {
+    const cookieStore = await cookies();
+    const onboarded = cookieStore.get("venn_onboarded");
+    if (!onboarded) {
+      const [identity, earlyLeads] = await Promise.all([
+        getCardIdentity(userId),
+        getLeadsByUser(userId, { limit: 1 }),
+      ]);
+      if (!identity || earlyLeads.length === 0) {
+        redirect("/welcome");
+      }
+    }
   }
 
   // Fetch pipeline data for right panel

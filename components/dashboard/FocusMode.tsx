@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { LeadCard } from "@/components/leads/LeadCard";
+import { EmptyState } from "@/components/dashboard/EmptyState";
 import type { IntentScore } from "@/types";
 
 interface Lead {
@@ -97,6 +98,10 @@ export function FocusMode({ leads, totalLeads }: FocusModeProps) {
   const highIntent = leads.filter((l) => l.intentScore === "high" && l.status === "complete");
   const warmLeads = leads.filter((l) => l.intentScore === "medium" && l.status === "complete");
 
+  if (totalLeads === 0) {
+    return <EmptyState />;
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -177,63 +182,6 @@ export function FocusMode({ leads, totalLeads }: FocusModeProps) {
           </div>
         )}
       </section>
-
-      {totalLeads === 0 && (
-        <div
-          className="text-center py-16"
-          style={{
-            border: "0.5px dashed #1E1C18",
-            borderRadius: 8,
-          }}
-        >
-          <div
-            className="mx-auto mb-4 flex items-center justify-center"
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 12,
-              background: "#C4973F10",
-              border: "0.5px solid #C4973F30",
-            }}
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C4973F" strokeWidth="1.5" strokeLinecap="round">
-              <circle cx="11" cy="11" r="7" />
-              <path d="m16.5 16.5 4 4" />
-            </svg>
-          </div>
-          <p
-            className="mb-2"
-            style={{
-              fontSize: 18,
-              color: "#FFFDF8",
-              fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif",
-            }}
-          >
-            No leads yet
-          </p>
-          <p
-            className="mb-6 max-w-xs mx-auto"
-            style={{ fontSize: 13, color: "#555250", fontFamily: "var(--font-inter)", lineHeight: 1.5 }}
-          >
-            Run your first search to start building your intelligence pipeline
-          </p>
-          <Link
-            href="/search"
-            className="inline-flex items-center px-4 py-2 rounded transition-opacity hover:opacity-90"
-            style={{
-              background: "#C4973F",
-              color: "#0A0907",
-              fontSize: 13,
-              fontWeight: 500,
-              fontFamily: "var(--font-inter)",
-              textDecoration: "none",
-              borderRadius: 6,
-            }}
-          >
-            Start searching
-          </Link>
-        </div>
-      )}
     </motion.div>
   );
 }
