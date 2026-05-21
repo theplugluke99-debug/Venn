@@ -1,8 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { SCORING_PROMPT } from "./prompts";
 import type { IntelligenceProfile } from "@/types";
+import { config } from "@/lib/config";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const anthropic = new Anthropic({ apiKey: config.anthropic.apiKey });
 
 interface ScrapeData {
   businessName: string;

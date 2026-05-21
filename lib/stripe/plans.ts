@@ -17,7 +17,7 @@ export const PLANS: Record<
     name: "Starter",
     price: 79,
     leads: 100,
-    priceId: null,
+    priceId: process.env.STRIPE_STARTER_PRICE_ID ?? null,
   },
   growth: {
     name: "Growth",

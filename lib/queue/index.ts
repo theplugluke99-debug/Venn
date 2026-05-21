@@ -1,7 +1,8 @@
 import { Queue } from "bullmq";
 import IORedis from "ioredis";
+import { config } from "@/lib/config";
 
-export const redis = new IORedis(process.env.REDIS_URL || "redis://localhost:6379", {
+export const redis = new IORedis(config.redis.url, {
   maxRetriesPerRequest: null,
 });
 

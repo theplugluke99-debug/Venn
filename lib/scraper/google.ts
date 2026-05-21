@@ -1,5 +1,6 @@
 import { Client, PlaceInputType } from "@googlemaps/google-maps-services-js";
 import type { PlaceReview } from "@googlemaps/google-maps-services-js";
+import { config } from "@/lib/config";
 
 const client = new Client({});
 
@@ -76,7 +77,7 @@ export async function searchBusinessesByNiche(
     const response = await client.textSearch({
       params: {
         query: `${niche} ${location}`,
-        key: process.env.GOOGLE_PLACES_API_KEY!,
+        key: config.google.placesApiKey,
       },
     });
 
@@ -110,7 +111,7 @@ export async function scrapeGoogleBusiness(
           input: `${businessName} ${location}`,
           inputtype: PlaceInputType.textQuery,
           fields: ["place_id"],
-          key: process.env.GOOGLE_PLACES_API_KEY!,
+          key: config.google.placesApiKey,
         },
       });
       resolvedPlaceId = searchResponse.data.candidates?.[0]?.place_id;
@@ -122,7 +123,7 @@ export async function scrapeGoogleBusiness(
       params: {
         place_id: resolvedPlaceId,
         fields: DETAIL_FIELDS as unknown as string[],
-        key: process.env.GOOGLE_PLACES_API_KEY!,
+        key: config.google.placesApiKey,
       },
     });
 

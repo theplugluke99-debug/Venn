@@ -1,12 +1,13 @@
 import { NextRequest } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
+import { config } from "@/lib/config";
 import { type Stripe as StripeType } from "stripe";
 
 const PRICE_TO_PLAN: Record<string, string> = {
-  [process.env.STRIPE_STARTER_PRICE_ID ?? ""]: "starter",
-  [process.env.STRIPE_GROWTH_PRICE_ID ?? ""]: "growth",
-  [process.env.STRIPE_PRO_PRICE_ID ?? ""]: "pro",
+  [config.stripe.prices.starter]: "starter",
+  [config.stripe.prices.growth]: "growth",
+  [config.stripe.prices.pro]: "pro",
   [process.env.STRIPE_ENTERPRISE_PRICE_ID ?? ""]: "enterprise",
 };
 
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     event = stripe.webhooks.constructEvent(
       body,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      config.stripe.webhookSecret
     );
   } catch (err) {
     console.error("[Stripe webhook] Invalid signature", err);
