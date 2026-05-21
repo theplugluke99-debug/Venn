@@ -14,10 +14,26 @@ export async function generateMetadata({
   const card = await getCardBySlug(slug);
   if (!card) return { title: "Not Found" };
 
+  const cardUser = await db.user.findUnique({
+    where: { id: card.userId },
+    include: { cardIdentity: true },
+  });
+  const agencyName = card.agencyName ?? cardUser?.cardIdentity?.agencyName ?? null;
+
   return {
-    title: `${card.lead.businessName} — Venn`,
-    description: card.headline ?? `A prospect intelligence card for ${card.lead.businessName}`,
+    title: `${card.lead.businessName} — something put together for you`,
+    description: agencyName
+      ? `A personalised intelligence briefing from ${agencyName}`
+      : `A personalised intelligence briefing for ${card.lead.businessName}`,
     robots: { index: false, follow: false },
+    viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+    openGraph: {
+      title: `${card.lead.businessName} — something put together for you`,
+      description: agencyName
+        ? `A personalised intelligence briefing from ${agencyName}`
+        : `A personalised prospect briefing`,
+      type: "website",
+    },
   };
 }
 

@@ -22,14 +22,28 @@ interface ProspectCardProps {
   location: string;
 }
 
-function AgencyLogo({ logoUrl, agencyName, brandColour }: { logoUrl: string | null; agencyName: string | null; brandColour: string }) {
+function AgencyLogo({
+  logoUrl,
+  agencyName,
+  brandColour,
+}: {
+  logoUrl: string | null;
+  agencyName: string | null;
+  brandColour: string;
+}) {
   if (logoUrl) {
-    return <img src={logoUrl} alt={agencyName ?? "Agency"} style={{ height: 28, objectFit: "contain" }} />;
+    return (
+      <img
+        src={logoUrl}
+        alt={agencyName ?? "Agency"}
+        style={{ height: 28, maxWidth: 120, objectFit: "contain" }}
+      />
+    );
   }
   return (
     <span
       style={{
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: 700,
         color: brandColour,
         fontFamily: "Georgia, serif",
@@ -41,7 +55,12 @@ function AgencyLogo({ logoUrl, agencyName, brandColour }: { logoUrl: string | nu
   );
 }
 
-function CTAButton({ ctaText, ctaType, ctaValue, brandColour }: {
+function CTAButton({
+  ctaText,
+  ctaType,
+  ctaValue,
+  brandColour,
+}: {
   ctaText: string;
   ctaType: string;
   ctaValue: string | null;
@@ -73,6 +92,8 @@ function CTAButton({ ctaText, ctaType, ctaValue, brandColour }: {
         fontFamily: "system-ui, -apple-system, sans-serif",
         textDecoration: "none",
         letterSpacing: "-0.01em",
+        minHeight: 52,
+        boxSizing: "border-box",
       }}
     >
       {ctaText}
@@ -95,195 +116,254 @@ export function ProspectCard({
   location,
 }: ProspectCardProps) {
   return (
-    <div style={{ minHeight: "100vh", background: "#FAFAF8", fontFamily: "system-ui, -apple-system, sans-serif" }}>
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px" }}>
+    <>
+      <style>{`
+        :root { --brand: ${brandColour}; }
 
-        {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          style={{
-            paddingTop: 40,
-            paddingBottom: 32,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderBottom: "1px solid #F0EDE8",
-          }}
-        >
-          <AgencyLogo logoUrl={logoUrl} agencyName={agencyName} brandColour={brandColour} />
-          <p style={{ fontSize: 12, color: "#999", fontWeight: 400 }}>
-            Put this together specifically for you
-          </p>
-        </motion.header>
+        .pc-container {
+          min-height: 100vh;
+          background: #FAFAF8;
+          font-family: system-ui, -apple-system, sans-serif;
+        }
+        .pc-inner {
+          max-width: 680px;
+          margin: 0 auto;
+          padding: 0 24px;
+        }
+        .pc-header {
+          padding-top: 40px;
+          padding-bottom: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 1px solid #F0EDE8;
+          gap: 12px;
+        }
+        .pc-header-tagline {
+          font-size: 12px;
+          color: #999;
+          font-weight: 400;
+          text-align: right;
+          flex-shrink: 0;
+        }
+        .pc-hero {
+          padding-top: 48px;
+          padding-bottom: 40px;
+        }
+        .pc-hero-eyebrow {
+          font-size: 11px;
+          color: #aaa;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          margin-bottom: 12px;
+        }
+        .pc-hero-name {
+          font-size: 40px;
+          line-height: 1.1;
+          color: #1a1a18;
+          margin-bottom: 20px;
+          font-family: Georgia, 'Times New Roman', serif;
+          font-weight: 400;
+          letter-spacing: -0.02em;
+          word-break: break-word;
+        }
+        .pc-hero-headline {
+          font-size: 18px;
+          line-height: 1.6;
+          color: #4a4a48;
+          font-family: Georgia, 'Times New Roman', serif;
+          font-weight: 400;
+        }
+        .pc-divider { height: 1px; background: #F0EDE8; }
+        .pc-section {
+          padding-top: 40px;
+          padding-bottom: 40px;
+        }
+        .pc-section-label {
+          font-size: 11px;
+          color: #aaa;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          margin-bottom: 28px;
+        }
+        .pc-obs-list { display: flex; flex-direction: column; gap: 28px; }
+        .pc-obs-item { display: flex; gap: 20px; }
+        .pc-obs-bar {
+          width: 2px;
+          flex-shrink: 0;
+          background: var(--brand);
+          border-radius: 2px;
+          align-self: stretch;
+          min-height: 40px;
+        }
+        .pc-obs-title {
+          font-size: 15px;
+          font-weight: 600;
+          color: #1a1a18;
+          margin-bottom: 6px;
+          line-height: 1.3;
+        }
+        .pc-obs-detail {
+          font-size: 14px;
+          color: #666;
+          line-height: 1.6;
+        }
+        .pc-revenue-section {
+          padding-top: 36px;
+          padding-bottom: 36px;
+        }
+        .pc-revenue-label {
+          font-size: 11px;
+          color: #aaa;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          margin-bottom: 12px;
+        }
+        .pc-revenue-amount {
+          font-size: 42px;
+          font-family: Georgia, 'Times New Roman', serif;
+          color: var(--brand);
+          line-height: 1;
+          margin-bottom: 6px;
+        }
+        .pc-revenue-sub { font-size: 13px; color: #999; }
+        .pc-cta-section {
+          padding-top: 8px;
+          padding-bottom: 48px;
+        }
+        .pc-footer {
+          padding-top: 24px;
+          padding-bottom: 32px;
+          border-top: 1px solid #F0EDE8;
+          text-align: center;
+        }
+        .pc-footer p { font-size: 12px; color: #ccc; }
 
-        {/* Business name hero */}
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08 }}
-          style={{ paddingTop: 48, paddingBottom: 40 }}
-        >
-          <p style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
-            {niche} · {location}
-          </p>
-          <h1
-            style={{
-              fontSize: 40,
-              lineHeight: 1.1,
-              color: "#1a1a18",
-              marginBottom: 20,
-              fontFamily: "Georgia, 'Times New Roman', serif",
-              fontWeight: 400,
-              letterSpacing: "-0.02em",
-            }}
+        @media (max-width: 480px) {
+          .pc-inner { padding: 0 16px; }
+          .pc-header { padding-top: 24px; padding-bottom: 20px; }
+          .pc-header-tagline { font-size: 11px; }
+          .pc-hero { padding-top: 28px; padding-bottom: 28px; }
+          .pc-hero-name { font-size: 26px; }
+          .pc-hero-headline { font-size: 15px; line-height: 1.55; }
+          .pc-section { padding-top: 24px; padding-bottom: 24px; }
+          .pc-obs-item { gap: 14px; }
+          .pc-obs-title { font-size: 14px; }
+          .pc-obs-detail { font-size: 13px; line-height: 1.6; }
+          .pc-revenue-section { padding-top: 24px; padding-bottom: 24px; }
+          .pc-revenue-amount { font-size: 36px; }
+          .pc-cta-section { padding-top: 4px; padding-bottom: 36px; }
+          .pc-footer { padding-top: 16px; padding-bottom: 24px; }
+        }
+      `}</style>
+
+      <div className="pc-container">
+        <div className="pc-inner">
+
+          {/* Header */}
+          <motion.header
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="pc-header"
           >
-            {businessName}
-          </h1>
-          <p
-            style={{
-              fontSize: 18,
-              lineHeight: 1.6,
-              color: "#4a4a48",
-              fontFamily: "Georgia, 'Times New Roman', serif",
-              fontWeight: 400,
-            }}
-          >
-            {headline}
-          </p>
-        </motion.section>
+            <AgencyLogo
+              logoUrl={logoUrl}
+              agencyName={agencyName}
+              brandColour={brandColour}
+            />
+            <p className="pc-header-tagline">Put this together specifically for you</p>
+          </motion.header>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: "#F0EDE8" }} />
-
-        {/* Observations */}
-        {observations.length > 0 && (
+          {/* Hero */}
           <motion.section
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.16 }}
-            style={{ paddingTop: 40, paddingBottom: 40 }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08 }}
+            className="pc-hero"
           >
-            <p style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 28 }}>
-              What we found
+            <p className="pc-hero-eyebrow">
+              {niche} · {location}
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-              {observations.map((obs, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 + i * 0.07 }}
-                  style={{ display: "flex", gap: 20 }}
-                >
-                  <div
-                    style={{
-                      width: 2,
-                      flexShrink: 0,
-                      background: brandColour,
-                      borderRadius: 2,
-                      alignSelf: "stretch",
-                      minHeight: 40,
-                    }}
-                  />
-                  <div>
-                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "#1a1a18", marginBottom: 6, lineHeight: 1.3 }}>
-                      {obs.title}
-                    </h3>
-                    <p style={{ fontSize: 14, color: "#666", lineHeight: 1.65 }}>
-                      {obs.detail}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            <h1 className="pc-hero-name">{businessName}</h1>
+            <p className="pc-hero-headline">{headline}</p>
           </motion.section>
-        )}
 
-        {/* Revenue impact */}
-        {revenueLoss && (
-          <>
-            <div style={{ height: 1, background: "#F0EDE8" }} />
+          <div className="pc-divider" />
+
+          {/* Observations */}
+          {observations.length > 0 && (
             <motion.section
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              style={{ paddingTop: 36, paddingBottom: 36 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.16 }}
+              className="pc-section"
             >
-              <p style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
-                We estimate this is costing you approximately
-              </p>
-              <p
-                style={{
-                  fontSize: 42,
-                  fontFamily: "Georgia, 'Times New Roman', serif",
-                  color: brandColour,
-                  lineHeight: 1,
-                  marginBottom: 6,
-                }}
-              >
-                {revenueLoss}
-              </p>
-              <p style={{ fontSize: 13, color: "#999" }}>per month in missed revenue</p>
+              <p className="pc-section-label">What we found</p>
+              <div className="pc-obs-list">
+                {observations.map((obs, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 + i * 0.07 }}
+                    className="pc-obs-item"
+                  >
+                    <div className="pc-obs-bar" />
+                    <div>
+                      <h3 className="pc-obs-title">{obs.title}</h3>
+                      <p className="pc-obs-detail">{obs.detail}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </motion.section>
-          </>
-        )}
+          )}
 
-        {/* Demo placeholder */}
-        <div style={{ height: 1, background: "#F0EDE8" }} />
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          style={{ paddingTop: 36, paddingBottom: 36 }}
-        >
-          <p style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 16 }}>
-            See it in action
-          </p>
-          <div
-            style={{
-              borderRadius: 10,
-              overflow: "hidden",
-              background: "#F5F3F0",
-              height: 200,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+          {/* Revenue impact */}
+          {revenueLoss && (
+            <>
+              <div className="pc-divider" />
+              <motion.section
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="pc-revenue-section"
+              >
+                <p className="pc-revenue-label">
+                  We estimate this is costing you approximately
+                </p>
+                <p className="pc-revenue-amount">{revenueLoss}</p>
+                <p className="pc-revenue-sub">per month in missed revenue</p>
+              </motion.section>
+            </>
+          )}
+
+          {/* CTA */}
+          <div className="pc-divider" />
+          <motion.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="pc-cta-section"
+            style={{ paddingTop: 28 }}
           >
-            <p style={{ fontSize: 13, color: "#bbb" }}>Product demo</p>
-          </div>
-        </motion.section>
+            <CTAButton
+              ctaText={ctaText}
+              ctaType={ctaType}
+              ctaValue={ctaValue}
+              brandColour={brandColour}
+            />
+          </motion.section>
 
-        {/* CTA */}
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55 }}
-          style={{ paddingTop: 8, paddingBottom: 48 }}
-        >
-          <CTAButton
-            ctaText={ctaText}
-            ctaType={ctaType}
-            ctaValue={ctaValue}
-            brandColour={brandColour}
-          />
-        </motion.section>
-
-        {/* Footer */}
-        <footer
-          style={{
-            paddingTop: 24,
-            paddingBottom: 32,
-            borderTop: "1px solid #F0EDE8",
-            textAlign: "center",
-          }}
-        >
-          <p style={{ fontSize: 12, color: "#ccc" }}>
-            {agencyName ?? "Venn"} · This analysis was prepared specifically for {businessName}
-          </p>
-        </footer>
+          {/* Footer */}
+          <footer className="pc-footer">
+            <p>
+              {agencyName ?? "Venn"} · This analysis was prepared specifically for{" "}
+              {businessName}
+            </p>
+          </footer>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
