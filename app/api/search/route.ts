@@ -5,6 +5,7 @@ import { getUserByClerkId } from "@/lib/db/queries/users";
 import { createLead } from "@/lib/db/queries/leads";
 import { addScrapeJob } from "@/lib/queue";
 import { searchBusinessesByNiche } from "@/lib/scraper/google";
+import { getMonthlyLeadCount, getMonthlyLeadLimit } from "@/lib/stripe/gates";
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +34,18 @@ export async function POST(request: NextRequest) {
     }
 
     const clampedLimit = Math.min(Math.max(Number(limit) || 10, 1), 20);
+
+    // Monthly lead limit check
+    const [used, monthLimit] = await Promise.all([
+      getMonthlyLeadCount(user.id),
+      getMonthlyLeadLimit(user.id),
+    ]);
+    if (used >= monthLimit) {
+      return Response.json(
+        { error: "upgrade_required", feature: "search", used, limit: monthLimit },
+        { status: 403 }
+      );
+    }
 
     // Discover businesses via Google Places text search
     const businesses = await searchBusinessesByNiche(

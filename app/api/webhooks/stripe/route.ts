@@ -3,6 +3,18 @@ import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { type Stripe as StripeType } from "stripe";
 
+const PRICE_TO_PLAN: Record<string, string> = {
+  [process.env.STRIPE_STARTER_PRICE_ID ?? ""]: "starter",
+  [process.env.STRIPE_GROWTH_PRICE_ID ?? ""]: "growth",
+  [process.env.STRIPE_PRO_PRICE_ID ?? ""]: "pro",
+  [process.env.STRIPE_ENTERPRISE_PRICE_ID ?? ""]: "enterprise",
+};
+
+function planFromPriceId(priceId: string | null | undefined): string {
+  if (!priceId) return "starter";
+  return PRICE_TO_PLAN[priceId] ?? "starter";
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.text();
   const sig = request.headers.get("stripe-signature");
@@ -33,6 +45,8 @@ export async function POST(request: NextRequest) {
         const subscription = await stripe.subscriptions.retrieve(
           session.subscription as string
         );
+        const priceId = subscription.items.data[0]?.price.id ?? null;
+        const plan = planFromPriceId(priceId);
 
         await db.subscription.upsert({
           where: { userId },
@@ -40,16 +54,16 @@ export async function POST(request: NextRequest) {
             userId,
             stripeCustomerId: session.customer as string,
             stripeSubId: subscription.id,
-            stripePriceId: subscription.items.data[0]?.price.id,
-            plan: "growth",
+            stripePriceId: priceId,
+            plan,
             status: "active",
           },
           update: {
             stripeCustomerId: session.customer as string,
             stripeSubId: subscription.id,
-            stripePriceId: subscription.items.data[0]?.price.id,
+            stripePriceId: priceId,
             status: "active",
-            plan: "growth",
+            plan,
           },
         });
         break;
@@ -57,16 +71,30 @@ export async function POST(request: NextRequest) {
 
       case "customer.subscription.updated": {
         const sub = event.data.object as StripeType.Subscription;
-        const userId = sub.metadata?.userId;
-        if (!userId) break;
+        const priceId = sub.items.data[0]?.price.id ?? null;
+        const plan = planFromPriceId(priceId);
 
-        await db.subscription.updateMany({
-          where: { stripeSubId: sub.id },
-          data: {
-            status: sub.status === "active" ? "active" : "inactive",
-            stripePriceId: sub.items.data[0]?.price.id,
-          },
-        });
+        // Try metadata first, then fall back to DB lookup by stripeSubId
+        const userId = sub.metadata?.userId;
+        if (userId) {
+          await db.subscription.updateMany({
+            where: { userId },
+            data: {
+              status: sub.status === "active" ? "active" : "inactive",
+              stripePriceId: priceId,
+              plan,
+            },
+          });
+        } else {
+          await db.subscription.updateMany({
+            where: { stripeSubId: sub.id },
+            data: {
+              status: sub.status === "active" ? "active" : "inactive",
+              stripePriceId: priceId,
+              plan,
+            },
+          });
+        }
         break;
       }
 
@@ -74,7 +102,7 @@ export async function POST(request: NextRequest) {
         const sub = event.data.object as StripeType.Subscription;
         await db.subscription.updateMany({
           where: { stripeSubId: sub.id },
-          data: { status: "cancelled", plan: "starter" },
+          data: { status: "cancelled" },
         });
         break;
       }

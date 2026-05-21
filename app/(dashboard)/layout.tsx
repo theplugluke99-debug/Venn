@@ -46,6 +46,12 @@ export default async function DashboardLayout({
     userName = clerkUser.firstName ?? clerkUser.fullName?.split(" ")[0] ?? undefined;
     userEmail = clerkUser.emailAddresses[0]?.emailAddress;
     userId = user.id;
+
+    // Subscription check: redirect to /subscribe if no active subscription
+    const sub = user.subscription;
+    if (!sub || (sub.status !== "active" && sub.status !== "trialing")) {
+      redirect("/subscribe");
+    }
   }
 
   // Check onboarding: skip if cookie present, otherwise check DB

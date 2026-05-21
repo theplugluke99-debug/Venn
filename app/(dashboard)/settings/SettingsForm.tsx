@@ -19,6 +19,8 @@ interface CardIdentity {
 interface SettingsFormProps {
   initialData: CardIdentity | null;
   plan: string;
+  renewalDate: string | null;
+  hasStripeCustomer: boolean;
 }
 
 const angles = ["pain", "opportunity", "compliment"] as const;
@@ -184,7 +186,7 @@ function CardPreview({ form }: { form: { agencyName: string; brandColour: string
   );
 }
 
-export function SettingsForm({ initialData, plan }: SettingsFormProps) {
+export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer }: SettingsFormProps) {
   const [form, setForm] = useState({
     brandColour: initialData?.brandColour ?? "#C4973F",
     accentColour: initialData?.accentColour ?? "#E8B44B",
@@ -337,17 +339,37 @@ export function SettingsForm({ initialData, plan }: SettingsFormProps) {
           {sectionTitle("Account")}
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p style={{ fontSize: 13, color: "#FFFDF8", fontFamily: "var(--font-inter)", marginBottom: 4 }}>Current plan</p>
+              <p style={{ fontSize: 11, color: "#555250", fontFamily: "var(--font-inter)", marginBottom: 6 }}>Current plan</p>
               <PlanBadge plan={plan} />
+              {renewalDate && (
+                <p style={{ fontSize: 11, color: "#444", fontFamily: "var(--font-inter)", marginTop: 4 }}>
+                  Renews {renewalDate}
+                </p>
+              )}
             </div>
-            {plan !== "pro" && plan !== "enterprise" && (
-              <button
-                type="button"
-                style={{ fontSize: 13, fontWeight: 500, background: "#C4973F", color: "#0A0907", fontFamily: "var(--font-inter)", borderRadius: 6, cursor: "pointer", padding: "6px 14px", border: "none" }}
-              >
-                Upgrade plan
-              </button>
-            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
+              {hasStripeCustomer && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const res = await fetch("/api/stripe/portal", { method: "POST" });
+                    const d = await res.json();
+                    if (d.url) window.location.href = d.url;
+                  }}
+                  style={{ fontSize: 12, fontWeight: 500, background: "#1A1814", color: "#888", fontFamily: "var(--font-inter)", borderRadius: 6, cursor: "pointer", padding: "6px 14px", border: "0.5px solid #1E1C18" }}
+                >
+                  Manage billing
+                </button>
+              )}
+              {plan !== "pro" && plan !== "enterprise" && (
+                <a
+                  href="/subscribe"
+                  style={{ fontSize: 12, fontWeight: 500, background: "#C4973F", color: "#0A0907", fontFamily: "var(--font-inter)", borderRadius: 6, cursor: "pointer", padding: "6px 14px", border: "none", textDecoration: "none", display: "inline-block" }}
+                >
+                  Upgrade plan
+                </a>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <LockBadge feature="api_access" plan={plan} />
