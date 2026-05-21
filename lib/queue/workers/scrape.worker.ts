@@ -9,12 +9,12 @@ import { Prisma } from "@prisma/client";
 export const scrapeWorker = new Worker(
   "scrape",
   async (job: Job) => {
-    const { leadId, businessName, location, niche, website, userId } = job.data;
+    const { leadId, businessName, location, niche, website, userId, placeId } = job.data;
 
     await db.lead.update({ where: { id: leadId }, data: { status: "scraping" } });
     await job.updateProgress(10);
 
-    const googleData = await scrapeGoogleBusiness(businessName, location).catch(() => null);
+    const googleData = await scrapeGoogleBusiness(businessName, location, placeId).catch(() => null);
     await job.updateProgress(35);
 
     const websiteUrl = website || googleData?.website;

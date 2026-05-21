@@ -1,8 +1,17 @@
 import { SearchForm } from "@/components/leads/SearchForm";
 
-export const metadata = { title: "New Search — Venn" };
+export const metadata = { title: "Search — Venn" };
 
-export default function SearchPage() {
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ niche?: string; location?: string; autostart?: string }>;
+}) {
+  const params = await searchParams;
+  const initialNiche = typeof params.niche === "string" ? params.niche : "";
+  const initialLocation = typeof params.location === "string" ? params.location : "";
+  const autostart = params.autostart === "1" && !!initialNiche && !!initialLocation;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
       <div className="w-full max-w-lg text-center mb-10">
@@ -15,7 +24,7 @@ export default function SearchPage() {
             lineHeight: 1.2,
           }}
         >
-          Find your next clients
+          {autostart ? "Finding your leads…" : "Find your next clients"}
         </h1>
         <p
           style={{
@@ -25,11 +34,17 @@ export default function SearchPage() {
             lineHeight: 1.5,
           }}
         >
-          Enter a business name, niche and location. Venn does the rest.
+          {autostart
+            ? `Searching for ${initialNiche} in ${initialLocation}`
+            : "Enter a niche and location. Venn finds and scores every matching business in real time."}
         </p>
       </div>
 
-      <SearchForm />
+      <SearchForm
+        initialNiche={initialNiche}
+        initialLocation={initialLocation}
+        autostart={autostart}
+      />
     </div>
   );
 }

@@ -22,6 +22,7 @@ export async function addScrapeJob(data: {
   niche: string;
   website?: string;
   userId: string;
+  placeId?: string;
 }) {
   const job = await scrapeQueue.add("scrape-lead", data, {
     jobId: `scrape-${data.leadId}`,

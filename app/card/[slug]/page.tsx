@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { db } from "@/lib/db";
 import { getCardBySlug, incrementCardViewCount } from "@/lib/db/queries/cards";
 import { ProspectCard } from "@/components/card/ProspectCard";
 import type { CardObservation } from "@/types";
@@ -31,12 +32,17 @@ export default async function CardPage({
 
   await incrementCardViewCount(slug);
 
+  const cardUser = await db.user.findUnique({
+    where: { id: card.userId },
+    include: { cardIdentity: true },
+  });
+
   const cardIdentity = {
-    ctaType: "reply" as string,
-    ctaValue: card.ctaValue ?? null,
-    brandColour: card.brandColour ?? "#C4973F",
-    logoUrl: card.logoUrl ?? null,
-    agencyName: card.agencyName ?? null,
+    ctaType: cardUser?.cardIdentity?.ctaType ?? "reply",
+    ctaValue: card.ctaValue ?? cardUser?.cardIdentity?.ctaValue ?? null,
+    brandColour: card.brandColour ?? cardUser?.cardIdentity?.brandColour ?? "#C4973F",
+    logoUrl: card.logoUrl ?? cardUser?.cardIdentity?.logoUrl ?? null,
+    agencyName: card.agencyName ?? cardUser?.cardIdentity?.agencyName ?? null,
   };
 
   return (

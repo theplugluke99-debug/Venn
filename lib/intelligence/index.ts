@@ -18,39 +18,56 @@ interface CardIdentityData {
   writingStyle?: string | null;
 }
 
+const DEFAULT_PROFILE = (data: ScrapeData): IntelligenceProfile => ({
+  intentScore: "medium",
+  intentSignals: ["Insufficient data for full analysis"],
+  businessBio: `${data.businessName} is a ${data.niche} business based in ${data.location}.`,
+  observations: [],
+  openingLine: `Hi, I noticed ${data.businessName} and thought we should connect about how we could help.`,
+  recommendedChannel: "email",
+  suggestedAngle: "opportunity",
+});
+
 export async function generateIntelligence(
   data: ScrapeData,
   cardIdentity: CardIdentityData | null | undefined
 ): Promise<IntelligenceProfile> {
   const prompt = SCORING_PROMPT(data, cardIdentity);
 
-  const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 2048,
-    messages: [{ role: "user", content: prompt }],
-  });
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const message = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2048,
+        messages: [{ role: "user", content: prompt }],
+      });
 
-  const content = message.content[0];
-  if (content.type !== "text") {
-    throw new Error("Unexpected response type from Claude");
+      const content = message.content[0];
+      if (content.type !== "text") throw new Error("Non-text response");
+
+      const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("No JSON in response");
+
+      const parsed = JSON.parse(jsonMatch[0]) as IntelligenceProfile;
+
+      return {
+        intentScore: parsed.intentScore || "medium",
+        intentSignals: Array.isArray(parsed.intentSignals) ? parsed.intentSignals : [],
+        businessBio: parsed.businessBio || "",
+        observations: Array.isArray(parsed.observations) ? parsed.observations : [],
+        openingLine: parsed.openingLine || "",
+        recommendedChannel: parsed.recommendedChannel || "email",
+        suggestedAngle: parsed.suggestedAngle || "pain",
+      };
+    } catch (err) {
+      if (attempt === 1) {
+        console.error(`[Intelligence] Both attempts failed for ${data.businessName}:`, err);
+        return DEFAULT_PROFILE(data);
+      }
+    }
   }
 
-  const jsonMatch = content.text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    throw new Error("No JSON found in Claude response");
-  }
-
-  const parsed = JSON.parse(jsonMatch[0]) as IntelligenceProfile;
-
-  return {
-    intentScore: parsed.intentScore || "medium",
-    intentSignals: parsed.intentSignals || [],
-    businessBio: parsed.businessBio || "",
-    observations: parsed.observations || [],
-    openingLine: parsed.openingLine || "",
-    recommendedChannel: parsed.recommendedChannel || "email",
-    suggestedAngle: parsed.suggestedAngle || "pain",
-  };
+  return DEFAULT_PROFILE(data);
 }
 
 export async function generateCardCopy(
