@@ -3,6 +3,9 @@ import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId } from "@/lib/db/queries/users";
 import { db } from "@/lib/db";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
+import { SolopreneurTracker } from "@/components/dashboard/SolopreneurTracker";
+import { getGreeting } from "@/lib/utils/greeting";
+import { checkAndLogMilestones } from "@/lib/events";
 
 export const metadata = { title: "Dashboard — Venn" };
 
@@ -15,11 +18,42 @@ export default async function DashboardPage() {
 
   const now = Date.now();
 
+  const sub = await db.subscription.findUnique({ where: { userId: user.id } });
+  const isSolopreneur = sub?.isSolopreneur && sub?.solopreneurApproved;
+
+  // Log milestones (non-blocking)
+  checkAndLogMilestones(user.id).catch(() => null);
+
   const [totalLeads, highIntentLeads, cardsSent] = await Promise.all([
     db.lead.count({ where: { userId: user.id } }),
     db.lead.count({ where: { userId: user.id, intentScore: "high", status: "complete" } }),
     db.card.count({ where: { userId: user.id } }),
   ]);
+
+  // Solopreneur tracker data
+  let solopreneurData: {
+    searchCount: number;
+    cardCount: number;
+    sequenceStepsSent: number;
+    hasSequence: boolean;
+  } | null = null;
+
+  if (isSolopreneur) {
+    const [searchCount, cardCount, sequenceStepsSentCount, sequenceExists] = await Promise.all([
+      db.lead.count({ where: { userId: user.id } }),
+      db.card.count({ where: { userId: user.id } }),
+      db.sequenceStep.count({
+        where: { sequence: { userId: user.id }, status: "sent" },
+      }),
+      db.sequence.count({ where: { userId: user.id } }),
+    ]);
+    solopreneurData = {
+      searchCount,
+      cardCount,
+      sequenceStepsSent: sequenceStepsSentCount,
+      hasSequence: sequenceExists > 0,
+    };
+  }
 
   const recentLeads = await db.lead.findMany({
     where: { userId: user.id },
@@ -100,13 +134,73 @@ export default async function DashboardPage() {
 
   const recentActivity = activity.slice(0, 10).map(({ _sort: _s, ...rest }) => rest);
 
+  // Greeting context
+  const hotCard = recentCards.find(
+    (c) => c.lastViewed && now - c.lastViewed.getTime() < 86_400_000
+  );
+  const memberDays = Math.floor((now - user.createdAt.getTime()) / (1000 * 60 * 60 * 24));
+
+  const weekStart = new Date();
+  weekStart.setDate(weekStart.getDate() - 7);
+  const lastWeekStart = new Date();
+  lastWeekStart.setDate(lastWeekStart.getDate() - 14);
+
+  const [weekCards, lastWeekCards] = await Promise.all([
+    db.card.count({ where: { userId: user.id, createdAt: { gte: weekStart } } }),
+    db.card.count({ where: { userId: user.id, createdAt: { gte: lastWeekStart, lt: weekStart } } }),
+  ]);
+
+  const now2 = new Date();
+  const greeting = getGreeting({
+    name: user.name ?? user.email,
+    hasHotLead: !!hotCard,
+    hotLeadName: hotCard?.lead?.businessName,
+    daysSinceLastLogin: 0, // TODO: track last login
+    dealJustClosed: sub?.dealClosed ?? false,
+    solopreneurDaysLeft: sub?.solopreneurExpiry
+      ? Math.max(0, Math.ceil((sub.solopreneurExpiry.getTime() - now) / (1000 * 60 * 60 * 24)))
+      : undefined,
+    dayOfWeek: now2.getDay(),
+    hour: now2.getHours(),
+    weeklyCardCount: weekCards,
+    weeklyCardCountLastWeek: lastWeekCards,
+    memberDays,
+  });
+
+  // Stuck detection: 5+ cards, 0 replies, last card > 7 days ago
+  const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+  const [replyCount, lastCard] = await Promise.all([
+    db.sequenceStep.count({ where: { sequence: { userId: user.id }, status: "replied" } }),
+    db.card.findFirst({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, select: { createdAt: true } }),
+  ]);
+  const isStuck =
+    cardsSent >= 5 &&
+    replyCount === 0 &&
+    !!lastCard &&
+    lastCard.createdAt < sevenDaysAgo;
+
   return (
-    <DashboardContent
-      leads={serialisedLeads}
-      totalLeads={totalLeads}
-      totalCards={cardsSent}
-      stats={stats}
-      recentActivity={recentActivity}
-    />
+    <>
+      {isSolopreneur && solopreneurData && (
+        <SolopreneurTracker
+          searchCount={solopreneurData.searchCount}
+          cardCount={solopreneurData.cardCount}
+          sequenceStepsSent={solopreneurData.sequenceStepsSent}
+          hasSequence={solopreneurData.hasSequence}
+          dealClosed={sub?.dealClosed ?? false}
+          dealClientName={sub?.dealClientName}
+          solopreneurExpiry={sub?.solopreneurExpiry ?? null}
+        />
+      )}
+      <DashboardContent
+        leads={serialisedLeads}
+        totalLeads={totalLeads}
+        totalCards={cardsSent}
+        stats={stats}
+        recentActivity={recentActivity}
+        greeting={greeting}
+        isStuck={isStuck}
+      />
+    </>
   );
 }

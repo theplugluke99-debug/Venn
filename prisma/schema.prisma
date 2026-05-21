@@ -31,6 +31,8 @@ model User {
   leads        Lead[]
   subscription Subscription?
   apiKeys      ApiKey[]
+  events       UserEvent[]
+  feedback     Feedback[]
 }
 
 model ApiKey {
@@ -145,14 +147,65 @@ model Card {
 }
 
 model Subscription {
-  id               String   @id @default(cuid())
-  userId           String   @unique
-  user             User     @relation(fields: [userId], references: [id])
-  stripeCustomerId String?
-  stripePriceId    String?
-  stripeSubId      String?
-  plan             String   @default("starter")
-  status           String   @default("active")
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  user                  User      @relation(fields: [userId], references: [id])
+  stripeCustomerId      String?
+  stripePriceId         String?
+  stripeSubId           String?
+  plan                  String    @default("starter")
+  status                String    @default("active")
+  // Solopreneur trial fields
+  isSolopreneur         Boolean   @default(false)
+  solopreneurApproved   Boolean   @default(false)
+  solopreneurExpiry     DateTime?
+  dealClosed            Boolean   @default(false)
+  dealClosedAt          DateTime?
+  dealValue             Float?
+  dealClientName        String?
+  dealLeadId            String?
+  // Activity tracking
+  activityQualified     Boolean   @default(false)
+  searchCount           Int       @default(0)
+  cardCount             Int       @default(0)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model SolopreneurApplication {
+  id           String   @id @default(cuid())
+  userId       String
+  email        String
+  name         String
+  agency       String?
+  teamSize     String?
+  niche        String?
+  monthlySpend String?
+  notes        String?
+  status       String   @default("pending")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model UserEvent {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String
+  title       String
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, type])
+}
+
+model Feedback {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  message       String
+  implemented   Boolean   @default(false)
+  implementedAt DateTime?
+  createdAt     DateTime  @default(now())
 }

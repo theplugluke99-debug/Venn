@@ -5,6 +5,8 @@ import { useMode } from "@/components/layout/DashboardProvider";
 import { KPICard } from "./KPICard";
 import { FocusMode } from "./FocusMode";
 import { IntelMode } from "./IntelMode";
+import { MilestoneToast } from "./MilestoneToast";
+import { StuckPanel } from "./StuckPanel";
 import type { IntentScore } from "@/types";
 
 interface Lead {
@@ -42,6 +44,8 @@ interface DashboardContentProps {
   totalCards: number;
   stats: Stats;
   recentActivity: ActivityItem[];
+  greeting?: { headline: string; subline?: string };
+  isStuck?: boolean;
 }
 
 const ACTIVITY_DOT: Record<string, string> = {
@@ -66,11 +70,36 @@ export function DashboardContent({
   totalCards,
   stats,
   recentActivity,
+  greeting,
+  isStuck = false,
 }: DashboardContentProps) {
   const { mode } = useMode();
 
   return (
     <div>
+      {/* Contextual greeting */}
+      {greeting && (
+        <div style={{ marginBottom: 24 }}>
+          <h2
+            style={{
+              fontSize: 22,
+              color: "#FFFDF8",
+              fontFamily: "var(--font-instrument-serif), Georgia, serif",
+              fontWeight: 400,
+              marginBottom: greeting.subline ? 4 : 0,
+            }}
+          >
+            {greeting.headline}
+          </h2>
+          {greeting.subline && (
+            <p style={{ fontSize: 13, color: "#666462" }}>{greeting.subline}</p>
+          )}
+        </div>
+      )}
+
+      {/* Stuck detection panel */}
+      <StuckPanel isStuck={isStuck} />
+
       {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         <KPICard
@@ -189,6 +218,9 @@ export function DashboardContent({
           </div>
         </div>
       )}
+
+      {/* Milestone toast */}
+      <MilestoneToast />
     </div>
   );
 }

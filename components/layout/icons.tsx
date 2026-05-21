@@ -176,6 +176,17 @@ export function IconGlobe({ size = 16, className }: IconProps) {
   );
 }
 
+export function IconTimeline({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="6" cy="6" r="2" />
+      <circle cx="6" cy="12" r="2" />
+      <circle cx="6" cy="18" r="2" />
+      <path d="M10 6h10M10 12h10M10 18h10" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function IconSpinner({ size = 16, className }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" className={`animate-spin ${className ?? ""}`} {...base}>

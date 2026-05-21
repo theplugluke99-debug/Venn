@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSidebar } from "./DashboardProvider";
 import {
   IconDashboard, IconSearch, IconUsers, IconCard,
-  IconSend, IconChartBar, IconSettings, IconMenu,
+  IconSend, IconChartBar, IconSettings, IconMenu, IconTimeline,
 } from "./icons";
 
 interface NavItem {
@@ -22,6 +22,7 @@ const topNav: NavItem[] = [
   { href: "/cards", label: "Cards", Icon: IconCard },
   { href: "/outreach", label: "Outreach", Icon: IconSend },
   { href: "/pipeline", label: "Pipeline", Icon: IconChartBar },
+  { href: "/journey", label: "Journey", Icon: IconTimeline },
 ];
 
 const bottomNav: NavItem[] = [

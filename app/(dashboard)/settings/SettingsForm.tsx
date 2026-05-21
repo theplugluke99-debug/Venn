@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { hasFeatureAccess } from "@/lib/auth/features";
 import type { Feature } from "@/lib/auth/features";
+import { CancellationModal } from "@/components/dashboard/CancellationModal";
 
 interface CardIdentity {
   brandColour: string;
@@ -21,6 +22,8 @@ interface SettingsFormProps {
   plan: string;
   renewalDate: string | null;
   hasStripeCustomer: boolean;
+  warmLeadCount?: number;
+  hotLeadName?: string;
 }
 
 const angles = ["pain", "opportunity", "compliment"] as const;
@@ -186,7 +189,78 @@ function CardPreview({ form }: { form: { agencyName: string; brandColour: string
   );
 }
 
-export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer }: SettingsFormProps) {
+function FeedbackWidget() {
+  const [text, setText] = useState("");
+  const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  async function submit() {
+    if (!text.trim()) return;
+    setSending(true);
+    await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text }),
+    });
+    setSent(true);
+    setSending(false);
+  }
+
+  return (
+    <div style={{ marginTop: 24 }}>
+      <p style={{ fontSize: 11, color: "#444", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "var(--font-inter)", fontWeight: 500, marginBottom: 10 }}>
+        What should we build next?
+      </p>
+      {sent ? (
+        <p style={{ fontSize: 13, color: "#C4973F", fontFamily: "var(--font-inter)" }}>
+          Sent. I read every one.
+        </p>
+      ) : (
+        <>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Tell Luke what you need..."
+            rows={3}
+            style={{
+              width: "100%",
+              padding: "10px 12px",
+              borderRadius: 8,
+              border: "0.5px solid #2A2826",
+              background: "#0D0C09",
+              color: "#FFFDF8",
+              fontSize: 12,
+              fontFamily: "var(--font-inter)",
+              outline: "none",
+              resize: "vertical",
+              boxSizing: "border-box",
+              marginBottom: 8,
+            }}
+          />
+          <button
+            onClick={submit}
+            disabled={!text.trim() || sending}
+            style={{
+              padding: "7px 16px",
+              borderRadius: 6,
+              border: "none",
+              background: "#1A1814",
+              color: "#888",
+              fontSize: 12,
+              cursor: !text.trim() || sending ? "not-allowed" : "pointer",
+              opacity: !text.trim() || sending ? 0.5 : 1,
+              fontFamily: "var(--font-inter)",
+            }}
+          >
+            {sending ? "Sending…" : "Send to Luke"}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer, warmLeadCount = 0, hotLeadName }: SettingsFormProps) {
   const [form, setForm] = useState({
     brandColour: initialData?.brandColour ?? "#C4973F",
     accentColour: initialData?.accentColour ?? "#E8B44B",
@@ -201,6 +275,7 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   function update(key: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -351,11 +426,7 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
               {hasStripeCustomer && (
                 <button
                   type="button"
-                  onClick={async () => {
-                    const res = await fetch("/api/stripe/portal", { method: "POST" });
-                    const d = await res.json();
-                    if (d.url) window.location.href = d.url;
-                  }}
+                  onClick={() => setShowCancelModal(true)}
                   style={{ fontSize: 12, fontWeight: 500, background: "#1A1814", color: "#888", fontFamily: "var(--font-inter)", borderRadius: 6, cursor: "pointer", padding: "6px 14px", border: "0.5px solid #1E1C18" }}
                 >
                   Manage billing
@@ -434,7 +505,23 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
         <p style={{ fontSize: 11, color: "#333230", fontFamily: "var(--font-inter)", marginTop: 8, lineHeight: 1.5 }}>
           Updates as you change settings. This is what prospects see.
         </p>
+
+        {/* Feedback */}
+        <FeedbackWidget />
       </div>
+
+      {showCancelModal && (
+        <CancellationModal
+          warmLeadCount={warmLeadCount}
+          hotLeadName={hotLeadName}
+          onCancel={async () => {
+            const res = await fetch("/api/stripe/portal", { method: "POST" });
+            const d = await res.json();
+            if (d.url) window.location.href = d.url;
+          }}
+          onDismiss={() => setShowCancelModal(false)}
+        />
+      )}
     </div>
   );
 }

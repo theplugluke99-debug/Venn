@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getUserByClerkId, getCardIdentity } from "@/lib/db/queries/users";
 import { stripe } from "@/lib/stripe";
+import { db } from "@/lib/db";
 import { SettingsForm } from "./SettingsForm";
 
 export const metadata = { title: "Settings — Venn" };
@@ -35,6 +36,16 @@ export default async function SettingsPage() {
     }
   }
 
+  // Warm leads and hot lead for cancellation modal
+  const [warmLeadCount, hotCard] = await Promise.all([
+    db.lead.count({ where: { id: user.id, status: "complete" } }),
+    db.card.findFirst({
+      where: { userId: user.id, lastViewed: { gt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+      orderBy: { viewCount: "desc" },
+      include: { lead: { select: { businessName: true } } },
+    }),
+  ]);
+
   return (
     <div>
       <div className="mb-8">
@@ -65,6 +76,8 @@ export default async function SettingsPage() {
         plan={plan}
         renewalDate={renewalDate}
         hasStripeCustomer={hasStripeCustomer}
+        warmLeadCount={warmLeadCount}
+        hotLeadName={hotCard?.lead?.businessName}
       />
     </div>
   );

@@ -57,4 +57,14 @@ export const config = {
   app: {
     url: process.env.NEXT_PUBLIC_APP_URL!,
   },
+  // Optional
+  resend: {
+    apiKey: process.env.RESEND_API_KEY ?? null,
+  },
+  admin: {
+    email: process.env.ADMIN_EMAIL ?? null,
+  },
+  hunter: {
+    apiKey: process.env.HUNTER_API_KEY ?? null,
+  },
 } as const;
