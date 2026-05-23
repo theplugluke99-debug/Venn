@@ -8,10 +8,10 @@ export default async function AdminSolopreneurPage() {
   if (!clerkId) redirect("/sign-in");
 
   const adminEmail = process.env.ADMIN_EMAIL;
-  if (!adminEmail) redirect("/");
+  if (!adminEmail) redirect("/home");
 
   const user = await db.user.findUnique({ where: { clerkId } });
-  if (!user || user.email !== adminEmail) redirect("/");
+  if (!user || user.email !== adminEmail) redirect("/home");
 
   const applications = await db.solopreneurApplication.findMany({
     orderBy: { createdAt: "desc" },

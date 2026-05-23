@@ -41,7 +41,7 @@ function SettingsIcon() {
 }
 
 const navItems = [
-  { href: "/", label: "Overview", Icon: HomeIcon },
+  { href: "/home", label: "Overview", Icon: HomeIcon },
   { href: "/search", label: "New Search", Icon: SearchIcon },
   { href: "/leads", label: "Leads", Icon: LeadsIcon },
   { href: "/settings", label: "Settings", Icon: SettingsIcon },
@@ -60,8 +60,8 @@ export function SidebarNav({ userName, userEmail }: SidebarNavProps) {
       <nav className="flex-1 px-3 py-5 space-y-0.5">
         {navItems.map(({ href, label, Icon }) => {
           const isActive =
-            href === "/"
-              ? pathname === "/"
+            href === "/home"
+              ? pathname === "/home"
               : pathname === href || pathname.startsWith(`${href}/`);
 
           return (

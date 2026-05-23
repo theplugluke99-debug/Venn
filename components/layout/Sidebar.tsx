@@ -16,7 +16,7 @@ interface NavItem {
 }
 
 const topNav: NavItem[] = [
-  { href: "/", label: "Dashboard", Icon: IconDashboard },
+  { href: "/home", label: "Dashboard", Icon: IconDashboard },
   { href: "/search", label: "Search", Icon: IconSearch },
   { href: "/leads", label: "Leads", Icon: IconUsers },
   { href: "/cards", label: "Cards", Icon: IconCard },
@@ -39,7 +39,7 @@ export function Sidebar({ userName, userInitials }: SidebarProps) {
   const pathname = usePathname();
 
   function isActive(href: string) {
-    return href === "/" ? pathname === "/" : pathname.startsWith(href);
+    return href === "/home" ? pathname === "/home" : pathname.startsWith(href);
   }
 
   return (

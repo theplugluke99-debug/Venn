@@ -6,7 +6,7 @@ import { useSidebar, useMode } from "./DashboardProvider";
 import { IconMenu, IconSearch } from "./icons";
 
 const PAGE_TITLES: Record<string, string> = {
-  "/": "Dashboard",
+  "/home": "Dashboard",
   "/search": "New Search",
   "/leads": "Leads",
   "/cards": "Cards",
@@ -28,7 +28,7 @@ export function TopBar() {
   const { mode, setMode } = useMode();
   const pathname = usePathname();
   const title = getTitle(pathname);
-  const isDashboard = pathname === "/";
+  const isDashboard = pathname === "/home";
 
   return (
     <header

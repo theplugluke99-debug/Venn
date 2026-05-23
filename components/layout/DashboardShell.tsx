@@ -36,7 +36,7 @@ export function DashboardShell({
 }: DashboardShellProps) {
   const { collapsed } = useSidebar();
   const pathname = usePathname();
-  const showRightPanel = pathname === "/" || pathname === "/leads";
+  const showRightPanel = pathname === "/home" || pathname === "/leads";
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "#0A0907" }}>
