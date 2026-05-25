@@ -53,6 +53,12 @@ export async function upsertCardIdentity(
     socialProof?: Prisma.InputJsonValue;
     defaultResponseTime?: string;
     closeIntroText?: string;
+    agencyWebsite?: string;
+    agencyEmail?: string;
+    reportSchedule?: string;
+    reportAutoSend?: boolean;
+    healthAlertThreshold?: number;
+    deliverableReminderDays?: number;
   }
 ) {
   return db.cardIdentity.upsert({

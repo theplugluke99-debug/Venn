@@ -20,6 +20,12 @@ interface CardIdentity {
   cardStyle: string;
   defaultResponseTime?: string | null;
   closeIntroText?: string | null;
+  agencyWebsite?: string | null;
+  agencyEmail?: string | null;
+  reportSchedule?: string | null;
+  reportAutoSend?: boolean | null;
+  healthAlertThreshold?: number | null;
+  deliverableReminderDays?: number | null;
 }
 
 interface ServicePackageRow {
@@ -290,6 +296,12 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
     cardStyle: initialData?.cardStyle ?? "editorial",
     defaultResponseTime: initialData?.defaultResponseTime ?? "24 hours",
     closeIntroText: initialData?.closeIntroText ?? "",
+    agencyWebsite: initialData?.agencyWebsite ?? "",
+    agencyEmail: initialData?.agencyEmail ?? "",
+    reportSchedule: initialData?.reportSchedule ?? "manual",
+    reportAutoSend: String(initialData?.reportAutoSend ?? false),
+    healthAlertThreshold: String(initialData?.healthAlertThreshold ?? 60),
+    deliverableReminderDays: String(initialData?.deliverableReminderDays ?? 2),
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -626,6 +638,57 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
               <p style={{ fontSize: 11, color: "#333230", fontFamily: "var(--font-inter)", marginTop: 4 }}>
                 Leave blank to use the default. [businessName] is replaced automatically.
               </p>
+            </Field>
+          </div>
+        </section>
+
+        {/* Agency OS settings */}
+        <section style={{ background: "#0F0E0B", border: "0.5px solid #1E1C18", borderRadius: 8, padding: 20 }}>
+          {sectionTitle("Agency OS")}
+          <div className="flex flex-col gap-5">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <Field label="Agency website">
+                <TextInput value={form.agencyWebsite} onChange={(v) => update("agencyWebsite", v)} placeholder="https://youragency.com" />
+              </Field>
+              <Field label="Client-facing contact email">
+                <TextInput value={form.agencyEmail} onChange={(v) => update("agencyEmail", v)} placeholder="hello@youragency.com" />
+              </Field>
+            </div>
+            <Field label="Default report schedule">
+              <div style={{ display: "flex", gap: 8 }}>
+                {[["manual", "Manual only"], ["first", "1st of month"], ["last", "Last day of month"]].map(([val, label]) => (
+                  <button key={val} type="button" onClick={() => update("reportSchedule", val)} style={{
+                    padding: "7px 12px", borderRadius: 5, fontSize: 12, fontFamily: "var(--font-inter)", cursor: "pointer",
+                    background: form.reportSchedule === val ? "#C4973F15" : "transparent",
+                    border: `0.5px solid ${form.reportSchedule === val ? "#C4973F" : "#1E1C18"}`,
+                    color: form.reportSchedule === val ? "#C4973F" : "#555250",
+                  }}>{label}</button>
+                ))}
+              </div>
+            </Field>
+            <Field label="Client health alert threshold">
+              <div style={{ display: "flex", gap: 8 }}>
+                {[["80", "80 — Early warning"], ["60", "60 — Attention needed"], ["40", "40 — Critical"]].map(([val, label]) => (
+                  <button key={val} type="button" onClick={() => update("healthAlertThreshold", val)} style={{
+                    padding: "7px 12px", borderRadius: 5, fontSize: 12, fontFamily: "var(--font-inter)", cursor: "pointer",
+                    background: form.healthAlertThreshold === val ? "#C4973F15" : "transparent",
+                    border: `0.5px solid ${form.healthAlertThreshold === val ? "#C4973F" : "#1E1C18"}`,
+                    color: form.healthAlertThreshold === val ? "#C4973F" : "#555250",
+                  }}>{label}</button>
+                ))}
+              </div>
+            </Field>
+            <Field label="Deliverable reminder (days before due)">
+              <div style={{ display: "flex", gap: 8 }}>
+                {[["1", "1 day"], ["2", "2 days"], ["3", "3 days"], ["7", "7 days"]].map(([val, label]) => (
+                  <button key={val} type="button" onClick={() => update("deliverableReminderDays", val)} style={{
+                    padding: "7px 12px", borderRadius: 5, fontSize: 12, fontFamily: "var(--font-inter)", cursor: "pointer",
+                    background: form.deliverableReminderDays === val ? "#C4973F15" : "transparent",
+                    border: `0.5px solid ${form.deliverableReminderDays === val ? "#C4973F" : "#1E1C18"}`,
+                    color: form.deliverableReminderDays === val ? "#C4973F" : "#555250",
+                  }}>{label}</button>
+                ))}
+              </div>
             </Field>
           </div>
         </section>

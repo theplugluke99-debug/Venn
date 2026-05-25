@@ -36,6 +36,7 @@ model User {
   proposals       Proposal[]
   servicePackages ServicePackage[]
   closeSessions   CloseSession[]
+  clients         Client[]
 }
 
 model ApiKey {
@@ -67,6 +68,12 @@ model CardIdentity {
   socialProof          Json?
   defaultResponseTime  String   @default("24 hours")
   closeIntroText       String?
+  agencyWebsite        String?
+  agencyEmail          String?
+  reportSchedule       String   @default("manual")
+  reportAutoSend       Boolean  @default(false)
+  healthAlertThreshold Int      @default(60)
+  deliverableReminderDays Int   @default(2)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 }
@@ -104,6 +111,7 @@ model Lead {
   sequence           Sequence?
   proposals          Proposal[]
   closeSessions      CloseSession[]
+  clients            Client[]
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 }
@@ -313,4 +321,98 @@ model DiscoveryAnswer {
   questionText   String
   answer         String
   answeredAt     DateTime     @default(now())
+}
+
+model Client {
+  id              String          @id @default(cuid())
+  userId          String
+  user            User            @relation(fields: [userId], references: [id])
+  leadId          String?
+  lead            Lead?           @relation(fields: [leadId], references: [id])
+  proposalId      String?
+  businessName    String
+  ownerName       String?
+  email           String?
+  phone           String?
+  website         String?
+  niche           String?
+  location        String?
+  logoUrl         String?
+  status          String          @default("active")
+  startDate       DateTime        @default(now())
+  contractValue   Float?
+  billingCycle    String          @default("monthly")
+  nextBillingDate DateTime?
+  contractEndDate DateTime?
+  healthScore     Int             @default(100)
+  healthSignals   Json?
+  lastHealthCheck DateTime?
+  notes           String?
+  tags            Json?
+  deliverables    Deliverable[]
+  reports         ClientReport[]
+  checkIns        ClientCheckIn[]
+  activities      ClientActivity[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model Deliverable {
+  id          String    @id @default(cuid())
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id])
+  userId      String
+  title       String
+  description String?
+  category    String
+  status      String    @default("pending")
+  priority    String    @default("medium")
+  dueDate     DateTime?
+  completedAt DateTime?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model ClientReport {
+  id        String    @id @default(cuid())
+  clientId  String
+  client    Client    @relation(fields: [clientId], references: [id])
+  userId    String
+  slug      String    @unique
+  title     String
+  period    String
+  content   Json
+  status    String    @default("draft")
+  sentAt    DateTime?
+  viewedAt  DateTime?
+  viewCount Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model ClientCheckIn {
+  id          String    @id @default(cuid())
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id])
+  userId      String
+  type        String
+  notes       String?
+  sentiment   String?
+  nextAction  String?
+  scheduledAt DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model ClientActivity {
+  id          String   @id @default(cuid())
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [id])
+  userId      String
+  type        String
+  title       String
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
 }

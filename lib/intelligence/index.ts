@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { SCORING_PROMPT, DELIVERY_PROMPT, PROPOSAL_PROMPT, CLOSE_QUESTIONS_PROMPT } from "./prompts";
+import { SCORING_PROMPT, DELIVERY_PROMPT, PROPOSAL_PROMPT, CLOSE_QUESTIONS_PROMPT, CLIENT_REPORT_PROMPT } from "./prompts";
 import type { IntelligenceProfile } from "@/types";
 import { config } from "@/lib/config";
 
@@ -236,6 +236,41 @@ export async function generateCloseQuestions(
     questions: Array.isArray(parsed.questions) ? parsed.questions.slice(0, 4) : [],
     responseTime: parsed.responseTime ?? "24 hours",
     sentMessage: parsed.sentMessage ?? "Put something together before your proposal",
+  };
+}
+
+export interface ClientReportContent {
+  thisMonth: string;
+  completions: string[];
+  theNumbers: string;
+  howYoureLooking: string;
+  nextMonth: string[];
+  personalNote: string;
+}
+
+export async function generateClientReport(data: Parameters<typeof CLIENT_REPORT_PROMPT>[0]): Promise<ClientReportContent> {
+  const prompt = CLIENT_REPORT_PROMPT(data);
+
+  const message = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 2000,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const content = message.content[0];
+  if (content.type !== "text") throw new Error("Unexpected response type");
+
+  const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("No JSON in report response");
+
+  const parsed = JSON.parse(jsonMatch[0]) as Partial<ClientReportContent>;
+  return {
+    thisMonth: parsed.thisMonth ?? "",
+    completions: Array.isArray(parsed.completions) ? parsed.completions : [],
+    theNumbers: parsed.theNumbers ?? "",
+    howYoureLooking: parsed.howYoureLooking ?? "",
+    nextMonth: Array.isArray(parsed.nextMonth) ? parsed.nextMonth : [],
+    personalNote: parsed.personalNote ?? "",
   };
 }
 

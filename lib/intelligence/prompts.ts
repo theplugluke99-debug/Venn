@@ -277,3 +277,50 @@ Respond ONLY with valid JSON:
   "linkedinDm": "LinkedIn DM after connecting. Under 60 words. Reference their business. Include the card URL."
 }
 `;
+
+export const CLIENT_REPORT_PROMPT = (data: {
+  client: { businessName: string; niche?: string | null; startDate: Date };
+  period: string;
+  completedDeliverables: Array<{ title: string; category: string; completedAt: Date | null }>;
+  checkInNotes: string[];
+  metrics: Record<string, string>;
+  nextPriorities: string[];
+  cardIdentity: { agencyName?: string | null; agencyOwnerName?: string | null; writingStyle?: string | null };
+  leadIntel?: { googleRating?: number | null; reviewCount?: number | null; observations?: unknown } | null;
+}) => `
+You are a professional agency reporting assistant. Write a monthly client report for ${data.client.businessName}.
+
+AGENCY: ${data.cardIdentity.agencyName ?? "the agency"}
+OWNER: ${data.cardIdentity.agencyOwnerName ?? "the agency owner"}
+WRITING STYLE: ${data.cardIdentity.writingStyle ?? "professional, warm, and direct"}
+REPORT PERIOD: ${data.period}
+CLIENT SINCE: ${new Date(data.client.startDate).toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
+
+WORK COMPLETED THIS PERIOD:
+${data.completedDeliverables.map((d) => `- ${d.title} (${d.category})`).join("\n") || "No deliverables logged this period."}
+
+CHECK-IN NOTES FROM THIS PERIOD:
+${data.checkInNotes.join("\n") || "No check-in notes."}
+
+METRICS PROVIDED:
+${JSON.stringify(data.metrics, null, 2)}
+
+NEXT MONTH PRIORITIES:
+${data.nextPriorities.map((p, i) => `${i + 1}. ${p}`).join("\n") || "To be confirmed."}
+
+ORIGINAL INTELLIGENCE (when we found them):
+${data.leadIntel ? JSON.stringify(data.leadIntel, null, 2) : "Not available."}
+
+Write a client report in JSON with this EXACT structure:
+{
+  "thisMonth": "2-3 paragraphs summarising what was done and why it matters. Human. Honest. Not corporate. Reference specific work completed.",
+  "completions": ["Brief one-line description of work item 1 and its impact", "Work item 2 and its impact"],
+  "theNumbers": "A paragraph interpreting the metrics provided. If none provided, acknowledge that metrics will be tracked going forward.",
+  "howYoureLooking": "A paragraph on their business position. If we have original intelligence, compare then vs now. If not, focus on trajectory and momentum.",
+  "nextMonth": ["Priority 1 — what and why", "Priority 2 — what and why", "Priority 3 — what and why"],
+  "personalNote": "A warm, personal closing paragraph from ${data.cardIdentity.agencyOwnerName ?? "the agency owner"}. 3-4 sentences. Genuine. Not sycophantic. Reference something specific about this client or this month. End with confidence in what's ahead."
+}
+
+Respond ONLY with valid JSON. No markdown. No explanation. No preamble.
+`;
+

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId } from "@/lib/db/queries/users";
 import { db } from "@/lib/db";
@@ -116,6 +117,35 @@ export default async function DashboardPage() {
 
   activity.sort((a, b) => b._sort - a._sort);
 
+  // Agency OS stats
+  const agencyStats = await (async () => {
+    const clientCount = await db.client.count({ where: { userId: user.id, status: "active" } });
+    if (clientCount === 0) return null;
+    const now = new Date();
+    const weekEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const [atRisk, deliverablesThisWeek, unreportedClients] = await Promise.all([
+      db.client.count({ where: { userId: user.id, status: "active", healthScore: { lt: 50 } } }),
+      db.deliverable.count({
+        where: {
+          userId: user.id,
+          status: { not: "complete" },
+          dueDate: { gte: now, lte: weekEnd },
+        },
+      }),
+      db.client.count({
+        where: {
+          userId: user.id,
+          status: "active",
+          reports: {
+            none: { sentAt: { gte: monthStart } },
+          },
+        },
+      }),
+    ]);
+    return { clientCount, atRisk, deliverablesThisWeek, unreportedClients };
+  })();
+
   const stats = { totalLeads, highIntentLeads, cardsSent, replyRate: 0 };
 
   const serialisedLeads = recentLeads.map((l) => ({
@@ -201,6 +231,80 @@ export default async function DashboardPage() {
         greeting={greeting}
         isStuck={isStuck}
       />
+
+      {/* Agency OS section */}
+      {agencyStats ? (
+        <div style={{ marginTop: 40, paddingTop: 32, borderTop: "0.5px solid #1A1814" }}>
+          <p style={{
+            fontSize: 10, color: "#2A2826", textTransform: "uppercase", letterSpacing: "0.12em",
+            fontFamily: "var(--font-inter)", marginBottom: 16,
+          }}>
+            Your agency
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+            <Link href="/clients?filter=at-risk" style={{ textDecoration: "none" }}>
+              <div style={{
+                background: "#0F0E0B", border: `0.5px solid ${agencyStats.atRisk > 0 ? "#C0392B30" : "#1E1C18"}`,
+                borderRadius: 8, padding: "16px 18px",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                  {agencyStats.atRisk > 0 && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C0392B", display: "inline-block" }} />}
+                  <p style={{ fontSize: 20, fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif", color: agencyStats.atRisk > 0 ? "#C0392B" : "#FFFDF8" }}>
+                    {agencyStats.atRisk}
+                  </p>
+                </div>
+                <p style={{ fontSize: 11, color: "#555250", fontFamily: "var(--font-inter)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Clients needing attention
+                </p>
+              </div>
+            </Link>
+            <Link href="/deliverables" style={{ textDecoration: "none" }}>
+              <div style={{
+                background: "#0F0E0B", border: `0.5px solid ${agencyStats.deliverablesThisWeek > 0 ? "#C4973F30" : "#1E1C18"}`,
+                borderRadius: 8, padding: "16px 18px",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                  {agencyStats.deliverablesThisWeek > 0 && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C4973F", display: "inline-block" }} />}
+                  <p style={{ fontSize: 20, fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif", color: agencyStats.deliverablesThisWeek > 0 ? "#C4973F" : "#FFFDF8" }}>
+                    {agencyStats.deliverablesThisWeek}
+                  </p>
+                </div>
+                <p style={{ fontSize: 11, color: "#555250", fontFamily: "var(--font-inter)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Deliverables due this week
+                </p>
+              </div>
+            </Link>
+            <Link href="/reports" style={{ textDecoration: "none" }}>
+              <div style={{
+                background: "#0F0E0B", border: `0.5px solid ${agencyStats.unreportedClients > 0 ? "#C4973F30" : "#1E1C18"}`,
+                borderRadius: 8, padding: "16px 18px",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                  {agencyStats.unreportedClients > 0 && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C4973F", display: "inline-block" }} />}
+                  <p style={{ fontSize: 20, fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif", color: agencyStats.unreportedClients > 0 ? "#C4973F" : "#FFFDF8" }}>
+                    {agencyStats.unreportedClients}
+                  </p>
+                </div>
+                <p style={{ fontSize: 11, color: "#555250", fontFamily: "var(--font-inter)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Reports to send this month
+                </p>
+              </div>
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div style={{ marginTop: 40, paddingTop: 32, borderTop: "0.5px solid #1A1814" }}>
+          <p style={{
+            fontSize: 10, color: "#2A2826", textTransform: "uppercase", letterSpacing: "0.12em",
+            fontFamily: "var(--font-inter)", marginBottom: 12,
+          }}>
+            Your agency
+          </p>
+          <p style={{ fontSize: 13, color: "#2A2826", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}>
+            When you win your first client through Venn — they appear here.
+          </p>
+        </div>
+      )}
     </>
   );
 }
