@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
 
 function HomeIcon() {
   return (
@@ -49,13 +50,24 @@ function ProposalIcon() {
   );
 }
 
+function CloseIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 11V7a4 4 0 00-8 0v4H0v2h15v-2h-.5M8 11H.5" />
+      <circle cx="11.5" cy="10" r="3.5" />
+      <path d="M10 10h3M11.5 8.5v3" />
+    </svg>
+  );
+}
+
 const navItems = [
   { href: "/home", label: "Overview", Icon: HomeIcon },
   { href: "/search", label: "New Search", Icon: SearchIcon },
   { href: "/leads", label: "Leads", Icon: LeadsIcon },
+  { href: "/close", label: "Close", Icon: CloseIcon, badgeKey: "close" },
   { href: "/proposals", label: "Proposals", Icon: ProposalIcon },
   { href: "/settings", label: "Settings", Icon: SettingsIcon },
-];
+] as const;
 
 interface SidebarNavProps {
   userName?: string;
@@ -64,15 +76,31 @@ interface SidebarNavProps {
 
 export function SidebarNav({ userName, userEmail }: SidebarNavProps) {
   const pathname = usePathname();
+  const [closeBadge, setCloseBadge] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/close")
+      .then((r) => r.json())
+      .then((data: { sessions?: Array<{ status: string; proposalId: string | null }> }) => {
+        if (!Array.isArray(data.sessions)) return;
+        const count = data.sessions.filter(
+          (s) => s.status === "discovery_complete" && !s.proposalId
+        ).length;
+        setCloseBadge(count);
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <nav className="flex-1 px-3 py-5 space-y-0.5">
-        {navItems.map(({ href, label, Icon }) => {
+        {navItems.map(({ href, label, Icon, ...rest }) => {
+          const badgeKey = "badgeKey" in rest ? (rest as { badgeKey?: string }).badgeKey : undefined;
           const isActive =
             href === "/home"
               ? pathname === "/home"
               : pathname === href || pathname.startsWith(`${href}/`);
+          const badgeCount = badgeKey === "close" ? closeBadge : 0;
 
           return (
             <Link
@@ -89,6 +117,11 @@ export function SidebarNav({ userName, userEmail }: SidebarNavProps) {
                 <Icon />
               </span>
               <span className={isActive ? "font-medium" : ""}>{label}</span>
+              {badgeCount > 0 && (
+                <span className="ml-auto flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none">
+                  {badgeCount}
+                </span>
+              )}
             </Link>
           );
         })}

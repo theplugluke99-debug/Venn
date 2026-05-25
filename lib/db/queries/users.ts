@@ -51,6 +51,8 @@ export async function upsertCardIdentity(
     ctaValue?: string;
     cardStyle?: string;
     socialProof?: Prisma.InputJsonValue;
+    defaultResponseTime?: string;
+    closeIntroText?: string;
   }
 ) {
   return db.cardIdentity.upsert({

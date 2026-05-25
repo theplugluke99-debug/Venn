@@ -35,6 +35,7 @@ model User {
   feedback        Feedback[]
   proposals       Proposal[]
   servicePackages ServicePackage[]
+  closeSessions   CloseSession[]
 }
 
 model ApiKey {
@@ -62,10 +63,12 @@ model CardIdentity {
   defaultAngle     String   @default("pain")
   ctaType          String   @default("reply")
   ctaValue         String?
-  cardStyle        String   @default("editorial")
-  socialProof      Json?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  cardStyle            String   @default("editorial")
+  socialProof          Json?
+  defaultResponseTime  String   @default("24 hours")
+  closeIntroText       String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
 
 model Lead {
@@ -100,6 +103,7 @@ model Lead {
   card               Card?
   sequence           Sequence?
   proposals          Proposal[]
+  closeSessions      CloseSession[]
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 }
@@ -274,4 +278,39 @@ model ServicePackage {
   isDefault   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model CloseSession {
+  id                   String            @id @default(cuid())
+  leadId               String
+  lead                 Lead              @relation(fields: [leadId], references: [id])
+  userId               String
+  user                 User              @relation(fields: [userId], references: [id])
+  slug                 String            @unique
+  status               String            @default("sent")
+  questions            Json
+  answers              Json?
+  discoveryViewedAt    DateTime?
+  discoveryCompletedAt DateTime?
+  proposalId           String?
+  proposalGeneratedAt  DateTime?
+  viewCount            Int               @default(0)
+  lastViewed           DateTime?
+  completionRate       Float?
+  sentMessage          String?
+  sentChannel          String?
+  sentAt               DateTime?
+  discoveryAnswers     DiscoveryAnswer[]
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+}
+
+model DiscoveryAnswer {
+  id             String       @id @default(cuid())
+  closeSessionId String
+  closeSession   CloseSession @relation(fields: [closeSessionId], references: [id])
+  questionIndex  Int
+  questionText   String
+  answer         String
+  answeredAt     DateTime     @default(now())
 }

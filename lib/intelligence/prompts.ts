@@ -152,7 +152,45 @@ Rules:
 - ctaText must match the agency's ctaType
 `;
 
-export const PROPOSAL_PROMPT = (lead: unknown, cardIdentity: unknown, packages: unknown) => `
+export const CLOSE_QUESTIONS_PROMPT = (lead: unknown, cardIdentity: unknown) => `
+You are generating personalised discovery questions for an async sales experience called Venn Close.
+
+The prospect will answer these questions before their proposal is generated. The questions must feel like they come from a human who has done real research — not a generic intake form.
+
+LEAD / BUSINESS DATA:
+${JSON.stringify(lead, null, 2)}
+
+AGENCY IDENTITY:
+${JSON.stringify(cardIdentity, null, 2)}
+
+Rules:
+- Generate exactly 4 questions. Never 3, never 5. Always 4.
+- Every question must reference something SPECIFIC from the lead data (a signal, a review theme, a stat, a gap)
+- Never ask generic questions. "What are your goals" is not acceptable.
+- One question must address a specific pain signal found in the data
+- One question must explore their experience with previous solutions/agencies
+- One question must reveal their timeline and urgency
+- One question must ask what success looks like to them specifically
+- Each question should feel warm and curious — like a smart person who cares about the outcome
+- The context line (explaining why you're asking) should add warmth, not bureaucracy. If it doesn't add warmth, omit it.
+- sentMessage must be under 14 words. Natural. Agency owner's voice. Never start with "I".
+- responseTime is how quickly the agency will respond after completion.
+
+Respond ONLY with valid JSON:
+{
+  "questions": [
+    {
+      "text": "The question. Thoughtful. Specific to their business. One or two sentences max.",
+      "context": "One sentence explaining why you're asking this. Only include if it genuinely adds warmth. Otherwise omit this field entirely.",
+      "placeholder": "A suggested placeholder for the textarea — casual and inviting, not prescriptive"
+    }
+  ],
+  "responseTime": "24 hours",
+  "sentMessage": "Pre-written message to send with the Close link — under 14 words, in agency owner's voice"
+}
+`;
+
+export const PROPOSAL_PROMPT = (lead: unknown, cardIdentity: unknown, packages: unknown, discoveryContext?: Array<{ question: string; answer: string }>) => `
 You are writing a personalised proposal for a business. This proposal will be read by the business owner on a beautiful web page. It must feel like genuine, bespoke work — not a template.
 
 LEAD / BUSINESS DATA:
@@ -163,7 +201,12 @@ ${JSON.stringify(cardIdentity, null, 2)}
 
 SERVICE PACKAGES AVAILABLE:
 ${JSON.stringify(packages, null, 2)}
+${discoveryContext && discoveryContext.length > 0 ? `
+DISCOVERY CONVERSATION — THE PROSPECT ANSWERED THESE QUESTIONS BEFORE THE PROPOSAL:
+${JSON.stringify(discoveryContext, null, 2)}
 
+CRITICAL: Use their exact words where relevant. Reference what they said specifically. If they mentioned previous bad experiences, address that directly in the proposal. If they expressed urgency or a specific timeline, acknowledge it. This proposal was written after a real conversation — make it feel that way.
+` : ""}
 Respond ONLY with valid JSON matching this exact structure:
 {
   "title": "Proposal title — e.g. 'A Growth Plan for [Business Name]'. Under 8 words.",

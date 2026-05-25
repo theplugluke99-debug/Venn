@@ -6,6 +6,7 @@ import { getLeadById } from "@/lib/db/queries/leads";
 import { GenerateCardButton } from "./GenerateCardButton";
 import { CopyButton } from "./CopyButton";
 import { GenerateProposalButton } from "./GenerateProposalButton";
+import { SendCloseButton } from "./SendCloseButton";
 import type {
   IntentScore,
   Observation,
@@ -42,6 +43,7 @@ export default async function LeadDetailPage({
 
   const plan = user.subscription?.plan ?? "starter";
   const canProposals = plan === "pro" || plan === "enterprise";
+  const canClose = plan === "growth" || plan === "pro" || plan === "enterprise";
 
   const observations = lead.observations as Observation[] | null;
   const websiteAudit = lead.websiteAudit as WebsiteAudit | null;
@@ -454,8 +456,13 @@ export default async function LeadDetailPage({
           <GenerateCardButton leadId={id} />
         )}
 
+        {lead.status === "complete" && canClose && (
+          <div style={{ marginTop: 12 }}>
+            <SendCloseButton leadId={id} businessName={lead.businessName} phone={lead.phone} />
+          </div>
+        )}
         {lead.status === "complete" && canProposals && (
-          <div style={{ marginTop: 16 }}>
+          <div style={{ marginTop: 8 }}>
             <GenerateProposalButton leadId={id} />
           </div>
         )}

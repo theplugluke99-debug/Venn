@@ -1,3 +1,73 @@
+export function closeDiscoveryCompletedHtml({
+  agencyOwnerName,
+  businessName,
+  questions,
+  answers,
+  sessionUrl,
+  generateUrl,
+}: {
+  agencyOwnerName: string;
+  businessName: string;
+  questions: Array<{ text: string }>;
+  answers: Record<string, string>;
+  sessionUrl: string;
+  generateUrl: string;
+}): string {
+  const firstName = agencyOwnerName.split(" ")[0];
+  const qaRows = questions
+    .map((q, i) => {
+      const ans = answers[String(i)] ?? answers[String(i + 1)] ?? "No answer";
+      return `<tr>
+        <td style="padding:12px 0;border-bottom:1px solid #eee;vertical-align:top;">
+          <p style="font-style:italic;color:#1a1a18;margin:0 0 6px;font-size:14px;">${q.text}</p>
+          <p style="color:#555;margin:0;font-size:13px;line-height:1.6;">${ans}</p>
+        </td>
+      </tr>`;
+    })
+    .join("");
+
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body style="background:#fff;font-family:Georgia,serif;color:#1a1a18;max-width:520px;margin:40px auto;padding:0 24px;line-height:1.7;">
+  <p>${firstName} —</p>
+  <p><strong>${businessName}</strong> just completed their Venn Close discovery. Here's what they said:</p>
+  <table style="width:100%;border-collapse:collapse;margin:24px 0;">${qaRows}</table>
+  <p>Generate their proposal now while this is fresh:</p>
+  <p>
+    <a href="${generateUrl}" style="display:inline-block;background:#C4973F;color:#0A0907;padding:10px 20px;text-decoration:none;border-radius:4px;font-size:14px;margin-bottom:8px;">Generate proposal →</a>
+  </p>
+  <p><a href="${sessionUrl}" style="color:#C4973F;font-size:13px;">View session in dashboard →</a></p>
+  <p style="margin-top:32px;">— Venn</p>
+  <hr style="border:none;border-top:1px solid #eee;margin:32px 0;" />
+  <p style="font-size:12px;color:#999;">Venn · <a href="${process.env.NEXT_PUBLIC_APP_URL}" style="color:#999;">venn.so</a></p>
+</body>
+</html>`;
+}
+
+export function closeViewedHtml({
+  agencyOwnerName,
+  businessName,
+  sessionUrl,
+}: {
+  agencyOwnerName: string;
+  businessName: string;
+  sessionUrl: string;
+}): string {
+  const firstName = agencyOwnerName.split(" ")[0];
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body style="background:#fff;font-family:Georgia,serif;color:#1a1a18;max-width:520px;margin:40px auto;padding:0 24px;line-height:1.7;">
+  <p>${firstName} —</p>
+  <p><strong>${businessName}</strong> just opened their Venn Close discovery for the first time.</p>
+  <p>They're reading your questions now.</p>
+  <p><a href="${sessionUrl}" style="color:#C4973F;">View session →</a></p>
+  <p style="margin-top:32px;">— Venn</p>
+</body>
+</html>`;
+}
+
 export function proposalQuestionNotificationHtml({
   agencyOwnerName,
   businessName,

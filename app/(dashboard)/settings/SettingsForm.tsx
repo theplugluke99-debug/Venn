@@ -18,6 +18,8 @@ interface CardIdentity {
   ctaType: string;
   ctaValue: string | null;
   cardStyle: string;
+  defaultResponseTime?: string | null;
+  closeIntroText?: string | null;
 }
 
 interface ServicePackageRow {
@@ -286,6 +288,8 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
     ctaType: initialData?.ctaType ?? "reply",
     ctaValue: initialData?.ctaValue ?? "",
     cardStyle: initialData?.cardStyle ?? "editorial",
+    defaultResponseTime: initialData?.defaultResponseTime ?? "24 hours",
+    closeIntroText: initialData?.closeIntroText ?? "",
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -577,6 +581,52 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
                 <div style={{ fontSize: 11, color: "#444440", marginTop: 2 }}>{style.desc}</div>
               </button>
             ))}
+          </div>
+        </section>
+
+        {/* Venn Close settings */}
+        <section style={{ background: "#0F0E0B", border: "0.5px solid #1E1C18", borderRadius: 8, padding: 20 }}>
+          {sectionTitle("Venn Close")}
+          <div className="flex flex-col gap-5">
+            <Field label="Default response time">
+              <div style={{ display: "flex", gap: 8 }}>
+                {["24 hours", "48 hours", "72 hours"].map((rt) => (
+                  <button
+                    key={rt}
+                    type="button"
+                    onClick={() => update("defaultResponseTime", rt)}
+                    style={{
+                      padding: "7px 14px", borderRadius: 5, fontSize: 12,
+                      fontFamily: "var(--font-inter)", cursor: "pointer",
+                      background: form.defaultResponseTime === rt ? "#C4973F15" : "transparent",
+                      border: `0.5px solid ${form.defaultResponseTime === rt ? "#C4973F" : "#1E1C18"}`,
+                      color: form.defaultResponseTime === rt ? "#C4973F" : "#555250",
+                    }}
+                  >
+                    {rt}
+                  </button>
+                ))}
+              </div>
+            </Field>
+            <Field label="Opening message (shown to prospects)">
+              <textarea
+                value={form.closeIntroText}
+                onChange={(e) => update("closeIntroText", e.target.value)}
+                placeholder={`I've already looked at [businessName] in detail. Before I build your proposal I want to make sure it reflects what actually matters to you — not just what I found.\n\nThis takes about three minutes. There are no wrong answers.`}
+                rows={5}
+                style={{
+                  width: "100%", background: "#0F0E0B", border: "0.5px solid #1E1C18",
+                  borderRadius: 6, padding: "10px 12px", color: "#FFFDF8",
+                  fontSize: 13, fontFamily: "var(--font-inter)", outline: "none",
+                  resize: "vertical", lineHeight: 1.6,
+                }}
+                onFocus={(e) => (e.target.style.borderColor = "#C4973F")}
+                onBlur={(e) => (e.target.style.borderColor = "#1E1C18")}
+              />
+              <p style={{ fontSize: 11, color: "#333230", fontFamily: "var(--font-inter)", marginTop: 4 }}>
+                Leave blank to use the default. [businessName] is replaced automatically.
+              </p>
+            </Field>
           </div>
         </section>
 

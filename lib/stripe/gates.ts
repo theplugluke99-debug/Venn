@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { PLAN_LIMITS } from "@/lib/stripe/plans";
 
-export type GatedFeature = "search" | "cards" | "sequences" | "proposals" | "reporting";
+export type GatedFeature = "search" | "cards" | "sequences" | "proposals" | "close_session" | "reporting";
 
 const PLAN_ORDER: Record<string, number> = {
   solopreneur: 0,
@@ -11,13 +11,13 @@ const PLAN_ORDER: Record<string, number> = {
   enterprise: 4,
 };
 
-// Per-plan feature access (solopreneur has sequences but not cards/proposals)
+// Per-plan feature access
 const PLAN_FEATURES: Record<string, Record<GatedFeature, boolean>> = {
-  solopreneur: { search: true, cards: false, sequences: true, proposals: false, reporting: false },
-  starter:     { search: true, cards: true,  sequences: false, proposals: false, reporting: false },
-  growth:      { search: true, cards: true,  sequences: true,  proposals: false, reporting: false },
-  pro:         { search: true, cards: true,  sequences: true,  proposals: true,  reporting: true  },
-  enterprise:  { search: true, cards: true,  sequences: true,  proposals: true,  reporting: true  },
+  solopreneur: { search: true, cards: false, sequences: true,  proposals: false, close_session: false, reporting: false },
+  starter:     { search: true, cards: true,  sequences: false, proposals: false, close_session: false, reporting: false },
+  growth:      { search: true, cards: true,  sequences: true,  proposals: false, close_session: true,  reporting: false },
+  pro:         { search: true, cards: true,  sequences: true,  proposals: true,  close_session: true,  reporting: true  },
+  enterprise:  { search: true, cards: true,  sequences: true,  proposals: true,  close_session: true,  reporting: true  },
 };
 
 export async function canUseFeature(userId: string, feature: GatedFeature): Promise<boolean> {

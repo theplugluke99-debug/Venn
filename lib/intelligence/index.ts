@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { SCORING_PROMPT, DELIVERY_PROMPT, PROPOSAL_PROMPT } from "./prompts";
+import { SCORING_PROMPT, DELIVERY_PROMPT, PROPOSAL_PROMPT, CLOSE_QUESTIONS_PROMPT } from "./prompts";
 import type { IntelligenceProfile } from "@/types";
 import { config } from "@/lib/config";
 
@@ -171,9 +171,10 @@ export interface ProposalContent {
 export async function generateProposalContent(
   lead: unknown,
   cardIdentity: unknown,
-  packages: unknown
+  packages: unknown,
+  discoveryContext?: Array<{ question: string; answer: string }>
 ): Promise<ProposalContent> {
-  const prompt = PROPOSAL_PROMPT(lead, cardIdentity, packages);
+  const prompt = PROPOSAL_PROMPT(lead, cardIdentity, packages, discoveryContext);
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
@@ -197,6 +198,44 @@ export async function generateProposalContent(
     beforeAfter: Array.isArray(parsed.beforeAfter) ? parsed.beforeAfter : [],
     investmentContext: parsed.investmentContext ?? "",
     closingSection: parsed.closingSection ?? "",
+  };
+}
+
+export interface DiscoveryQuestion {
+  text: string;
+  context?: string;
+  placeholder?: string;
+}
+
+export interface CloseQuestionsResult {
+  questions: DiscoveryQuestion[];
+  responseTime: string;
+  sentMessage: string;
+}
+
+export async function generateCloseQuestions(
+  lead: unknown,
+  cardIdentity: unknown
+): Promise<CloseQuestionsResult> {
+  const prompt = CLOSE_QUESTIONS_PROMPT(lead, cardIdentity);
+
+  const message = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 1200,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const content = message.content[0];
+  if (content.type !== "text") throw new Error("Unexpected response type");
+
+  const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("No JSON in close questions response");
+
+  const parsed = JSON.parse(jsonMatch[0]) as Partial<CloseQuestionsResult>;
+  return {
+    questions: Array.isArray(parsed.questions) ? parsed.questions.slice(0, 4) : [],
+    responseTime: parsed.responseTime ?? "24 hours",
+    sentMessage: parsed.sentMessage ?? "Put something together before your proposal",
   };
 }
 
