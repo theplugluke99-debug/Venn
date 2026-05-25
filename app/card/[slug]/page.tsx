@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { getCardBySlug, incrementCardViewCount } from "@/lib/db/queries/cards";
 import { ProspectCard } from "@/components/card/ProspectCard";
-import type { CardObservation } from "@/types";
+import type { CardObservationFull, RevenueBreakdownItem, ApproachMove } from "@/components/card/ProspectCard";
 
 export async function generateMetadata({
   params,
@@ -19,19 +19,18 @@ export async function generateMetadata({
     include: { cardIdentity: true },
   });
   const agencyName = card.agencyName ?? cardUser?.cardIdentity?.agencyName ?? null;
+  const mins = card.minutesAnalysing ?? 14;
 
   return {
-    title: `${card.lead.businessName} — something put together for you`,
-    description: agencyName
-      ? `A personalised intelligence briefing from ${agencyName}`
-      : `A personalised intelligence briefing for ${card.lead.businessName}`,
+    title: `Something prepared for ${card.lead.businessName}`,
+    description: `We spent ${mins} minutes analysing ${card.lead.businessName}. Here's what we found.`,
     robots: { index: false, follow: false },
     viewport: "width=device-width, initial-scale=1, maximum-scale=1",
     openGraph: {
-      title: `${card.lead.businessName} — something put together for you`,
+      title: `Something prepared for ${card.lead.businessName}`,
       description: agencyName
-        ? `A personalised intelligence briefing from ${agencyName}`
-        : `A personalised prospect briefing`,
+        ? `We spent ${mins} minutes analysing ${card.lead.businessName}. Prepared by ${agencyName}.`
+        : `We spent ${mins} minutes analysing ${card.lead.businessName}. Here's what we found.`,
       type: "website",
     },
   };
@@ -53,28 +52,32 @@ export default async function CardPage({
     include: { cardIdentity: true },
   });
 
-  const cardIdentity = {
-    ctaType: cardUser?.cardIdentity?.ctaType ?? "reply",
-    ctaValue: card.ctaValue ?? cardUser?.cardIdentity?.ctaValue ?? null,
-    brandColour: card.brandColour ?? cardUser?.cardIdentity?.brandColour ?? "#C4973F",
-    logoUrl: card.logoUrl ?? cardUser?.cardIdentity?.logoUrl ?? null,
-    agencyName: card.agencyName ?? cardUser?.cardIdentity?.agencyName ?? null,
-  };
+  const identity = cardUser?.cardIdentity;
 
   return (
     <ProspectCard
       businessName={card.lead.businessName}
       headline={card.headline ?? `Here's what we found about ${card.lead.businessName}`}
-      observations={(card.observations as unknown as CardObservation[]) ?? []}
-      revenueLoss={card.revenueLoss ?? null}
-      ctaText={card.ctaText ?? "Let's talk"}
-      ctaType={cardIdentity.ctaType}
-      ctaValue={cardIdentity.ctaValue}
-      brandColour={cardIdentity.brandColour}
-      logoUrl={cardIdentity.logoUrl}
-      agencyName={cardIdentity.agencyName}
+      subheadline={undefined}
       niche={card.lead.niche}
       location={card.lead.location}
+      googleRating={card.lead.googleRating}
+      reviewCount={card.lead.reviewCount}
+      observations={(card.observations as unknown as CardObservationFull[]) ?? []}
+      revenueLoss={card.revenueLoss ?? null}
+      revenueBreakdown={(card.revenueBreakdown as unknown as RevenueBreakdownItem[]) ?? []}
+      approachMoves={(card.approachMoves as unknown as ApproachMove[]) ?? []}
+      minutesAnalysing={card.minutesAnalysing}
+      signalBanner={card.signalBanner}
+      brandColour={card.brandColour ?? identity?.brandColour ?? "#C4973F"}
+      logoUrl={card.logoUrl ?? identity?.logoUrl ?? null}
+      agencyName={card.agencyName ?? identity?.agencyName ?? null}
+      agencyOwnerName={identity?.agencyOwnerName ?? null}
+      agencyOwnerPhoto={identity?.agencyOwnerPhoto ?? null}
+      ctaType={identity?.ctaType ?? "reply"}
+      ctaValue={card.ctaValue ?? identity?.ctaValue ?? null}
+      ctaText={card.ctaText ?? "Let's talk"}
+      lastViewed={card.lastViewed}
     />
   );
 }

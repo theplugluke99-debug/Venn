@@ -66,3 +66,28 @@ export async function updateCard(
 ) {
   return db.card.update({ where: { id }, data });
 }
+
+export async function getCardById(id: string) {
+  return db.card.findUnique({
+    where: { id },
+    include: {
+      lead: {
+        select: {
+          businessName: true,
+          ownerName: true,
+          location: true,
+          niche: true,
+          googleRating: true,
+          reviewCount: true,
+          phone: true,
+          email: true,
+          instagramHandle: true,
+          businessBio: true,
+          intentScore: true,
+          observations: true,
+          openingLine: true,
+        },
+      },
+    },
+  });
+}

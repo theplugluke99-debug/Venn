@@ -1,7 +1,9 @@
 import { db } from "@/lib/db";
-import { generateCardCopy } from "@/lib/intelligence";
+import { generateCardCopy, generateDeliveryMessages } from "@/lib/intelligence";
 import { generateSlug } from "./generator";
 import type { Prisma } from "@prisma/client";
+
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://venn.so";
 
 export async function buildCard(leadId: string, userId: string) {
   const lead = await db.lead.findUnique({
@@ -19,6 +21,15 @@ export async function buildCard(leadId: string, userId: string) {
   const cardCopy = await generateCardCopy(lead, cardIdentity);
 
   const slug = generateSlug(lead.businessName);
+  const cardUrl = `${BASE_URL}/card/${slug}`;
+
+  // Generate delivery messages in parallel with card creation
+  let deliveryMessages = null;
+  try {
+    deliveryMessages = await generateDeliveryMessages(lead, cardIdentity, cardUrl);
+  } catch (err) {
+    console.error("[buildCard] Delivery messages failed:", err);
+  }
 
   const card = await db.card.create({
     data: {
@@ -28,6 +39,11 @@ export async function buildCard(leadId: string, userId: string) {
       headline: cardCopy.headline,
       observations: cardCopy.observations as unknown as Prisma.InputJsonValue,
       revenueLoss: cardCopy.revenueLoss,
+      revenueBreakdown: cardCopy.revenueBreakdown as unknown as Prisma.InputJsonValue,
+      approachMoves: cardCopy.approachMoves as unknown as Prisma.InputJsonValue,
+      minutesAnalysing: cardCopy.minutesAnalysing,
+      signalBanner: cardCopy.signalBanner || null,
+      deliveryMessages: deliveryMessages as unknown as Prisma.InputJsonValue,
       ctaText: cardCopy.ctaText,
       ctaValue: cardIdentity?.ctaValue ?? null,
       brandColour: cardIdentity?.brandColour ?? "#C4973F",

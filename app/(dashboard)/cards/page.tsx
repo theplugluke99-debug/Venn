@@ -95,18 +95,21 @@ export default async function CardsPage() {
                 {new Date(card.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
               </p>
             </div>
-            <Link
-              href={`/card/${card.slug}`}
-              target="_blank"
-              style={{
-                fontSize: 12,
-                color: "#C4973F",
-                fontFamily: "var(--font-inter)",
-                textDecoration: "none",
-              }}
-            >
-              View →
-            </Link>
+            <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+              <Link
+                href={`/cards/${card.id}/deliver`}
+                style={{ fontSize: 12, color: "#888580", fontFamily: "var(--font-inter)", textDecoration: "none" }}
+              >
+                Deliver
+              </Link>
+              <Link
+                href={`/card/${card.slug}`}
+                target="_blank"
+                style={{ fontSize: 12, color: "#C4973F", fontFamily: "var(--font-inter)", textDecoration: "none" }}
+              >
+                View →
+              </Link>
+            </div>
           </div>
         ))}
       </div>

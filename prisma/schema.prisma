@@ -46,21 +46,24 @@ model ApiKey {
 }
 
 model CardIdentity {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id])
-  brandColour   String   @default("#C4973F")
-  accentColour  String   @default("#E8B44B")
-  logoUrl       String?
-  agencyName    String?
-  agencyTagline String?
-  writingStyle  String?
-  defaultAngle  String   @default("pain")
-  ctaType       String   @default("reply")
-  ctaValue      String?
-  socialProof   Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id])
+  brandColour      String   @default("#C4973F")
+  accentColour     String   @default("#E8B44B")
+  logoUrl          String?
+  agencyName       String?
+  agencyTagline    String?
+  agencyOwnerName  String?
+  agencyOwnerPhoto String?
+  writingStyle     String?
+  defaultAngle     String   @default("pain")
+  ctaType          String   @default("reply")
+  ctaValue         String?
+  cardStyle        String   @default("editorial")
+  socialProof      Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model Lead {
@@ -127,23 +130,29 @@ model SequenceStep {
 }
 
 model Card {
-  id           String    @id @default(cuid())
-  slug         String    @unique
-  leadId       String    @unique
-  lead         Lead      @relation(fields: [leadId], references: [id])
-  userId       String
-  headline     String?
-  observations Json?
-  revenueLoss  String?
-  ctaText      String?
-  ctaValue     String?
-  brandColour  String?
-  logoUrl      String?
-  agencyName   String?
-  viewCount    Int       @default(0)
-  lastViewed   DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  slug             String    @unique
+  leadId           String    @unique
+  lead             Lead      @relation(fields: [leadId], references: [id])
+  userId           String
+  headline         String?
+  observations     Json?
+  revenueLoss      String?
+  revenueBreakdown Json?
+  approachMoves    Json?
+  minutesAnalysing Int?
+  signalBanner     String?
+  personalNote     String?
+  deliveryMessages Json?
+  ctaText          String?
+  ctaValue         String?
+  brandColour      String?
+  logoUrl          String?
+  agencyName       String?
+  viewCount        Int       @default(0)
+  lastViewed       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Subscription {

@@ -43,10 +43,13 @@ export async function upsertCardIdentity(
     logoUrl?: string;
     agencyName?: string;
     agencyTagline?: string;
+    agencyOwnerName?: string;
+    agencyOwnerPhoto?: string;
     writingStyle?: string;
     defaultAngle?: string;
     ctaType?: string;
     ctaValue?: string;
+    cardStyle?: string;
     socialProof?: Prisma.InputJsonValue;
   }
 ) {

@@ -11,10 +11,13 @@ interface CardIdentity {
   logoUrl: string | null;
   agencyName: string | null;
   agencyTagline: string | null;
+  agencyOwnerName: string | null;
+  agencyOwnerPhoto: string | null;
   writingStyle: string | null;
   defaultAngle: string;
   ctaType: string;
   ctaValue: string | null;
+  cardStyle: string;
 }
 
 interface SettingsFormProps {
@@ -267,10 +270,13 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
     logoUrl: initialData?.logoUrl ?? "",
     agencyName: initialData?.agencyName ?? "",
     agencyTagline: initialData?.agencyTagline ?? "",
+    agencyOwnerName: initialData?.agencyOwnerName ?? "",
+    agencyOwnerPhoto: initialData?.agencyOwnerPhoto ?? "",
     writingStyle: initialData?.writingStyle ?? "",
     defaultAngle: initialData?.defaultAngle ?? "pain",
     ctaType: initialData?.ctaType ?? "reply",
     ctaValue: initialData?.ctaValue ?? "",
+    cardStyle: initialData?.cardStyle ?? "editorial",
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -327,6 +333,12 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
             </Field>
             <Field label="Logo URL">
               <TextInput value={form.logoUrl} onChange={(v) => update("logoUrl", v)} placeholder="https://cdn.youragency.com/logo.svg" />
+            </Field>
+            <Field label="Your name (shown on card)">
+              <TextInput value={form.agencyOwnerName} onChange={(v) => update("agencyOwnerName", v)} placeholder="e.g. Luke K." />
+            </Field>
+            <Field label="Your photo URL (circular, shown on card)">
+              <TextInput value={form.agencyOwnerPhoto} onChange={(v) => update("agencyOwnerPhoto", v)} placeholder="https://..." />
             </Field>
             <Field label="Brand colour">
               <div className="flex items-center gap-3">
@@ -406,6 +418,40 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
             <Field label={ctaLabels[form.ctaType] ?? "CTA value"}>
               <TextInput value={form.ctaValue} onChange={(v) => update("ctaValue", v)} placeholder={ctaPlaceholders[form.ctaType] ?? ""} />
             </Field>
+          </div>
+        </section>
+
+        {/* Card style */}
+        <section style={{ background: "#0F0E0B", border: "0.5px solid #1E1C18", borderRadius: 8, padding: 20 }}>
+          {sectionTitle("Card style")}
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {[
+              { id: "editorial", label: "Editorial", desc: "Dark, numbered sections, review quotes" },
+              { id: "minimal", label: "Minimal", desc: "Very sparse, data focused", soon: true },
+              { id: "letter", label: "Letter", desc: "Warm, personal tone", soon: true },
+              { id: "narrative", label: "Narrative", desc: "Cinematic scroll", soon: true },
+            ].map((style) => (
+              <button
+                key={style.id}
+                type="button"
+                onClick={() => !style.soon && update("cardStyle", style.id)}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: 6,
+                  border: form.cardStyle === style.id ? "0.5px solid #C4973F" : "0.5px solid #1E1C18",
+                  background: form.cardStyle === style.id ? "rgba(196,151,63,0.06)" : "transparent",
+                  color: form.cardStyle === style.id ? "#C4973F" : style.soon ? "#2A2826" : "#555250",
+                  fontSize: 13,
+                  fontFamily: "var(--font-inter)",
+                  cursor: style.soon ? "not-allowed" : "pointer",
+                  textAlign: "left" as const,
+                  opacity: style.soon ? 0.5 : 1,
+                }}
+              >
+                <div>{style.label}{style.soon && <span style={{ fontSize: 10, marginLeft: 6, color: "#444440" }}>Soon</span>}</div>
+                <div style={{ fontSize: 11, color: "#444440", marginTop: 2 }}>{style.desc}</div>
+              </button>
+            ))}
           </div>
         </section>
 

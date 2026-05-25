@@ -80,9 +80,7 @@ Rules:
 `;
 
 export const CARD_PROMPT = (lead: unknown, cardIdentity: unknown) => `
-You are writing copy for a personalised prospect card.
-
-This card will be seen by the business owner named below. It must feel like a human being built it specifically for them.
+You are writing copy for a personalised prospect card. This card will be seen by the business owner. It must feel like a human built it specifically for them — not a template.
 
 LEAD DATA:
 ${JSON.stringify(lead, null, 2)}
@@ -90,22 +88,92 @@ ${JSON.stringify(lead, null, 2)}
 AGENCY IDENTITY:
 ${JSON.stringify(cardIdentity, null, 2)}
 
-Respond ONLY with valid JSON:
+Respond ONLY with valid JSON matching this exact structure:
 {
-  "headline": "A single arresting headline. Maximum 8 words. Specific to their business.",
-  "subheadline": "One sentence expanding the headline. Empathetic not salesy.",
+  "headline": "A single arresting headline. Maximum 8 words. Must reference their specific situation.",
+  "subheadline": "One empathetic sentence expanding the headline. Not salesy.",
   "observations": [
-    { "title": "Observation one", "detail": "Specific finding from their business data" },
-    { "title": "Observation two", "detail": "Specific finding" },
-    { "title": "Observation three", "detail": "Specific finding" }
+    {
+      "title": "Primary negative signal title",
+      "detail": "Specific finding from their data — 1-2 sentences",
+      "reviewQuote": "An actual or representative quote from their reviews (in quotes, realistic)",
+      "frequency": "e.g. '6 mentions this month' or 'Affecting ~23% of bookings'",
+      "impact": "high"
+    },
+    {
+      "title": "Secondary signal",
+      "detail": "Specific finding",
+      "reviewQuote": "A short representative quote",
+      "frequency": "Specific frequency or impact stat",
+      "impact": "high"
+    },
+    {
+      "title": "Positive signal — what they do well",
+      "detail": "What clients genuinely love about this business",
+      "reviewQuote": "A positive representative quote",
+      "frequency": "e.g. 'Mentioned in 73% of positive reviews'",
+      "impact": "medium"
+    }
   ],
-  "revenueLoss": "Estimated monthly impact of their main problem in GBP. Be specific. E.g. £2,400/month",
-  "ctaText": "The CTA text. Human, low pressure. Maximum 12 words."
+  "revenueLoss": "£X,XXX/month",
+  "revenueBreakdown": [
+    { "icon": "clock", "description": "Fix wait time friction", "amount": 1250 },
+    { "icon": "phone", "description": "Repair mobile booking drop-off", "amount": 780 },
+    { "icon": "star", "description": "Increase rebooking rate", "amount": 370 }
+  ],
+  "approachMoves": [
+    {
+      "title": "Move title (2-4 words)",
+      "body": "One sentence prose describing this approach. Specific to this business. Not bullet points."
+    },
+    {
+      "title": "Move title",
+      "body": "One sentence."
+    },
+    {
+      "title": "Move title",
+      "body": "One sentence."
+    }
+  ],
+  "minutesAnalysing": 14,
+  "signalBanner": "Real-time signal detected: [specific finding from their recent reviews]",
+  "ctaText": "Human, low pressure CTA text. Maximum 12 words."
 }
 
 Rules:
-- Headline must name or reference their specific situation
-- Never use generic phrases like 'take your business to the next level'
-- Revenue loss must feel calculated not guessed — reference the specific signal
-- CTA must match the agency's ctaType and feel personal
+- headline must be specific — never generic
+- reviewQuote must feel real and human, drawn from patterns in their review data
+- revenueLoss must feel calculated, not guessed — reference the specific signals
+- revenueBreakdown icon options: "clock" | "phone" | "star" | "chart" — pick the best fit
+- revenueBreakdown amounts must sum to roughly the revenueLoss number
+- approachMoves must be specific to this business, not generic agency services
+- minutesAnalysing must be between 12 and 18
+- signalBanner must reference a specific recent signal, not be generic
+- ctaText must match the agency's ctaType
+`;
+
+export const DELIVERY_PROMPT = (lead: unknown, cardIdentity: unknown, cardUrl: string) => `
+Generate personalised delivery messages for this prospect card across four channels.
+
+BUSINESS: ${JSON.stringify({ businessName: (lead as Record<string, unknown>)?.businessName, niche: (lead as Record<string, unknown>)?.niche, location: (lead as Record<string, unknown>)?.location, openingLine: (lead as Record<string, unknown>)?.openingLine, observations: (lead as Record<string, unknown>)?.observations }, null, 2)}
+
+AGENCY:
+Name: ${(cardIdentity as Record<string, unknown>)?.agencyName ?? "the agency"}
+Owner: ${(cardIdentity as Record<string, unknown>)?.agencyOwnerName ?? "the owner"}
+Writing style: ${(cardIdentity as Record<string, unknown>)?.writingStyle ?? "professional and direct"}
+
+CARD URL: ${cardUrl}
+
+Write messages that sound like a real person who did real research. Never robotic. Never template-ish. Use the writing style provided.
+
+Respond ONLY with valid JSON:
+{
+  "whatsapp": "One short WhatsApp message. Under 40 words. Reference one specific signal from their business. Include the card URL at the end.",
+  "instagramStep1": "First Instagram DM. Curiosity-building only. No link. Under 20 words. Conversational.",
+  "instagramStep2": "Follow-up DM after they reply. Include the card URL. Under 20 words.",
+  "emailSubject": "Email subject line. Under 8 words. Reference their business name or main signal.",
+  "emailBody": "Email body. Three sentences max. First: what you found. Second: what it could mean for them. Third: soft invitation with the card URL.",
+  "linkedinNote": "LinkedIn connection request note. Max 280 characters. Professional. Reference something specific.",
+  "linkedinDm": "LinkedIn DM after connecting. Under 60 words. Reference their business. Include the card URL."
+}
 `;
