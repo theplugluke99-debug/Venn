@@ -4,12 +4,41 @@
   --color-gold: #C4973F;
   --color-gold-bright: #E8B44B;
   --color-deep-black: #0A0907;
+  --color-surface: #0F0E0B;
   --color-rich-dark: #0F0E0B;
   --color-charcoal: #1A1814;
   --color-ivory: #FFFDF8;
-  --color-muted: #888888;
+  --color-text-secondary: #888580;
+  --color-text-muted: #444440;
+  --color-border: #1E1C18;
+  --color-green: #4CAF50;
   --font-serif: var(--font-instrument-serif);
   --font-sans: var(--font-inter);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes signal-travel {
+  0% { left: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.blink-cursor {
+  animation: blink-cursor 600ms ease-in-out infinite;
 }
 
 * {

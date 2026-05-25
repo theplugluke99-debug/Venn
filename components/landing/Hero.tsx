@@ -4,23 +4,28 @@ import { useEffect, useState } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
 import Link from "next/link";
 
-// Lens intersection of two circles: left cx=20 cy=30 r=35, right cx=80 cy=30 r=35
-// Intersection points: (50, 11.97) and (50, 48.03)
-const LENS = "M 50 11.97 A 35 35 0 0 1 50 48.03 A 35 35 0 0 0 50 11.97 Z";
+// Vesica piscis for circles at (20,30) and (80,30) r=35 in viewBox 0 0 100 60
+// Intersection points: y = 30 ± sqrt(35² − 30²) = 30 ± 18.03
+const LENS_PATH = "M 50 11.97 A 35 35 0 0 1 50 48.03 A 35 35 0 0 0 50 11.97 Z";
 
-const HEADLINE = [
-  "The clients you need",
-  "are already out there.",
-  "Venn knows exactly",
-  "who they are.",
+const HEADLINE_LINES = [
+  ["The", "clients", "you", "need"],
+  ["are", "already", "out", "there."],
+  ["Venn", "knows", "exactly"],
+  ["who", "they", "are."],
 ];
 
-function VennMark() {
+function VennMark({ size = 28 }: { size?: number }) {
   return (
-    <svg viewBox="0 0 28 24" width="28" height="24" fill="none" aria-hidden>
-      <circle cx="10" cy="12" r="7" stroke="#C4973F" strokeWidth="1" />
-      <circle cx="18" cy="12" r="7" stroke="#C4973F" strokeWidth="1" />
-      <path d="M 14 6.26 A 7 7 0 0 1 14 17.74 A 7 7 0 0 0 14 6.26 Z" fill="#C4973F" />
+    <svg viewBox="0 0 28 24" width={size} height={Math.round((size * 24) / 28)} fill="none" aria-hidden>
+      <defs>
+        <clipPath id="hero-mark-clip">
+          <circle cx="10" cy="12" r="7" />
+        </clipPath>
+      </defs>
+      <circle cx="10" cy="12" r="7" stroke="#C4973F" strokeWidth="1" fill="none" />
+      <circle cx="18" cy="12" r="7" stroke="#C4973F" strokeWidth="1" fill="none" />
+      <circle cx="18" cy="12" r="7" fill="#C4973F" clipPath="url(#hero-mark-clip)" />
     </svg>
   );
 }
@@ -29,31 +34,41 @@ export function Hero() {
   const leftCx = useMotionValue(-30);
   const rightCx = useMotionValue(130);
 
-  const [logoVisible, setLogoVisible] = useState(false);
-  const [intersectionVisible, setIntersectionVisible] = useState(false);
+  const [phase, setPhase] = useState(0);
   const [breathing, setBreathing] = useState(false);
-  const [radiance, setRadiance] = useState(false);
-  const [headlineVisible, setHeadlineVisible] = useState(false);
-  const [sublineVisible, setSublineVisible] = useState(false);
-  const [ctasVisible, setCtasVisible] = useState(false);
+  const [pulseKey, setPulseKey] = useState(0);
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setLogoVisible(true), 80),
+      // Phase 1 — logo
+      setTimeout(() => setPhase(1), 50),
+      // Phase 2 — circles start moving
       setTimeout(() => {
-        animate(leftCx, 20, { duration: 2.2, ease: [0.4, 0, 0.2, 1] });
-        animate(rightCx, 80, { duration: 2.2, ease: [0.4, 0, 0.2, 1] });
+        setPhase(2);
+        animate(leftCx, 20, { duration: 2.2, ease: [0.45, 0, 0.55, 1] });
+        animate(rightCx, 80, { duration: 2.2, ease: [0.45, 0, 0.55, 1] });
       }, 300),
-      setTimeout(() => { setIntersectionVisible(true); setRadiance(true); }, 2500),
-      setTimeout(() => setBreathing(true), 3200),
-      setTimeout(() => setHeadlineVisible(true), 3000),
-      setTimeout(() => setSublineVisible(true), 4400),
-      setTimeout(() => setCtasVisible(true), 4800),
+      // Phase 3 — intersection ignites
+      setTimeout(() => {
+        setPhase(3);
+        setPulseKey((k) => k + 1);
+      }, 2500),
+      // Phase 4 — breathing starts (400ms after ignition)
+      setTimeout(() => setBreathing(true), 2900),
+      // Phase 5 — headline
+      setTimeout(() => setPhase(5), 3000),
+      // Phase 6 — subline
+      setTimeout(() => setPhase(6), 4000),
+      // Phase 7 — CTAs
+      setTimeout(() => setPhase(7), 4400),
+      // Phase 8 — pills
+      setTimeout(() => setPhase(8), 4800),
     ];
     return () => timers.forEach(clearTimeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  let wordIdx = 0;
+  let wordIndex = 0;
 
   return (
     <section
@@ -61,13 +76,13 @@ export function Hero() {
         position: "relative",
         minHeight: "100vh",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
         background: "#0A0907",
         overflow: "hidden",
       }}
     >
-      {/* Background Venn circles */}
+      {/* Background circles — absolute SVG covers full section */}
       <svg
         aria-hidden
         style={{
@@ -76,102 +91,148 @@ export function Hero() {
           width: "100%",
           height: "100%",
           pointerEvents: "none",
+          zIndex: 1,
         }}
         viewBox="0 0 100 60"
         preserveAspectRatio="xMidYMid slice"
       >
-        <motion.circle cx={leftCx} cy={30} r={35} stroke="#C4973F" strokeWidth="0.18" fill="none" />
-        <motion.circle cx={rightCx} cy={30} r={35} stroke="#C4973F" strokeWidth="0.18" fill="none" />
+        {/* Left circle */}
+        <motion.circle
+          cx={leftCx}
+          cy={30}
+          r={35}
+          stroke="#C4973F"
+          strokeWidth="0.2"
+          fill="none"
+        />
+        {/* Right circle */}
+        <motion.circle
+          cx={rightCx}
+          cy={30}
+          r={35}
+          stroke="#C4973F"
+          strokeWidth="0.2"
+          fill="none"
+        />
 
-        {/* Intersection fill */}
+        {/* Radiance pulse on ignition */}
+        {phase >= 3 && (
+          <motion.circle
+            key={`radiance-${pulseKey}`}
+            cx={50}
+            cy={30}
+            r={3}
+            fill="#C4973F"
+            initial={{ r: 3, opacity: 0.5 }}
+            animate={{ r: 20, opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          />
+        )}
+
+        {/* Vesica piscis — the intersection */}
         <motion.path
-          d={LENS}
+          d={LENS_PATH}
           fill="#C4973F"
           initial={{ opacity: 0 }}
           animate={
             breathing
-              ? { opacity: [0.75, 1, 0.75] }
-              : { opacity: intersectionVisible ? 1 : 0 }
+              ? { opacity: [0.8, 1, 0.8] }
+              : phase >= 3
+              ? { opacity: 1 }
+              : { opacity: 0 }
           }
           transition={
             breathing
-              ? { duration: 3, repeat: Infinity, ease: "easeInOut" }
+              ? { duration: 3, repeat: Infinity, ease: "easeInOut", repeatType: "loop" }
               : { duration: 0.4 }
           }
         />
 
-        {/* Radiance pulse */}
-        <motion.circle
-          cx={50}
-          cy={30}
-          r={4}
-          fill="#C4973F"
-          initial={{ r: 4, opacity: 0 }}
-          animate={radiance ? { r: [4, 22], opacity: [0.5, 0] } : {}}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-        />
+        {/* Ambient glow around intersection */}
+        {phase >= 3 && (
+          <circle cx={50} cy={30} r={12} fill="url(#hero-glow)" opacity={0.35} />
+        )}
+
+        <defs>
+          <radialGradient id="hero-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#C4973F" stopOpacity="1" />
+            <stop offset="100%" stopColor="#C4973F" stopOpacity="0" />
+          </radialGradient>
+        </defs>
       </svg>
 
-      {/* Content */}
+      {/* Content layer */}
       <div
         style={{
           position: "relative",
           zIndex: 10,
-          textAlign: "center",
-          padding: "0 24px",
-          maxWidth: 700,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
           width: "100%",
+          minHeight: "100vh",
+          padding: "0 24px",
         }}
       >
-        {/* Logo */}
+        {/* Logo — top centre */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: logoVisible ? 1 : 0 }}
+          animate={{ opacity: phase >= 1 ? 1 : 0 }}
           transition={{ duration: 0.6 }}
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             gap: 10,
-            marginBottom: 72,
+            paddingTop: 100,
+            paddingBottom: 0,
           }}
         >
-          <VennMark />
+          <VennMark size={30} />
           <span
             style={{
               fontFamily: "var(--font-instrument-serif), Georgia, serif",
               fontSize: 20,
               color: "#FFFDF8",
               letterSpacing: "-0.01em",
+              lineHeight: 1,
             }}
           >
             Venn
           </span>
         </motion.div>
 
-        {/* Headline */}
+        {/* Spacer — pushes headline below circle centre */}
+        <div style={{ flex: 1, minHeight: "38vh" }} />
+
+        {/* Headline — word by word */}
         <h1
           style={{
             fontFamily: "var(--font-instrument-serif), Georgia, serif",
-            fontSize: "clamp(40px, 6.5vw, 68px)",
             fontWeight: 400,
-            lineHeight: 1.02,
-            color: "#FFFDF8",
+            lineHeight: 1.0,
+            textAlign: "center",
+            letterSpacing: "-0.01em",
             marginBottom: 32,
-            letterSpacing: "-0.02em",
+            padding: 0,
           }}
         >
-          {HEADLINE.map((line, li) => (
+          {HEADLINE_LINES.map((line, li) => (
             <span key={li} style={{ display: "block" }}>
-              {line.split(" ").map((word, wi) => {
-                const delay = wordIdx++ * 0.12;
+              {line.map((word) => {
+                const delay = wordIndex++ * 0.12;
                 return (
                   <motion.span
-                    key={wi}
+                    key={`${li}-${word}`}
                     initial={{ opacity: 0, y: 8 }}
-                    animate={headlineVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+                    animate={phase >= 5 ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
                     transition={{ delay, duration: 0.45, ease: "easeOut" }}
-                    style={{ display: "inline-block", marginRight: "0.25em" }}
+                    style={{
+                      display: "inline-block",
+                      marginRight: "0.25em",
+                      fontSize: "clamp(40px, 5.5vw, 68px)",
+                      color: "#FFFDF8",
+                    }}
                   >
                     {word}
                   </motion.span>
@@ -184,32 +245,35 @@ export function Hero() {
         {/* Subline */}
         <motion.p
           initial={{ opacity: 0, y: 8 }}
-          animate={sublineVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-          transition={{ duration: 0.5 }}
+          animate={phase >= 6 ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           style={{
             fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
-            fontSize: "clamp(16px, 2vw, 18px)",
+            fontSize: 18,
             color: "#888580",
             lineHeight: 1.7,
             maxWidth: 480,
-            margin: "0 auto 40px",
+            textAlign: "center",
+            margin: "0 0 40px",
           }}
         >
-          Find them. Know what&apos;s broken in their business. Say exactly the right thing. Win.
+          Find them. Know what&apos;s broken in their business.
+          <br />
+          Say exactly the right thing. Win.
         </motion.p>
 
         {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
-          animate={ctasVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-          transition={{ duration: 0.5 }}
+          animate={phase >= 7 ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 24,
+            gap: 28,
             flexWrap: "wrap",
-            marginBottom: 44,
+            marginBottom: 28,
           }}
         >
           <Link
@@ -237,9 +301,6 @@ export function Hero() {
               fontSize: 14,
               color: "#C4973F",
               textDecoration: "none",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
             }}
           >
             See how it works →
@@ -247,28 +308,21 @@ export function Hero() {
         </motion.div>
 
         {/* Stat pills */}
-        <motion.div
+        <motion.p
           initial={{ opacity: 0 }}
-          animate={ctasVisible ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          animate={{ opacity: phase >= 8 ? 1 : 0 }}
+          transition={{ duration: 0.6 }}
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
-            flexWrap: "wrap",
             fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
+            fontSize: 11,
+            color: "#444440",
+            letterSpacing: "0.06em",
+            textAlign: "center",
+            marginBottom: 80,
           }}
         >
-          {["Replaces Apollo", "Clay", "Digital sales rooms"].map((pill, i, arr) => (
-            <span key={pill} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 11, color: "#444440", letterSpacing: "0.05em" }}>{pill}</span>
-              {i < arr.length - 1 && (
-                <span style={{ fontSize: 11, color: "#2A2826" }}>·</span>
-              )}
-            </span>
-          ))}
-        </motion.div>
+          Replaces Apollo · Clay · Digital sales rooms
+        </motion.p>
       </div>
     </section>
   );

@@ -4,11 +4,13 @@ import { Hero } from "@/components/landing/Hero";
 import { NamedPain } from "@/components/landing/NamedPain";
 import { LiveDemo } from "@/components/landing/LiveDemo";
 import { CardExperience } from "@/components/landing/CardExperience";
+import { ChannelDelivery } from "@/components/landing/ChannelDelivery";
+import { IntelligenceLoop } from "@/components/landing/IntelligenceLoop";
+import { ADifferentWay } from "@/components/landing/ADifferentWay";
 import { Comparison } from "@/components/landing/Comparison";
 import { Pricing } from "@/components/landing/Pricing";
-import { SocialProof } from "@/components/landing/SocialProof";
-import { FAQ } from "@/components/landing/FAQ";
-import { FinalCTA } from "@/components/landing/FinalCTA";
+import { Founder } from "@/components/landing/Founder";
+import { TheClose } from "@/components/landing/TheClose";
 import { Footer } from "@/components/landing/Footer";
 
 export const metadata: Metadata = {
@@ -32,11 +34,13 @@ export default function LandingPage() {
         <NamedPain />
         <LiveDemo />
         <CardExperience />
+        <ChannelDelivery />
+        <IntelligenceLoop />
+        <ADifferentWay />
         <Comparison />
-        <SocialProof />
         <Pricing />
-        <FAQ />
-        <FinalCTA />
+        <Founder />
+        <TheClose />
       </main>
       <Footer />
     </>

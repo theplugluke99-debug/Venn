@@ -4,21 +4,28 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-function VennMark() {
+function VennMark({ size = 28 }: { size?: number }) {
+  const h = Math.round((size * 24) / 28);
   return (
-    <svg viewBox="0 0 28 24" width="28" height="24" fill="none" aria-hidden>
-      <circle cx="10" cy="12" r="7" stroke="#C4973F" strokeWidth="1" />
-      <circle cx="18" cy="12" r="7" stroke="#C4973F" strokeWidth="1" />
-      <path d="M 14 6.26 A 7 7 0 0 1 14 17.74 A 7 7 0 0 0 14 6.26 Z" fill="#C4973F" />
+    <svg viewBox="0 0 28 24" width={size} height={h} fill="none" aria-hidden>
+      <defs>
+        <clipPath id="vm-clip-left">
+          <circle cx="10" cy="12" r="7" />
+        </clipPath>
+      </defs>
+      <circle cx="10" cy="12" r="7" stroke="#C4973F" strokeWidth="1" fill="none" />
+      <circle cx="18" cy="12" r="7" stroke="#C4973F" strokeWidth="1" fill="none" />
+      {/* Intersection filled gold via clipPath */}
+      <circle cx="18" cy="12" r="7" fill="#C4973F" clipPath="url(#vm-clip-left)" />
     </svg>
   );
 }
 
 const NAV_LINKS = [
   { href: "#how-it-works", label: "How it works" },
-  { href: "#the-card", label: "The card" },
+  { href: "#prospect-card", label: "The card" },
   { href: "#pricing", label: "Pricing" },
-  { href: "#compare", label: "Compare" },
+  { href: "#comparison", label: "Compare" },
 ];
 
 export function Nav() {
