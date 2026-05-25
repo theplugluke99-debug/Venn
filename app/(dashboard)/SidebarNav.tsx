@@ -40,10 +40,20 @@ function SettingsIcon() {
   );
 }
 
+function ProposalIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 1.5H4a1 1 0 00-1 1v11a1 1 0 001 1h7a1 1 0 001-1v-11a1 1 0 00-1-1z" />
+      <path d="M5 5h5M5 7.5h5M5 10h3" />
+    </svg>
+  );
+}
+
 const navItems = [
   { href: "/home", label: "Overview", Icon: HomeIcon },
   { href: "/search", label: "New Search", Icon: SearchIcon },
   { href: "/leads", label: "Leads", Icon: LeadsIcon },
+  { href: "/proposals", label: "Proposals", Icon: ProposalIcon },
   { href: "/settings", label: "Settings", Icon: SettingsIcon },
 ];
 

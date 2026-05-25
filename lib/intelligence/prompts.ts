@@ -152,6 +152,63 @@ Rules:
 - ctaText must match the agency's ctaType
 `;
 
+export const PROPOSAL_PROMPT = (lead: unknown, cardIdentity: unknown, packages: unknown) => `
+You are writing a personalised proposal for a business. This proposal will be read by the business owner on a beautiful web page. It must feel like genuine, bespoke work — not a template.
+
+LEAD / BUSINESS DATA:
+${JSON.stringify(lead, null, 2)}
+
+AGENCY IDENTITY:
+${JSON.stringify(cardIdentity, null, 2)}
+
+SERVICE PACKAGES AVAILABLE:
+${JSON.stringify(packages, null, 2)}
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "title": "Proposal title — e.g. 'A Growth Plan for [Business Name]'. Under 8 words.",
+  "threadSection": "Opening narrative — 2 short paragraphs. First: acknowledge what you've observed about their business (specific). Second: why you believe this is the right moment to act. Conversational, not corporate.",
+  "currentState": "Honest, empathetic assessment of where this business is right now — 2-3 sentences. Reference specific signals from the data. No fluff, no padding.",
+  "visionSection": "What success looks like 90 days after working together — 2-3 sentences. Specific outcomes, not generic agency promises. Paint a vivid picture.",
+  "planSection": [
+    {
+      "phase": "Phase 1",
+      "title": "Phase title — 2-4 words",
+      "duration": "e.g. Week 1-2",
+      "bullets": ["Specific deliverable", "Specific deliverable", "Specific deliverable"]
+    },
+    {
+      "phase": "Phase 2",
+      "title": "Phase title",
+      "duration": "e.g. Week 3-6",
+      "bullets": ["Specific deliverable", "Specific deliverable", "Specific deliverable"]
+    },
+    {
+      "phase": "Phase 3",
+      "title": "Phase title",
+      "duration": "e.g. Week 7-12",
+      "bullets": ["Specific deliverable", "Specific deliverable", "Specific deliverable"]
+    }
+  ],
+  "beforeAfter": [
+    { "before": "Current painful state — specific", "after": "Transformed state — specific and vivid" },
+    { "before": "Second painful state", "after": "Second transformed state" },
+    { "before": "Third painful state", "after": "Third transformed state" }
+  ],
+  "investmentContext": "Two sentences framing the investment. First: what the inaction is costing them (specific, reference their data). Second: how the investment compares to that cost. No hard sell.",
+  "closingSection": "Warm, direct closing — 2 sentences. First: affirm you've chosen to send this to them specifically. Second: what you'd like them to do next (soft CTA — book a call, reply, accept)."
+}
+
+Rules:
+- title MUST include the business name
+- threadSection must reference at least one specific observation from the lead data
+- planSection bullets must be actual deliverables, not vague agency speak
+- beforeAfter pairs must be directly tied to the specific signals found in this business
+- investmentContext must reference a real cost (from the revenue loss / observations data)
+- closingSection must feel human and written by a real person who cares about outcomes
+- Write in the agency's voice based on their writing style
+`;
+
 export const DELIVERY_PROMPT = (lead: unknown, cardIdentity: unknown, cardUrl: string) => `
 Generate personalised delivery messages for this prospect card across four channels.
 

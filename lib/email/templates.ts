@@ -1,3 +1,56 @@
+export function proposalQuestionNotificationHtml({
+  agencyOwnerName,
+  businessName,
+  visitorName,
+  question,
+  answerUrl,
+}: {
+  agencyOwnerName: string;
+  businessName: string;
+  visitorName: string;
+  question: string;
+  answerUrl: string;
+}): string {
+  const firstName = agencyOwnerName.split(" ")[0];
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body style="background:#fff;font-family:Georgia,serif;color:#1a1a1a;max-width:520px;margin:40px auto;padding:0 24px;line-height:1.7;">
+  <p>${firstName} —</p>
+  <p><strong>${visitorName}</strong> from <strong>${businessName}</strong> just asked a question on your proposal:</p>
+  <blockquote style="border-left:3px solid #C4973F;margin:16px 0;padding:0 16px;color:#555;font-style:italic;">"${question}"</blockquote>
+  <p>Answer it now while it's fresh — unanswered questions lose deals.</p>
+  <p><a href="${answerUrl}" style="display:inline-block;background:#C4973F;color:#0A0907;padding:10px 20px;text-decoration:none;border-radius:4px;font-size:14px;">Answer this question →</a></p>
+  <p style="margin-top:32px;">— Venn</p>
+  <hr style="border:none;border-top:1px solid #eee;margin:32px 0;" />
+  <p style="font-size:12px;color:#999;">Venn · <a href="${process.env.NEXT_PUBLIC_APP_URL}" style="color:#999;">venn.so</a></p>
+</body>
+</html>`;
+}
+
+export function proposalViewedHtml({
+  agencyOwnerName,
+  businessName,
+  proposalUrl,
+}: {
+  agencyOwnerName: string;
+  businessName: string;
+  proposalUrl: string;
+}): string {
+  const firstName = agencyOwnerName.split(" ")[0];
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body style="background:#fff;font-family:Georgia,serif;color:#1a1a1a;max-width:520px;margin:40px auto;padding:0 24px;line-height:1.7;">
+  <p>${firstName} —</p>
+  <p><strong>${businessName}</strong> just opened your proposal for the first time.</p>
+  <p>Now is a good moment to send a brief follow-up — something like: <em>"Just checking you got it. Happy to answer any questions on a quick call."</em></p>
+  <p><a href="${proposalUrl}" style="color:#C4973F;">View the proposal →</a></p>
+  <p style="margin-top:32px;">— Venn</p>
+</body>
+</html>`;
+}
+
 export function solopreneurApprovedHtml(name: string, expiryDate: string): string {
   return `<!DOCTYPE html>
 <html>

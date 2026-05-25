@@ -17,22 +17,24 @@ model Team {
 }
 
 model User {
-  id           String        @id @default(cuid())
-  clerkId      String        @unique
-  email        String        @unique
-  name         String?
-  teamId       String?
-  team         Team?         @relation(fields: [teamId], references: [id])
-  role         String        @default("owner")
-  seats        Int           @default(1)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  cardIdentity CardIdentity?
-  leads        Lead[]
-  subscription Subscription?
-  apiKeys      ApiKey[]
-  events       UserEvent[]
-  feedback     Feedback[]
+  id              String           @id @default(cuid())
+  clerkId         String           @unique
+  email           String           @unique
+  name            String?
+  teamId          String?
+  team            Team?            @relation(fields: [teamId], references: [id])
+  role            String           @default("owner")
+  seats           Int              @default(1)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  cardIdentity    CardIdentity?
+  leads           Lead[]
+  subscription    Subscription?
+  apiKeys         ApiKey[]
+  events          UserEvent[]
+  feedback        Feedback[]
+  proposals       Proposal[]
+  servicePackages ServicePackage[]
 }
 
 model ApiKey {
@@ -97,6 +99,7 @@ model Lead {
   jobId              String?
   card               Card?
   sequence           Sequence?
+  proposals          Proposal[]
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 }
@@ -217,4 +220,58 @@ model Feedback {
   implemented   Boolean   @default(false)
   implementedAt DateTime?
   createdAt     DateTime  @default(now())
+}
+
+model Proposal {
+  id                String             @id @default(cuid())
+  slug              String             @unique
+  leadId            String
+  lead              Lead               @relation(fields: [leadId], references: [id])
+  userId            String
+  user              User               @relation(fields: [userId], references: [id])
+  title             String
+  threadSection     String?
+  currentState      String?
+  visionSection     String?
+  planSection       Json?
+  beforeAfter       Json?
+  investmentContext String?
+  closingSection    String?
+  depositAmount     Float?
+  status            String             @default("draft")
+  stripeSessionId   String?
+  viewCount         Int                @default(0)
+  firstViewedAt     DateTime?
+  lastViewedAt      DateTime?
+  acceptedAt        DateTime?
+  paidAt            DateTime?
+  questions         ProposalQuestion[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+model ProposalQuestion {
+  id          String    @id @default(cuid())
+  proposalId  String
+  proposal    Proposal  @relation(fields: [proposalId], references: [id])
+  visitorName String
+  question    String
+  answer      String?
+  isPublic    Boolean   @default(true)
+  answeredAt  DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model ServicePackage {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  description String?
+  price       Float
+  currency    String   @default("GBP")
+  features    Json?
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

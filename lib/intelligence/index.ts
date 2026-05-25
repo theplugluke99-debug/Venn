@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { SCORING_PROMPT, DELIVERY_PROMPT } from "./prompts";
+import { SCORING_PROMPT, DELIVERY_PROMPT, PROPOSAL_PROMPT } from "./prompts";
 import type { IntelligenceProfile } from "@/types";
 import { config } from "@/lib/config";
 
@@ -142,6 +142,61 @@ export async function generateCardCopy(
     minutesAnalysing: typeof parsed.minutesAnalysing === "number" ? parsed.minutesAnalysing : 14,
     signalBanner: parsed.signalBanner ?? "",
     ctaText: parsed.ctaText ?? "Let's talk",
+  };
+}
+
+export interface ProposalPhase {
+  phase: string;
+  title: string;
+  duration: string;
+  bullets: string[];
+}
+
+export interface ProposalBeforeAfter {
+  before: string;
+  after: string;
+}
+
+export interface ProposalContent {
+  title: string;
+  threadSection: string;
+  currentState: string;
+  visionSection: string;
+  planSection: ProposalPhase[];
+  beforeAfter: ProposalBeforeAfter[];
+  investmentContext: string;
+  closingSection: string;
+}
+
+export async function generateProposalContent(
+  lead: unknown,
+  cardIdentity: unknown,
+  packages: unknown
+): Promise<ProposalContent> {
+  const prompt = PROPOSAL_PROMPT(lead, cardIdentity, packages);
+
+  const message = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 3000,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const content = message.content[0];
+  if (content.type !== "text") throw new Error("Unexpected response type");
+
+  const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("No JSON in proposal response");
+
+  const parsed = JSON.parse(jsonMatch[0]) as Partial<ProposalContent>;
+  return {
+    title: parsed.title ?? "A Growth Plan",
+    threadSection: parsed.threadSection ?? "",
+    currentState: parsed.currentState ?? "",
+    visionSection: parsed.visionSection ?? "",
+    planSection: Array.isArray(parsed.planSection) ? parsed.planSection : [],
+    beforeAfter: Array.isArray(parsed.beforeAfter) ? parsed.beforeAfter : [],
+    investmentContext: parsed.investmentContext ?? "",
+    closingSection: parsed.closingSection ?? "",
   };
 }
 

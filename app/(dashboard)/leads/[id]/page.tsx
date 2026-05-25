@@ -5,6 +5,7 @@ import { getUserByClerkId } from "@/lib/db/queries/users";
 import { getLeadById } from "@/lib/db/queries/leads";
 import { GenerateCardButton } from "./GenerateCardButton";
 import { CopyButton } from "./CopyButton";
+import { GenerateProposalButton } from "./GenerateProposalButton";
 import type {
   IntentScore,
   Observation,
@@ -38,6 +39,9 @@ export default async function LeadDetailPage({
   if (lead.status === "failed") {
     return <FailedView businessName={lead.businessName} />;
   }
+
+  const plan = user.subscription?.plan ?? "starter";
+  const canProposals = plan === "pro" || plan === "enterprise";
 
   const observations = lead.observations as Observation[] | null;
   const websiteAudit = lead.websiteAudit as WebsiteAudit | null;
@@ -448,6 +452,12 @@ export default async function LeadDetailPage({
           </div>
         ) : (
           <GenerateCardButton leadId={id} />
+        )}
+
+        {lead.status === "complete" && canProposals && (
+          <div style={{ marginTop: 16 }}>
+            <GenerateProposalButton leadId={id} />
+          </div>
         )}
       </div>
     </div>

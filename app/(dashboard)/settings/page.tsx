@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getUserByClerkId, getCardIdentity } from "@/lib/db/queries/users";
+import { getServicePackagesByUser } from "@/lib/db/queries/servicePackages";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { SettingsForm } from "./SettingsForm";
@@ -35,6 +36,8 @@ export default async function SettingsPage() {
       // not critical
     }
   }
+
+  const servicePackages = await getServicePackagesByUser(user.id);
 
   // Warm leads and hot lead for cancellation modal
   const [warmLeadCount, hotCard] = await Promise.all([
@@ -78,6 +81,13 @@ export default async function SettingsPage() {
         hasStripeCustomer={hasStripeCustomer}
         warmLeadCount={warmLeadCount}
         hotLeadName={hotCard?.lead?.businessName}
+        initialPackages={servicePackages.map((p) => ({
+          id: p.id,
+          name: p.name,
+          description: p.description ?? "",
+          price: p.price,
+          currency: p.currency,
+        }))}
       />
     </div>
   );

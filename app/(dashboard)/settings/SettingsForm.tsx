@@ -20,6 +20,14 @@ interface CardIdentity {
   cardStyle: string;
 }
 
+interface ServicePackageRow {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+}
+
 interface SettingsFormProps {
   initialData: CardIdentity | null;
   plan: string;
@@ -27,6 +35,7 @@ interface SettingsFormProps {
   hasStripeCustomer: boolean;
   warmLeadCount?: number;
   hotLeadName?: string;
+  initialPackages?: ServicePackageRow[];
 }
 
 const angles = ["pain", "opportunity", "compliment"] as const;
@@ -263,7 +272,7 @@ function FeedbackWidget() {
   );
 }
 
-export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer, warmLeadCount = 0, hotLeadName }: SettingsFormProps) {
+export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer, warmLeadCount = 0, hotLeadName, initialPackages = [] }: SettingsFormProps) {
   const [form, setForm] = useState({
     brandColour: initialData?.brandColour ?? "#C4973F",
     accentColour: initialData?.accentColour ?? "#E8B44B",
@@ -282,6 +291,12 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+
+  const [packages, setPackages] = useState<ServicePackageRow[]>(initialPackages);
+  const [pkgName, setPkgName] = useState("");
+  const [pkgPrice, setPkgPrice] = useState("");
+  const [pkgDesc, setPkgDesc] = useState("");
+  const [pkgSaving, setPkgSaving] = useState(false);
 
   function update(key: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -418,6 +433,116 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
             <Field label={ctaLabels[form.ctaType] ?? "CTA value"}>
               <TextInput value={form.ctaValue} onChange={(v) => update("ctaValue", v)} placeholder={ctaPlaceholders[form.ctaType] ?? ""} />
             </Field>
+          </div>
+        </section>
+
+        {/* Service packages */}
+        <section style={{ background: "#0F0E0B", border: "0.5px solid #1E1C18", borderRadius: 8, padding: 20 }}>
+          {sectionTitle("Service packages")}
+          <p style={{ fontSize: 12, color: "#444440", fontFamily: "var(--font-inter)", marginBottom: 16, lineHeight: 1.5 }}>
+            Packages are referenced when generating proposals for Pro plan users.
+          </p>
+
+          {packages.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+              {packages.map((pkg) => (
+                <div
+                  key={pkg.id}
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    background: "#0A0907", border: "0.5px solid #1E1C18", borderRadius: 6, padding: "10px 14px",
+                  }}
+                >
+                  <div>
+                    <p style={{ fontSize: 13, color: "#FFFDF8", fontFamily: "var(--font-inter)" }}>{pkg.name}</p>
+                    <p style={{ fontSize: 11, color: "#444440", fontFamily: "var(--font-inter)", marginTop: 2 }}>
+                      £{pkg.price.toLocaleString()} {pkg.currency}
+                      {pkg.description ? ` · ${pkg.description}` : ""}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await fetch(`/api/service-packages/${pkg.id}`, { method: "DELETE" });
+                      setPackages((prev) => prev.filter((p) => p.id !== pkg.id));
+                    }}
+                    style={{ fontSize: 11, color: "#444440", background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-inter)", padding: "4px 8px" }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <input
+              placeholder="Package name"
+              value={pkgName}
+              onChange={(e) => setPkgName(e.target.value)}
+              style={{
+                flex: "2 1 140px", padding: "8px 12px", borderRadius: 6, fontSize: 12,
+                background: "#0A0907", border: "0.5px solid #1E1C18", color: "#FFFDF8",
+                fontFamily: "var(--font-inter)", outline: "none",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#C4973F")}
+              onBlur={(e) => (e.target.style.borderColor = "#1E1C18")}
+            />
+            <input
+              placeholder="Price (£)"
+              value={pkgPrice}
+              onChange={(e) => setPkgPrice(e.target.value)}
+              type="number"
+              style={{
+                flex: "1 1 80px", padding: "8px 12px", borderRadius: 6, fontSize: 12,
+                background: "#0A0907", border: "0.5px solid #1E1C18", color: "#FFFDF8",
+                fontFamily: "var(--font-inter)", outline: "none",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#C4973F")}
+              onBlur={(e) => (e.target.style.borderColor = "#1E1C18")}
+            />
+            <input
+              placeholder="Description (optional)"
+              value={pkgDesc}
+              onChange={(e) => setPkgDesc(e.target.value)}
+              style={{
+                flex: "3 1 180px", padding: "8px 12px", borderRadius: 6, fontSize: 12,
+                background: "#0A0907", border: "0.5px solid #1E1C18", color: "#FFFDF8",
+                fontFamily: "var(--font-inter)", outline: "none",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#C4973F")}
+              onBlur={(e) => (e.target.style.borderColor = "#1E1C18")}
+            />
+            <button
+              type="button"
+              disabled={!pkgName.trim() || !pkgPrice || pkgSaving}
+              onClick={async () => {
+                if (!pkgName.trim() || !pkgPrice) return;
+                setPkgSaving(true);
+                try {
+                  const res = await fetch("/api/service-packages", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: pkgName.trim(), price: parseFloat(pkgPrice), description: pkgDesc.trim() || undefined }),
+                  });
+                  if (res.ok) {
+                    const data = await res.json() as { package: ServicePackageRow };
+                    setPackages((prev) => [...prev, data.package]);
+                    setPkgName(""); setPkgPrice(""); setPkgDesc("");
+                  }
+                } finally {
+                  setPkgSaving(false);
+                }
+              }}
+              style={{
+                padding: "8px 14px", borderRadius: 6, fontSize: 12, fontFamily: "var(--font-inter)",
+                background: "transparent", border: "0.5px solid #C4973F", color: "#C4973F",
+                cursor: (!pkgName.trim() || !pkgPrice) ? "not-allowed" : "pointer",
+                opacity: (!pkgName.trim() || !pkgPrice) ? 0.4 : 1,
+              }}
+            >
+              {pkgSaving ? "…" : "Add"}
+            </button>
           </div>
         </section>
 
