@@ -165,7 +165,7 @@ export function SubscribePage({
         </span>
         <h1
           style={{
-            fontSize: 36,
+            fontSize: "clamp(24px, 5vw, 36px)",
             color: "#FFFDF8",
             fontFamily: "var(--font-instrument-serif), Georgia, serif",
             fontWeight: 400,

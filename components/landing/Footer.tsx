@@ -72,7 +72,7 @@ export function Footer() {
 
         <div style={{ alignItems: "center", borderTop: `0.5px solid ${colours.border}`, display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between", paddingTop: 24, marginBottom: 16 }}>
           <p style={{ color: colours.muted, fontSize: 12 }}>© {new Date().getFullYear()} Venn. Built for agency owners.</p>
-          <p style={{ color: "#2A2826", fontSize: 12 }}>luke@venn.so</p>
+          <p style={{ color: "#2A2826", fontSize: 12 }}>hello@getvenn.agency</p>
         </div>
 
         {/* Legal links strip */}

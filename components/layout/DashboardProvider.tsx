@@ -1,10 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 interface SidebarContextValue {
   collapsed: boolean;
+  isMobile: boolean;
+  mobileOpen: boolean;
   toggle: () => void;
+  closeMobile: () => void;
 }
 
 interface ModeContextValue {
@@ -14,7 +17,10 @@ interface ModeContextValue {
 
 export const SidebarContext = createContext<SidebarContextValue>({
   collapsed: false,
+  isMobile: false,
+  mobileOpen: false,
   toggle: () => {},
+  closeMobile: () => {},
 });
 
 export const ModeContext = createContext<ModeContextValue>({
@@ -32,10 +38,31 @@ export function useMode() {
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [mode, setMode] = useState<"focus" | "intel">("focus");
 
+  useEffect(() => {
+    function check() {
+      setIsMobile(window.innerWidth < 768);
+    }
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const toggle = useCallback(() => {
+    if (isMobile) {
+      setMobileOpen((v) => !v);
+    } else {
+      setCollapsed((v) => !v);
+    }
+  }, [isMobile]);
+
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
+
   return (
-    <SidebarContext.Provider value={{ collapsed, toggle: () => setCollapsed((v) => !v) }}>
+    <SidebarContext.Provider value={{ collapsed, isMobile, mobileOpen, toggle, closeMobile }}>
       <ModeContext.Provider value={{ mode, setMode }}>
         {children}
       </ModeContext.Provider>

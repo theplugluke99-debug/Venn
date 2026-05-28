@@ -200,7 +200,7 @@ export function SolopreneurApplyPage() {
           >
             Included in your trial
           </p>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
+          <ul className="solo-feature-grid" style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
             {[
               "100 leads",
               "20 prospect cards",
@@ -219,7 +219,7 @@ export function SolopreneurApplyPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px" }}>
+          <div className="solo-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px" }}>
             {/* Name */}
             <Field
               label="Your name"
@@ -363,6 +363,13 @@ export function SolopreneurApplyPage() {
           </p>
         </form>
       </div>
+
+      <style>{`
+        @media (max-width: 560px) {
+          .solo-feature-grid { grid-template-columns: 1fr !important; }
+          .solo-form-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

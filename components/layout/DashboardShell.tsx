@@ -34,9 +34,9 @@ export function DashboardShell({
   counts,
   activity,
 }: DashboardShellProps) {
-  const { collapsed } = useSidebar();
+  const { collapsed, isMobile } = useSidebar();
   const pathname = usePathname();
-  const showRightPanel = pathname === "/home" || pathname === "/leads";
+  const showRightPanel = !isMobile && (pathname === "/home" || pathname === "/leads");
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "#0A0907" }}>
@@ -44,12 +44,12 @@ export function DashboardShell({
 
       <div
         className="flex flex-col flex-1 min-w-0 transition-all duration-[250ms] ease-out"
-        style={{ marginLeft: collapsed ? 52 : 200 }}
+        style={{ marginLeft: isMobile ? 0 : collapsed ? 52 : 200 }}
       >
         <TopBar />
 
         <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 overflow-y-auto px-6 py-6">
+          <main className="flex-1 overflow-y-auto px-4 py-4 md:px-6 md:py-6">
             {children}
           </main>
 

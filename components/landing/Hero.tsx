@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { CTA, VennLogo, colours, motionPresets } from "./system";
 
 const HEADLINE_LINES = [
@@ -10,22 +11,35 @@ const HEADLINE_LINES = [
   "who they are.",
 ];
 
-const LENS_PATH = "M65.4 18A30 30 0 0 1 65.4 62A24 24 0 0 0 65.4 18Z";
-
 export function Hero() {
+  const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+
+  const leftScrollX = useTransform(scrollYProgress, [0, 0.82], [0, -46]);
+  const rightScrollX = useTransform(scrollYProgress, [0, 0.82], [0, 46]);
+  const lensScrollOpacity = useTransform(scrollYProgress, [0, 0.46, 0.84], [1, 0.72, 0]);
+  const flareScrollScale = useTransform(scrollYProgress, [0, 0.84], [1, 0.12]);
+  const fieldScrollOpacity = useTransform(scrollYProgress, [0, 0.86], [1, 0.24]);
 
   return (
-    <section className="hero-cinematic">
+    <section ref={ref} className="hero-cinematic">
       <motion.svg
         aria-hidden
         className="hero-venn-field"
-        viewBox="0 0 120 80"
+        viewBox="0 0 160 90"
         preserveAspectRatio="xMidYMid meet"
         initial={reduceMotion ? false : "start"}
         animate={reduceMotion ? "settled" : "settled"}
+        style={{ opacity: reduceMotion ? 1 : fieldScrollOpacity }}
       >
         <defs>
+          <clipPath id="hero-left-circle-clip">
+            <circle cx="56" cy="45" r="43" />
+          </clipPath>
           <radialGradient id="hero-lens-gold" cx="50%" cy="50%" r="65%">
             <stop offset="0%" stopColor="#FFF5CD" />
             <stop offset="35%" stopColor="#E0AD48" />
@@ -42,52 +56,59 @@ export function Hero() {
           </filter>
         </defs>
 
-        <motion.circle
-          cx="45"
-          cy="40"
-          r="30"
-          fill="none"
-          stroke={colours.gold}
-          strokeWidth="0.42"
-          variants={{ start: { x: -56, opacity: 0.38 }, settled: { x: 0, opacity: 0.92 } }}
-          transition={{ duration: 2.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-        />
-        <motion.circle
-          cx="75"
-          cy="40"
-          r="24"
-          fill="none"
-          stroke={colours.gold}
-          strokeWidth="0.42"
-          variants={{ start: { x: 55, opacity: 0.38 }, settled: { x: 0, opacity: 0.92 } }}
-          transition={{ duration: 2.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-        />
-        <motion.circle
-          cx="65.4"
-          cy="40"
-          r="20"
-          fill="url(#hero-ambient)"
+        <motion.g style={{ x: reduceMotion ? 0 : leftScrollX }}>
+          <motion.circle
+            cx="56"
+            cy="45"
+            r="43"
+            fill="none"
+            stroke={colours.gold}
+            strokeWidth="0.34"
+            variants={{ start: { x: -86, opacity: 0.36 }, settled: { x: 0, opacity: 0.92 } }}
+            transition={{ duration: 2.6, ease: [0.22, 1, 0.36, 1], delay: 0.16 }}
+          />
+        </motion.g>
+        <motion.g style={{ x: reduceMotion ? 0 : rightScrollX }}>
+          <motion.circle
+            cx="104"
+            cy="45"
+            r="36"
+            fill="none"
+            stroke={colours.gold}
+            strokeWidth="0.34"
+            variants={{ start: { x: 86, opacity: 0.36 }, settled: { x: 0, opacity: 0.92 } }}
+            transition={{ duration: 2.6, ease: [0.22, 1, 0.36, 1], delay: 0.16 }}
+          />
+        </motion.g>
+        <motion.g
           variants={{ start: { opacity: 0, scale: 0.55 }, settled: { opacity: 1, scale: 1 } }}
-          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1], delay: 2.55 }}
-        />
-        <motion.path
-          d={LENS_PATH}
-          fill="url(#hero-lens-gold)"
-          filter="url(#hero-lens-glow)"
-          variants={{ start: { opacity: 0, scale: 0.9 }, settled: { opacity: 1, scale: 1 } }}
-          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 2.42 }}
-          style={{ transformOrigin: "65.4px 40px" }}
-        />
-        <motion.rect
-          x="26"
-          y="39.82"
-          width="80"
-          height="0.36"
-          fill="url(#hero-ambient)"
-          variants={{ start: { opacity: 0, scaleX: 0 }, settled: { opacity: 0.82, scaleX: 1 } }}
+          transition={{ duration: 1.25, ease: [0.22, 1, 0.36, 1], delay: 2.12 }}
+          style={{ opacity: reduceMotion ? 1 : lensScrollOpacity, transformOrigin: "82px 45px" }}
+        >
+          <circle cx="82" cy="45" r="22" fill="url(#hero-ambient)" />
+          <circle
+            cx="104"
+            cy="45"
+            r="36"
+            fill="url(#hero-lens-gold)"
+            clipPath="url(#hero-left-circle-clip)"
+            filter="url(#hero-lens-glow)"
+          />
+        </motion.g>
+        <motion.g
+          variants={{ start: { opacity: 0 }, settled: { opacity: 0.82 } }}
           transition={{ duration: 1.25, ease: [0.22, 1, 0.36, 1], delay: 2.7 }}
-          style={{ transformOrigin: "65.4px 40px" }}
-        />
+          style={{ opacity: reduceMotion ? 0.82 : lensScrollOpacity }}
+        >
+          <motion.rect
+            x="34"
+            y="44.82"
+            width="92"
+            height="0.34"
+            fill="url(#hero-ambient)"
+            style={{ scaleX: reduceMotion ? 1 : flareScrollScale, transformOrigin: "82px 45px" }}
+          />
+        </motion.g>
       </motion.svg>
 
       <div className="hero-noise" aria-hidden />
@@ -143,21 +164,22 @@ export function Hero() {
 
       <style>{`
         .hero-cinematic {
-          align-items: center;
+          align-items: stretch;
           background: radial-gradient(circle at 50% 45%, rgba(196,151,63,0.08), transparent 34%), ${colours.bg};
           display: flex;
           min-height: 100svh;
           overflow: hidden;
-          padding: 88px 24px 58px;
+          padding: 96px 24px 58px;
           position: relative;
           text-align: center;
         }
         .hero-venn-field {
-          height: 100%;
-          inset: 0;
+          height: min(46svh, 440px);
+          left: 50%;
           position: absolute;
-          transform: translateY(-38%) scale(0.92);
-          width: 100%;
+          top: clamp(86px, 12vh, 128px);
+          transform: translateX(-50%);
+          width: min(1380px, 118vw);
           z-index: 0;
         }
         .hero-noise {
@@ -169,6 +191,10 @@ export function Hero() {
           z-index: 0;
         }
         .hero-inner {
+          align-self: stretch;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
           margin: 0 auto;
           max-width: 940px;
           position: relative;
@@ -178,7 +204,7 @@ export function Hero() {
         .hero-brand {
           display: flex;
           justify-content: center;
-          margin-bottom: clamp(128px, 19vh, 182px);
+          margin-bottom: clamp(300px, 43vh, 420px);
         }
         .hero-copy {
           margin: 0 auto;
@@ -205,10 +231,13 @@ export function Hero() {
             padding-top: 74px;
           }
           .hero-brand {
-            margin-bottom: 120px;
+            margin-bottom: 300px;
           }
           .hero-venn-field {
-            transform: translateY(-34%) scale(1.06);
+            height: 300px;
+            top: 116px;
+            transform: translateX(-50%);
+            width: 760px;
           }
           .hero-title {
             font-size: clamp(42px, 12vw, 58px);

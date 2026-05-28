@@ -23,12 +23,25 @@ const SIGNALS = [
 
 export function LiveDemo() {
   const [active, setActive] = useState(0);
+  const [complete, setComplete] = useState(false);
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (reduceMotion) return;
+    if (reduceMotion) {
+      setComplete(true);
+      return;
+    }
+    setActive(0);
+    setComplete(false);
     const timer = window.setInterval(() => {
-      setActive((value) => (value + 1) % LOGS.length);
+      setActive((value) => {
+        if (value >= LOGS.length - 1) {
+          window.clearInterval(timer);
+          window.setTimeout(() => setComplete(true), 420);
+          return value;
+        }
+        return value + 1;
+      });
     }, 620);
     return () => window.clearInterval(timer);
   }, [reduceMotion]);
@@ -77,9 +90,26 @@ export function LiveDemo() {
               </div>
             </div>
 
-            <div className="signal-arrow" aria-hidden>→</div>
+            <motion.div
+              className="signal-arrow"
+              aria-hidden
+              initial={{ opacity: 0, scaleX: 0.4 }}
+              animate={complete ? { opacity: 1, scaleX: 1 } : { opacity: 0, scaleX: 0.4 }}
+              transition={{ ...motionPresets.soft, duration: 0.7 }}
+            >
+              →
+            </motion.div>
 
-            <div className="crystal-panel">
+            <motion.div
+              className="crystal-panel"
+              initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
+              animate={
+                complete
+                  ? { opacity: 1, y: 0, filter: "blur(0px)" }
+                  : { opacity: 0, y: 24, filter: "blur(10px)" }
+              }
+              transition={{ ...motionPresets.slow, delay: 0.1 }}
+            >
               <div className="crystal-head">
                 <VennLogo size={34} variant="horizontal" />
                 <span><i /> HIGH INTENT</span>
@@ -111,7 +141,7 @@ export function LiveDemo() {
                 <strong>Glow Aesthetics</strong>
               </div>
               <CTA href="#prospect-card">See what they receive →</CTA>
-            </div>
+            </motion.div>
           </div>
         </Reveal>
       </div>

@@ -9,4 +9,4 @@ export function getResend(): Resend {
   return _resend;
 }
 
-export const FROM_ADDRESS = "Luke at Venn <luke@venn.so>";
+export const FROM_ADDRESS = "Luke at Venn <luke@getvenn.agency>";
