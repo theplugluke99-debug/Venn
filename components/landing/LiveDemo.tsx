@@ -32,17 +32,17 @@ export function LiveDemo() {
   useEffect(() => {
     if (reduceMotion) return;
     if (!inView) return;
-    const start = window.setTimeout(() => setActive(0), 360);
+    const start = window.setTimeout(() => setActive(0), 220);
     const timer = window.setInterval(() => {
       setActive((value) => {
         if (value >= LOGS.length - 1) {
           window.clearInterval(timer);
-          window.setTimeout(() => setComplete(true), 780);
+          window.setTimeout(() => setComplete(true), 460);
           return value;
         }
         return value + 1;
       });
-    }, 1050);
+    }, 820);
     return () => {
       window.clearTimeout(start);
       window.clearInterval(timer);
@@ -139,9 +139,12 @@ export function LiveDemo() {
                 ))}
               </div>
               <div className="card-peek">
-                <VennLogo size={20} variant="mark" decorative />
-                <span>Momentum Agency</span>
+                <div className="card-peek-meta">
+                  <VennLogo size={16} variant="mark" decorative />
+                  <span>Momentum Agency</span>
+                </div>
                 <strong>Glow Aesthetics</strong>
+                <small>Personalised growth opportunity · Manchester</small>
               </div>
               <CTA href="#prospect-card">See what they receive →</CTA>
             </motion.div>
@@ -316,28 +319,57 @@ export function LiveDemo() {
         }
         .card-peek {
           background: #f8f0e2;
-          border-radius: 10px 10px 0 0;
+          border: 0.5px solid rgba(10,9,7,0.08);
+          border-bottom: 0;
+          border-radius: 6px 6px 0 0;
           color: ${colours.bg};
           margin-top: 6px;
-          max-height: 166px;
+          max-height: 118px;
           overflow: hidden;
-          padding: 18px 24px 0;
+          padding: 14px 22px 12px;
+          position: relative;
+        }
+        .card-peek::after {
+          background: linear-gradient(180deg, rgba(248,240,226,0), #f8f0e2 82%);
+          bottom: 0;
+          content: "";
+          height: 26px;
+          left: 0;
+          position: absolute;
+          right: 0;
+        }
+        .card-peek-meta {
+          align-items: center;
+          display: flex;
+          gap: 8px;
+          margin-bottom: 8px;
         }
         .card-peek span {
           color: #4c4337;
-          font-size: 13px;
-          margin-left: 8px;
+          font-size: 12px;
         }
         .card-peek strong {
           display: block;
           font-family: var(--font-instrument-serif), Georgia, serif;
-          font-size: 34px;
+          font-size: 30px;
           font-weight: 400;
-          margin-top: 10px;
+          line-height: 1;
+          margin-bottom: 8px;
+          position: relative;
+          z-index: 1;
+        }
+        .card-peek small {
+          color: #7a6f61;
+          display: block;
+          font-size: 11px;
+          position: relative;
+          z-index: 1;
         }
         .crystal-panel .venn-cta {
           margin-top: 0;
           position: relative;
+          border-radius: 0 0 6px 6px;
+          min-height: 46px;
           width: 100%;
           z-index: 1;
         }
