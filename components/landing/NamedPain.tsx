@@ -1,138 +1,85 @@
 "use client";
 
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { Reveal, Section, SectionHeader, colours } from "./system";
 
 const TRUTHS = [
-  {
-    num: "01",
-    line1: "Apollo gives you a database.",
-    line2: "You do the thinking.",
-  },
-  {
-    num: "02",
-    line1: "Clay enriches your data.",
-    line2: "You still write every word.",
-  },
-  {
-    num: "03",
-    line1: "Templates get ignored.",
-    line2: "Prospects always know.",
-  },
+  "Apollo gives you a database. You do the thinking.",
+  "Clay enriches your data. You still write every word.",
+  "Templates get ignored. Prospects always know.",
 ];
+
+function TruthRow({
+  truth,
+  index,
+  progress,
+  reduceMotion,
+}: {
+  truth: string;
+  index: number;
+  progress: ReturnType<typeof useScroll>["scrollYProgress"];
+  reduceMotion: boolean | null;
+}) {
+  const ranges: number[][] = [
+    [0, 0.18, 0.32],
+    [0.32, 0.48, 0.64],
+    [0.64, 0.8, 1],
+  ];
+  const opacity = useTransform(progress, ranges[index], [0.26, 1, index === 2 ? 1 : 0.26]);
+
+  return (
+    <motion.div
+      style={{
+        opacity: reduceMotion ? 1 : opacity,
+        borderTop: `0.5px solid ${index === 0 ? colours.goldBorder : colours.border}`,
+        padding: "26px 0 8px",
+      }}
+    >
+      <div style={{ alignItems: "flex-start", display: "grid", gap: 20, gridTemplateColumns: "36px 1fr" }}>
+        <span style={{ color: colours.muted, fontSize: 12, paddingTop: 9 }}>{String(index + 1).padStart(2, "0")}</span>
+        <p
+          style={{
+            color: colours.ivory,
+            fontFamily: "var(--font-instrument-serif), Georgia, serif",
+            fontSize: "clamp(31px, 4.2vw, 50px)",
+            lineHeight: 1.05,
+          }}
+        >
+          {truth}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
 
 function StickyTruths() {
   const ref = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start start", "end end"],
+    offset: ["start 0.72", "end 0.42"],
   });
 
-  const op0 = useTransform(scrollYProgress, [0, 0.2, 0.4, 0.55], [1, 1, 0.15, 0.15]);
-  const op1 = useTransform(scrollYProgress, [0.25, 0.4, 0.6, 0.72], [0.15, 1, 1, 0.15]);
-  const op2 = useTransform(scrollYProgress, [0.55, 0.72, 1, 1], [0.15, 1, 1, 1]);
-
-  const opacities = [op0, op1, op2];
-
   return (
-    <div ref={ref} style={{ height: "300vh", position: "relative" }}>
+    <div ref={ref} className="truths-wrap" style={{ height: "154vh", position: "relative" }}>
       <div
         style={{
-          position: "sticky",
-          top: 0,
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          padding: "0 40px",
-          maxWidth: 900,
+          display: "grid",
+          gap: 18,
           margin: "0 auto",
-          width: "100%",
+          maxWidth: 860,
+          minHeight: "72vh",
+          placeContent: "center",
+          position: "sticky",
+          top: 64,
         }}
       >
-        {TRUTHS.map((t, i) => (
-          <motion.div
-            key={i}
-            style={{ opacity: opacities[i] }}
-            transition={{ duration: 0.4 }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 20,
-                paddingBottom: i < 2 ? 56 : 0,
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
-                  fontSize: 13,
-                  color: "#444440",
-                  minWidth: 28,
-                  paddingTop: 8,
-                }}
-              >
-                {t.num}
-              </span>
-              <div
-                style={{
-                  width: 32,
-                  height: 1,
-                  backgroundColor: "#C4973F",
-                  flexShrink: 0,
-                  marginTop: 20,
-                }}
-              />
-              <div>
-                <p
-                  style={{
-                    fontFamily: "var(--font-instrument-serif), Georgia, serif",
-                    fontSize: "clamp(28px, 3.2vw, 40px)",
-                    fontWeight: 400,
-                    lineHeight: 1.15,
-                    color: "#FFFDF8",
-                    margin: 0,
-                  }}
-                >
-                  {t.line1}
-                  <br />
-                  {t.line2}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-
-        <motion.div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 8,
-            position: "absolute",
-            bottom: 48,
-            left: "50%",
-            translateX: "-50%",
-          }}
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 1 }}
-        >
-          <p
-            style={{
-              fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
-              fontSize: 10,
-              color: "#444440",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-            }}
-          >
-            Scroll to continue
-          </p>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 3v10M4 9l4 4 4-4" stroke="#444440" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </motion.div>
+        {TRUTHS.map((truth, index) => {
+          return (
+            <TruthRow key={truth} truth={truth} index={index} progress={scrollYProgress} reduceMotion={reduceMotion} />
+          );
+        })}
       </div>
     </div>
   );
@@ -140,92 +87,45 @@ function StickyTruths() {
 
 export function NamedPain() {
   return (
-    <section
-      id="how-it-works"
-      style={{
-        background: "#0F0E0B",
-        fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
-      }}
-    >
-      {/* Section header */}
-      <div style={{ padding: "120px 40px 80px", textAlign: "center" }}>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
-          style={{
-            fontSize: 10,
-            letterSpacing: "0.15em",
-            color: "#C4973F",
-            textTransform: "uppercase",
-            marginBottom: 24,
-          }}
-        >
-          02 / The Named Pain
-        </motion.p>
-
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          style={{
-            fontFamily: "var(--font-instrument-serif), Georgia, serif",
-            fontSize: "clamp(36px, 4.5vw, 56px)",
-            fontWeight: 400,
-            color: "#FFFDF8",
-            lineHeight: 1.1,
-            margin: 0,
-            letterSpacing: "-0.01em",
-          }}
-        >
-          Outreach is broken.
-          <br />
-          <em>You already know.</em>
-        </motion.h2>
-      </div>
-
-      {/* Sticky truths — desktop */}
-      <div className="named-pain-sticky">
-        <StickyTruths />
-      </div>
-
-      {/* Stacked truths — mobile fallback */}
-      <div className="named-pain-mobile" style={{ padding: "0 24px 80px" }}>
-        {TRUTHS.map((t, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.6, delay: i * 0.1 }}
-            style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 48 }}
-          >
-            <span style={{ fontSize: 12, color: "#444440", minWidth: 24, paddingTop: 6 }}>{t.num}</span>
-            <div style={{ width: 24, height: 1, backgroundColor: "#C4973F", marginTop: 18, flexShrink: 0 }} />
-            <p
-              style={{
-                fontFamily: "var(--font-instrument-serif), Georgia, serif",
-                fontSize: 32,
-                fontWeight: 400,
-                lineHeight: 1.15,
-                color: "#FFFDF8",
-                margin: 0,
-              }}
-            >
-              {t.line1}
+    <Section id="how-it-works" tone="secondary" tight>
+      <div className="venn-container">
+        <SectionHeader
+          eyebrow="02 / The named pain"
+          title={
+            <>
+              Outreach is broken.
               <br />
-              {t.line2}
-            </p>
-          </motion.div>
-        ))}
+              <em>You already know.</em>
+            </>
+          }
+        />
+
+        <div className="truths-desktop">
+          <StickyTruths />
+        </div>
+
+        <div className="truths-mobile" style={{ display: "none", gap: 34 }}>
+          {TRUTHS.map((truth, index) => (
+            <Reveal key={truth} delay={index * 0.08}>
+              <div style={{ borderTop: `0.5px solid ${index === 0 ? colours.goldBorder : colours.border}`, paddingTop: 22 }}>
+                <span style={{ color: colours.muted, display: "block", fontSize: 12, marginBottom: 12 }}>
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <p style={{ color: colours.ivory, fontFamily: "var(--font-instrument-serif), Georgia, serif", fontSize: 32, lineHeight: 1.08 }}>
+                  {truth}
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </div>
 
       <style>{`
-        @media (min-width: 769px) { .named-pain-mobile { display: none !important; } }
-        @media (max-width: 768px) { .named-pain-sticky { display: none !important; } }
+        @media (max-width: 760px) {
+          .truths-desktop { display: none; }
+          .truths-mobile { display: grid !important; }
+        }
       `}</style>
-    </section>
+    </Section>
   );
 }

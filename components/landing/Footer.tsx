@@ -1,16 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
-function VennMark() {
-  return (
-    <svg viewBox="0 0 28 24" width="22" height="19" fill="none" aria-hidden>
-      <circle cx="10" cy="12" r="7" stroke="#C4973F" strokeWidth="1" />
-      <circle cx="18" cy="12" r="7" stroke="#C4973F" strokeWidth="1" />
-      <path d="M 14 6.26 A 7 7 0 0 1 14 17.74 A 7 7 0 0 0 14 6.26 Z" fill="#C4973F" />
-    </svg>
-  );
-}
+import { VennLogo, colours } from "./system";
 
 const COLS = [
   {
@@ -43,74 +34,31 @@ export function Footer() {
   return (
     <footer
       style={{
-        background: "#0A0907",
-        borderTop: "0.5px solid #1E1C18",
-        padding: "60px 24px 40px",
+        background: colours.bg,
+        borderTop: `0.5px solid ${colours.border}`,
         fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
+        padding: "56px 24px 36px",
       }}
     >
-      <div style={{ maxWidth: 1140, margin: "0 auto" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "2fr 1fr 1fr 1fr",
-            gap: 48,
-            marginBottom: 60,
-          }}
-          className="footer-grid"
-        >
+      <div className="venn-container">
+        <div className="footer-grid" style={{ display: "grid", gap: 44, gridTemplateColumns: "2fr 1fr 1fr 1fr", marginBottom: 54 }}>
           <div>
-            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", marginBottom: 16 }}>
-              <VennMark />
-              <span
-                style={{
-                  fontFamily: "var(--font-instrument-serif), Georgia, serif",
-                  fontSize: 16,
-                  color: "#FFFDF8",
-                }}
-              >
-                Venn
-              </span>
+            <Link href="/" style={{ display: "inline-flex", marginBottom: 18, textDecoration: "none" }}>
+              <VennLogo size={27} variant="horizontal" />
             </Link>
-            <p
-              style={{
-                fontSize: 13,
-                color: "#444440",
-                lineHeight: 1.7,
-                maxWidth: 260,
-              }}
-            >
-              The prospect engine for agency owners. Find clients, understand their problems, win their business.
+            <p className="venn-copy" style={{ color: colours.muted, fontSize: 13, maxWidth: 280 }}>
+              The prospect engine that thinks before it speaks.
             </p>
           </div>
 
           {COLS.map((col) => (
             <div key={col.title}>
-              <p
-                style={{
-                  fontSize: 10,
-                  letterSpacing: "0.12em",
-                  color: "#444440",
-                  textTransform: "uppercase",
-                  marginBottom: 16,
-                }}
-              >
+              <p className="venn-eyebrow" style={{ color: colours.muted, marginBottom: 16 }}>
                 {col.title}
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {col.links.map(({ label, href }) => (
-                  <Link
-                    key={label}
-                    href={href}
-                    style={{
-                      fontSize: 13,
-                      color: "#888580",
-                      textDecoration: "none",
-                      transition: "color 0.15s",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFDF8")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "#888580")}
-                  >
+                  <Link key={label} href={href} style={{ color: colours.secondary, fontSize: 13, textDecoration: "none" }}>
                     {label}
                   </Link>
                 ))}
@@ -119,31 +67,18 @@ export function Footer() {
           ))}
         </div>
 
-        <div
-          style={{
-            borderTop: "0.5px solid #1E1C18",
-            paddingTop: 24,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
-          <p style={{ fontSize: 12, color: "#444440" }}>
-            © {new Date().getFullYear()} Venn. Built for agency owners.
-          </p>
-          <p style={{ fontSize: 12, color: "#2A2826" }}>
-            luke@venn.so
-          </p>
+        <div style={{ alignItems: "center", borderTop: `0.5px solid ${colours.border}`, display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between", paddingTop: 24 }}>
+          <p style={{ color: colours.muted, fontSize: 12 }}>© {new Date().getFullYear()} Venn. Built for agency owners.</p>
+          <p style={{ color: "#2A2826", fontSize: 12 }}>luke@venn.so</p>
         </div>
       </div>
 
       <style>{`
-        @media (max-width: 640px) {
-          .footer-grid {
-            grid-template-columns: 1fr 1fr !important;
-          }
+        footer a { transition: color 220ms var(--venn-ease); }
+        footer a:hover { color: ${colours.ivory} !important; }
+        @media (max-width: 700px) {
+          .footer-grid { grid-template-columns: 1fr 1fr !important; }
+          .footer-grid > div:first-child { grid-column: 1 / -1; }
         }
       `}</style>
     </footer>

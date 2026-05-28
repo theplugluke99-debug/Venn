@@ -1,352 +1,129 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Reveal, Section, SectionHeader, colours, motionPresets } from "./system";
 
-const STEPS = [
-  { id: "scan", label: "Scan", detail: "Find & verify business" },
-  { id: "analyse", label: "Analyse", detail: "Read reviews, score intent" },
-  { id: "generate", label: "Generate", detail: "Draft opening + card" },
-  { id: "deliver", label: "Deliver", detail: "Send across channels" },
-];
-
-function ElapsedTimer({ startedAt }: { startedAt: Date }) {
-  const [elapsed, setElapsed] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsed(Math.floor((Date.now() - startedAt.getTime()) / 1000));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [startedAt]);
-
-  const m = Math.floor(elapsed / 60);
-  const s = elapsed % 60;
-  return (
-    <span style={{ fontFamily: "monospace", fontSize: 13, color: "#C4973F" }}>
-      {m}:{s.toString().padStart(2, "0")}
-    </span>
-  );
-}
-
-const LIVE_EVENTS = [
-  { time: "0:00", event: "Scan started", location: "Manchester → Aesthetic Clinics", step: 0 },
-  { time: "0:07", event: "23 businesses found", location: "Pulling Google data", step: 0 },
-  { time: "0:19", event: "Reviews loaded", location: "847 reviews processed", step: 1 },
-  { time: "0:31", event: "Intent scored", location: "Glow Aesthetics — HIGH", step: 1 },
-  { time: "0:44", event: "Opening line written", location: "Claude AI · personalised", step: 2 },
-  { time: "0:52", event: "Card generated", location: "venn.agency/card/glow-aesthetics-mx7k", step: 2 },
-  { time: "1:03", event: "Email queued", location: "Ready to send", step: 3 },
+const SIGNALS = [
+  "Card opened",
+  "Revenue section viewed",
+  "Reply button hovered",
+  "Returned after 11 minutes",
 ];
 
 export function IntelligenceLoop() {
-  const [activeStep, setActiveStep] = useState(0);
-  const [eventIndex, setEventIndex] = useState(0);
-  const [startedAt] = useState(() => new Date());
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const inView = useRef(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !inView.current) {
-          inView.current = true;
-          let i = 0;
-          timerRef.current = setInterval(() => {
-            i++;
-            if (i < LIVE_EVENTS.length) {
-              setEventIndex(i);
-              setActiveStep(LIVE_EVENTS[i].step);
-            } else {
-              clearInterval(timerRef.current!);
-            }
-          }, 900);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => {
-      observer.disconnect();
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
-
-  const visibleEvents = LIVE_EVENTS.slice(0, eventIndex + 1);
+    if (reduceMotion) return;
+    const timer = window.setInterval(() => {
+      setActive((value) => (value + 1) % SIGNALS.length);
+    }, 1500);
+    return () => window.clearInterval(timer);
+  }, [reduceMotion]);
 
   return (
-    <section
-      id="intelligence"
-      ref={sectionRef}
-      style={{
-        background: "#0A0907",
-        padding: "120px 24px",
-        fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
-      }}
-    >
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
-          style={{
-            fontSize: 10,
-            letterSpacing: "0.15em",
-            color: "#C4973F",
-            textTransform: "uppercase",
-            marginBottom: 20,
-            textAlign: "center",
-          }}
-        >
-          06 / The intelligence loop
-        </motion.p>
+    <Section id="intelligence" tone="primary">
+      <div className="venn-container">
+        <SectionHeader
+          eyebrow="The intelligence loop"
+          title={
+            <>
+              You know when
+              <br />
+              they&apos;re reading it.
+            </>
+          }
+          subline="Before they&apos;ve said a word."
+        />
 
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          style={{
-            fontFamily: "var(--font-instrument-serif), Georgia, serif",
-            fontSize: "clamp(32px, 4.5vw, 48px)",
-            fontWeight: 400,
-            color: "#FFFDF8",
-            textAlign: "center",
-            marginBottom: 12,
-            lineHeight: 1.1,
-          }}
-        >
-          Scan. Analyse.
-          <br />
-          Generate. Deliver.
-        </motion.h2>
+        <Reveal>
+          <div className="loop-grid" style={{ display: "grid", gap: 18, gridTemplateColumns: "1fr 1fr", alignItems: "stretch" }}>
+            <div className="venn-card" style={{ padding: 26 }}>
+              <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: 28 }}>
+                <span className="venn-eyebrow">Prospect activity</span>
+                <span style={{ color: colours.gold, fontFamily: "monospace", fontSize: 12 }}>live</span>
+              </div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          style={{
-            fontSize: 15,
-            color: "#888580",
-            textAlign: "center",
-            marginBottom: 64,
-            lineHeight: 1.6,
-          }}
-        >
-          Four steps. Sixty seconds. Every time you search.
-        </motion.p>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 24,
-          }}
-          className="loop-grid"
-        >
-          {/* Step pipeline */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            style={{
-              background: "#0F0E0B",
-              border: "0.5px solid #1E1C18",
-              borderRadius: 8,
-              padding: "28px 24px",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-              {STEPS.map((step, i) => {
-                const isActive = i === activeStep;
-                const isDone = i < activeStep;
-                return (
-                  <div key={step.id} style={{ display: "flex", alignItems: "stretch", gap: 16 }}>
-                    {/* Left: dot + line */}
-                    <div
+              <div style={{ display: "grid", gap: 14 }}>
+                {SIGNALS.map((signal, index) => {
+                  const isActive = index === active;
+                  return (
+                    <motion.div
+                      key={signal}
+                      animate={{ opacity: isActive ? 1 : 0.44 }}
+                      transition={motionPresets.soft}
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
                         alignItems: "center",
-                        flexShrink: 0,
-                        width: 20,
+                        border: `0.5px solid ${isActive ? colours.goldBorder : colours.border}`,
+                        borderRadius: 8,
+                        display: "grid",
+                        gap: 14,
+                        gridTemplateColumns: "72px 1fr auto",
+                        padding: "15px 16px",
                       }}
                     >
-                      <div
-                        style={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: "50%",
-                          flexShrink: 0,
-                          background: isDone ? "#C4973F" : isActive ? "#C4973F" : "#1E1C18",
-                          border: isActive ? "2px solid #C4973F" : "1.5px solid transparent",
-                          boxShadow: isActive ? "0 0 8px rgba(196,151,63,0.5)" : "none",
-                          transition: "all 0.4s",
-                          marginTop: 18,
-                        }}
-                      />
-                      {i < STEPS.length - 1 && (
-                        <div
-                          style={{
-                            width: 1,
-                            flex: 1,
-                            minHeight: 24,
-                            background: isDone ? "#C4973F" : "#1E1C18",
-                            transition: "background 0.4s",
-                            opacity: isDone ? 0.6 : 0.3,
-                          }}
-                        />
-                      )}
+                      <span style={{ color: colours.muted, fontFamily: "monospace", fontSize: 12 }}>
+                        0:{String(18 + index * 9).padStart(2, "0")}
+                      </span>
+                      <span style={{ color: colours.ivory, fontSize: 14 }}>{signal}</span>
+                      <span style={{ background: isActive ? colours.gold : "#25211a", borderRadius: "50%", boxShadow: isActive ? "0 0 18px rgba(196,151,63,0.24)" : "none", height: 7, width: 7 }} />
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="venn-card" style={{ display: "grid", padding: 26 }}>
+              <div style={{ alignSelf: "start" }}>
+                <p className="venn-eyebrow" style={{ marginBottom: 24 }}>Hot lead state</p>
+                <div style={{ background: "#0A0907", border: `0.5px solid ${colours.border}`, borderRadius: 8, padding: 22 }}>
+                  <div style={{ alignItems: "flex-start", display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 22 }}>
+                    <div>
+                      <p style={{ color: colours.ivory, fontFamily: "var(--font-instrument-serif), Georgia, serif", fontSize: 30 }}>Glow Aesthetics</p>
+                      <p style={{ color: colours.muted, fontSize: 12 }}>Sarah M. · opened twice</p>
                     </div>
-
-                    {/* Right: text */}
-                    <div style={{ paddingTop: 12, paddingBottom: i < STEPS.length - 1 ? 16 : 0 }}>
-                      <p
-                        style={{
-                          fontSize: 14,
-                          fontWeight: 500,
-                          color: isActive || isDone ? "#FFFDF8" : "#444440",
-                          marginBottom: 2,
-                          transition: "color 0.4s",
-                        }}
-                      >
-                        {step.label}
-                      </p>
-                      <p
-                        style={{
-                          fontSize: 12,
-                          color: isDone ? "#888580" : isActive ? "#888580" : "#2A2826",
-                          transition: "color 0.4s",
-                        }}
-                      >
-                        {step.detail}
-                      </p>
-                    </div>
+                    <span style={{ border: `0.5px solid ${colours.goldBorder}`, borderRadius: 999, color: colours.gold, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", padding: "6px 9px" }}>
+                      WARM
+                    </span>
                   </div>
-                );
-              })}
-            </div>
 
-            <div
-              style={{
-                marginTop: 28,
-                paddingTop: 20,
-                borderTop: "0.5px solid #1E1C18",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <span style={{ fontSize: 12, color: "#444440" }}>Elapsed</span>
-              <ElapsedTimer startedAt={startedAt} />
-            </div>
-          </motion.div>
-
-          {/* Live event feed */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, delay: 0.25 }}
-            style={{
-              background: "#0F0E0B",
-              border: "0.5px solid #1E1C18",
-              borderRadius: 8,
-              padding: "24px",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 20,
-              }}
-            >
-              <div
-                className="pulse-dot"
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  background: "#C4973F",
-                }}
-              />
-              <span
-                style={{
-                  fontSize: 10,
-                  letterSpacing: "0.1em",
-                  color: "#444440",
-                  textTransform: "uppercase",
-                }}
-              >
-                Live feed
-              </span>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {visibleEvents.map((ev, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: 8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3 }}
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    alignItems: "flex-start",
-                    opacity: i === visibleEvents.length - 1 ? 1 : 0.5,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "monospace",
-                      fontSize: 11,
-                      color: "#444440",
-                      minWidth: 32,
-                      paddingTop: 1,
-                    }}
-                  >
-                    {ev.time}
-                  </span>
-                  <div>
-                    <p style={{ fontSize: 13, color: "#FFFDF8", margin: 0 }}>{ev.event}</p>
-                    <p style={{ fontSize: 11, color: "#444440", margin: 0 }}>{ev.location}</p>
+                  <div style={{ display: "grid", gap: 10 }}>
+                    {["Read the evidence", "Paused on opportunity", "Returned to reply"].map((item, index) => (
+                      <div key={item} style={{ alignItems: "center", display: "grid", gap: 12, gridTemplateColumns: "1fr 90px" }}>
+                        <span style={{ color: colours.secondary, fontSize: 13 }}>{item}</span>
+                        <span style={{ background: "#17140f", borderRadius: 999, display: "block", height: 5, overflow: "hidden" }}>
+                          <motion.span
+                            animate={{ width: `${[92, 76, 58][index]}%` }}
+                            transition={{ ...motionPresets.slow, delay: index * 0.12 }}
+                            style={{ background: colours.gold, display: "block", height: "100%" }}
+                          />
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+                </div>
+              </div>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          style={{
-            fontSize: 13,
-            color: "#444440",
-            textAlign: "center",
-            marginTop: 40,
-            lineHeight: 1.6,
-          }}
-        >
-          The entire loop runs automatically. You just decide who to contact.
-        </motion.p>
+              <p style={{ alignSelf: "end", color: colours.muted, fontSize: 12, lineHeight: 1.7, marginTop: 22 }}>
+                Calm signal, not vanity analytics. Enough to know when a conversation is becoming real.
+              </p>
+            </div>
+          </div>
+        </Reveal>
       </div>
 
       <style>{`
-        @media (max-width: 640px) {
+        @media (max-width: 780px) {
           .loop-grid { grid-template-columns: 1fr !important; }
         }
+        @media (max-width: 520px) {
+          .loop-grid [style*="grid-template-columns: 72px"] {
+            grid-template-columns: 52px 1fr auto !important;
+          }
+        }
       `}</style>
-    </section>
+    </Section>
   );
 }

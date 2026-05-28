@@ -1,217 +1,105 @@
+"use client";
+
 import { ReactNode } from "react";
+import { Reveal, Section, SectionHeader, VennLogo, colours } from "./system";
 
 function Check() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-label="Yes">
-      <circle cx="8" cy="8" r="7.5" stroke="#4CAF50" strokeWidth="0.5" />
-      <path d="M5 8l2 2 4-4" stroke="#4CAF50" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
+  return <span aria-label="Yes" style={{ color: colours.gold }}>✓</span>;
 }
 
 function Cross() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-label="No">
-      <circle cx="8" cy="8" r="7.5" stroke="#2A2826" strokeWidth="0.5" />
-      <path d="M6 6l4 4M10 6l-4 4" stroke="#444440" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
+  return <span aria-label="No" style={{ color: colours.muted }}>—</span>;
 }
 
-function Partial({ label }: { label: string }) {
-  return (
-    <span style={{ fontSize: 11, color: "#888580", fontStyle: "italic" }}>{label}</span>
-  );
+function Partial({ children }: { children: ReactNode }) {
+  return <span style={{ color: colours.secondary, fontSize: 12 }}>{children}</span>;
 }
 
-const ROWS: Array<{
-  feature: string;
-  venn: ReactNode;
-  apollo: ReactNode;
-  clay: ReactNode;
-  rooms: ReactNode;
-}> = [
-  {
-    feature: "Find businesses in real time",
-    venn: <Check />,
-    apollo: <Partial label="static DB" />,
-    clay: <Partial label="via enrichment" />,
-    rooms: <Cross />,
-  },
-  {
-    feature: "Analyse Google Reviews",
-    venn: <Check />,
-    apollo: <Cross />,
-    clay: <Cross />,
-    rooms: <Cross />,
-  },
-  {
-    feature: "Score intent automatically",
-    venn: <Check />,
-    apollo: <Cross />,
-    clay: <Partial label="manual setup" />,
-    rooms: <Cross />,
-  },
-  {
-    feature: "Generate personalised opening line",
-    venn: <Check />,
-    apollo: <Cross />,
-    clay: <Partial label="template-based" />,
-    rooms: <Cross />,
-  },
-  {
-    feature: "Digital prospect card with unique URL",
-    venn: <Check />,
-    apollo: <Cross />,
-    clay: <Cross />,
-    rooms: <Partial label="manual, $750/mo" />,
-  },
-  {
-    feature: "Revenue loss estimate",
-    venn: <Check />,
-    apollo: <Cross />,
-    clay: <Cross />,
-    rooms: <Cross />,
-  },
-  {
-    feature: "No spreadsheets required",
-    venn: <Check />,
-    apollo: <Cross />,
-    clay: <Cross />,
-    rooms: <Check />,
-  },
-  {
-    feature: "Works in 60 seconds per prospect",
-    venn: <Check />,
-    apollo: <Cross />,
-    clay: <Cross />,
-    rooms: <Cross />,
-  },
+const ROWS = [
+  { feature: "Find businesses in real time", venn: <Check />, apollo: <Partial>Static database</Partial>, clay: <Partial>Via enrichment</Partial>, rooms: <Cross /> },
+  { feature: "Analyse Google reviews", venn: <Check />, apollo: <Cross />, clay: <Cross />, rooms: <Cross /> },
+  { feature: "Score intent automatically", venn: <Check />, apollo: <Cross />, clay: <Partial>Manual setup</Partial>, rooms: <Cross /> },
+  { feature: "Generate opening line", venn: <Check />, apollo: <Cross />, clay: <Partial>Template logic</Partial>, rooms: <Cross /> },
+  { feature: "Create a private prospect card", venn: <Check />, apollo: <Cross />, clay: <Cross />, rooms: <Partial>Manual build</Partial> },
+  { feature: "Works without spreadsheets", venn: <Check />, apollo: <Cross />, clay: <Cross />, rooms: <Partial>After setup</Partial> },
 ];
 
 const COLS = [
-  { key: "venn", label: "Venn", highlight: true },
-  { key: "apollo", label: "Apollo", highlight: false },
-  { key: "clay", label: "Clay", highlight: false },
-  { key: "rooms", label: "Sales rooms", highlight: false },
-];
+  { key: "venn", label: "Venn" },
+  { key: "apollo", label: "Apollo" },
+  { key: "clay", label: "Clay" },
+  { key: "rooms", label: "Sales rooms" },
+] as const;
 
 export function Comparison() {
   return (
-    <section
-      id="compare"
-      style={{
-        background: "#0A0907",
-        padding: "120px 24px",
-        fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
-      }}
-    >
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <p
-          style={{
-            fontSize: 10,
-            letterSpacing: "0.15em",
-            color: "#C4973F",
-            textTransform: "uppercase",
-            marginBottom: 20,
-            textAlign: "center",
-          }}
-        >
-          Honest comparison
-        </p>
-        <h2
-          style={{
-            fontFamily: "var(--font-instrument-serif), Georgia, serif",
-            fontSize: "clamp(32px, 4.5vw, 48px)",
-            fontWeight: 400,
-            color: "#FFFDF8",
-            textAlign: "center",
-            marginBottom: 60,
-            lineHeight: 1.1,
-          }}
-        >
-          Different tools.
-          <br />
-          Different jobs.
-        </h2>
+    <Section id="compare" tone="primary">
+      <div className="venn-container">
+        <SectionHeader
+          eyebrow="Comparison"
+          title={
+            <>
+              Different tools.
+              <br />
+              Different jobs.
+            </>
+          }
+          subline="Apollo and Clay are useful infrastructure. Venn is the intelligence layer that decides what is worth saying."
+        />
 
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
-            <thead>
-              <tr>
-                <th
-                  style={{
-                    padding: "0 0 20px",
-                    textAlign: "left",
-                    fontSize: 12,
-                    color: "#444440",
-                    fontWeight: 400,
-                    width: "40%",
-                  }}
-                >
-                  Feature
-                </th>
-                {COLS.map((col) => (
-                  <th
-                    key={col.key}
-                    style={{
-                      padding: "0 0 20px",
-                      textAlign: "center",
-                      fontSize: 12,
-                      fontWeight: col.highlight ? 600 : 400,
-                      color: col.highlight ? "#C4973F" : "#444440",
-                    }}
-                  >
-                    {col.label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {ROWS.map((row, i) => (
-                <tr key={i} style={{ borderTop: "0.5px solid #1E1C18" }}>
-                  <td
-                    style={{
-                      padding: "16px 0",
-                      fontSize: 13,
-                      color: "#888580",
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {row.feature}
-                  </td>
+        <Reveal>
+          <div className="comparison-table" style={{ border: `0.5px solid ${colours.border}`, borderRadius: 8, overflow: "hidden" }}>
+            <table style={{ borderCollapse: "collapse", minWidth: 720, width: "100%" }}>
+              <thead>
+                <tr style={{ background: colours.bgSecondary }}>
+                  <th style={{ color: colours.muted, fontSize: 12, fontWeight: 400, padding: "20px 22px", textAlign: "left", width: "38%" }}>Capability</th>
                   {COLS.map((col) => (
-                    <td
+                    <th
                       key={col.key}
                       style={{
-                        padding: "16px 0",
+                        background: col.key === "venn" ? "rgba(196,151,63,0.08)" : "transparent",
+                        color: col.key === "venn" ? colours.gold : colours.secondary,
+                        fontSize: 12,
+                        fontWeight: col.key === "venn" ? 600 : 400,
+                        padding: "20px 14px",
                         textAlign: "center",
-                        background: col.highlight ? "rgba(196, 151, 63, 0.04)" : "transparent",
                       }}
                     >
-                      {row[col.key as keyof typeof row]}
-                    </td>
+                      {col.key === "venn" ? <VennLogo variant="wordmark" size={28} /> : col.label}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <p
-          style={{
-            fontSize: 12,
-            color: "#444440",
-            textAlign: "center",
-            marginTop: 32,
-            lineHeight: 1.6,
-          }}
-        >
-          Apollo and Clay are good tools for what they do.
-          <br />
-          Venn does something different.
-        </p>
+              </thead>
+              <tbody>
+                {ROWS.map((row) => (
+                  <tr key={row.feature} style={{ borderTop: `0.5px solid ${colours.border}` }}>
+                    <td style={{ color: colours.secondary, fontSize: 13, lineHeight: 1.45, padding: "18px 22px" }}>{row.feature}</td>
+                    {COLS.map((col) => (
+                      <td
+                        key={col.key}
+                        style={{
+                          background: col.key === "venn" ? "rgba(196,151,63,0.045)" : "transparent",
+                          fontSize: 15,
+                          padding: "18px 14px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {row[col.key]}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Reveal>
       </div>
-    </section>
+
+      <style>{`
+        @media (max-width: 760px) {
+          .comparison-table { overflow-x: auto !important; }
+        }
+      `}</style>
+    </Section>
   );
 }
