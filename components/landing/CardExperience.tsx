@@ -218,18 +218,21 @@ export function CardExperience() {
               <button
                 className={`style-tab${activeTab === "editorial" ? " style-tab-active" : ""}`}
                 onClick={() => switchTab("editorial")}
+                type="button"
               >
                 Editorial
               </button>
               <button
                 className={`style-tab${activeTab === "letter" ? " style-tab-active" : ""}`}
                 onClick={() => switchTab("letter")}
+                type="button"
               >
                 Letter
               </button>
               <button
                 className={`style-tab${activeTab === "minimal" ? " style-tab-active" : ""}`}
                 onClick={() => switchTab("minimal")}
+                type="button"
               >
                 Minimal
               </button>
@@ -243,7 +246,7 @@ export function CardExperience() {
             className="card-fade-wrap"
             style={{
               opacity: visible ? 1 : 0,
-              transition: visible ? "opacity 300ms ease" : "opacity 200ms ease",
+              transition: "opacity 300ms ease-out",
             }}
           >
             {activeTab === "editorial" ? <EditorialCard /> : activeTab === "letter" ? <LetterCard /> : <MinimalCard />}
