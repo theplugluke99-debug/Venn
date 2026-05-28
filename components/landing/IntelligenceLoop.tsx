@@ -92,7 +92,8 @@ export function IntelligenceLoop() {
               <div className="reader-screen">
                 <div className="browser-bar">⌕ venn.ai/c/glow-aesthetics</div>
                 <div className="reader-card">
-                  <VennLogo size={26} variant="horizontal" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/venn-logo.svg" alt="Venn" style={{ height: 26, width: "auto", display: "block", marginBottom: 4 }} />
                   <p className="venn-eyebrow">Personalised growth opportunity</p>
                   <h3>Glow Aesthetics</h3>
                   <p>We noticed a few things about your reviews, booking and competitors.</p>

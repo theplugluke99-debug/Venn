@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { CTA, VennLogo, colours, motionPresets } from "./system";
+import { CTA, colours, motionPresets } from "./system";
 
 const NAV_LINKS = [
   { sectionId: "how-it-works", label: "How it works" },
@@ -52,8 +52,9 @@ export function Nav() {
           className="venn-container"
           style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}
         >
-          <Link href="/" aria-label="Venn home" style={{ textDecoration: "none" }}>
-            <VennLogo size={28} variant="horizontal" />
+          <Link href="/" aria-label="Venn home" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/venn-logo.svg" alt="Venn" style={{ height: 28, width: "auto", display: "block" }} />
           </Link>
 
           <div className="nav-desktop-links" style={{ display: "flex", alignItems: "center", gap: 30 }}>

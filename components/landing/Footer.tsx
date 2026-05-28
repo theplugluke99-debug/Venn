@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { VennLogo, colours } from "./system";
+import { colours } from "./system";
 
 const COLS = [
   {
@@ -47,7 +47,8 @@ export function Footer() {
         <div className="footer-grid" style={{ display: "grid", gap: 44, gridTemplateColumns: "2fr 1fr 1fr 1fr", marginBottom: 54 }}>
           <div>
             <Link href="/" style={{ display: "inline-flex", marginBottom: 18, textDecoration: "none" }}>
-              <VennLogo size={27} variant="horizontal" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/venn-logo.svg" alt="Venn" style={{ height: 27, width: "auto", display: "block" }} />
             </Link>
             <p className="venn-copy" style={{ color: colours.muted, fontSize: 13, maxWidth: 280 }}>
               The prospect engine that thinks before it speaks.

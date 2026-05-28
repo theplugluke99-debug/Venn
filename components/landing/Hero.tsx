@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { CTA, VennLogo, colours, motionPresets } from "./system";
+import { CTA, colours, motionPresets } from "./system";
 
 const HEADLINE_LINES = [
   "The clients you need",
@@ -120,7 +120,8 @@ export function Hero() {
           transition={{ ...motionPresets.soft, delay: 0.5 }}
           className="hero-brand"
         >
-          <VennLogo size={33} variant="horizontal" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/venn-logo.svg" alt="Venn" style={{ height: 33, width: "auto", display: "block" }} />
         </motion.div>
 
         <div className="hero-copy">

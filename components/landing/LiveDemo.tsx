@@ -114,7 +114,8 @@ export function LiveDemo() {
               transition={{ ...motionPresets.slow, delay: 0.22 }}
             >
               <div className="crystal-head">
-                <VennLogo size={34} variant="horizontal" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/venn-logo.svg" alt="Venn" style={{ height: 34, width: "auto", display: "block" }} />
                 <span><i /> HIGH INTENT</span>
               </div>
               <p className="venn-eyebrow">Aesthetic clinic · Manchester</p>

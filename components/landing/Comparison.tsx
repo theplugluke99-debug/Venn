@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Reveal, Section, SectionHeader, VennLogo, colours } from "./system";
+import { Reveal, Section, SectionHeader, colours } from "./system";
 
 function Check() {
   return <span aria-label="Yes" style={{ color: colours.gold }}>✓</span>;
@@ -67,7 +67,10 @@ export function Comparison() {
                         textAlign: "center",
                       }}
                     >
-                      {col.key === "venn" ? <VennLogo variant="wordmark" size={28} /> : col.label}
+                      {col.key === "venn" ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src="/venn-logo.svg" alt="Venn" style={{ height: 22, width: "auto", display: "inline-block" }} />
+                      ) : col.label}
                     </th>
                   ))}
                 </tr>
