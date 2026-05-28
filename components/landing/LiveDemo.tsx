@@ -115,7 +115,7 @@ export function LiveDemo() {
             >
               <div className="crystal-head">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/venn-logo.svg" alt="Venn" style={{ height: 34, width: "auto", display: "block" }} />
+                <img src="/venn-logo.svg" alt="Venn" style={{ height: 78, width: "auto", display: "block" }} />
                 <span><i /> HIGH INTENT</span>
               </div>
               <p className="venn-eyebrow">Aesthetic clinic · Manchester</p>
@@ -141,7 +141,7 @@ export function LiveDemo() {
               </div>
               <div className="card-peek">
                 <div className="card-peek-meta">
-                  <VennLogo size={16} variant="mark" decorative />
+                  <VennLogo size={22} variant="mark" decorative />
                   <span>Momentum Agency</span>
                 </div>
                 <strong>Glow Aesthetics</strong>

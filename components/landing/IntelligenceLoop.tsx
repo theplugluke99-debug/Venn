@@ -41,7 +41,7 @@ export function IntelligenceLoop() {
               </aside>
               <main>
                 <div className="dash-brand">
-                  <VennLogo size={30} variant="mark" decorative />
+                  <VennLogo size={38} variant="mark" decorative />
                   <span>Momentum Agency</span>
                 </div>
                 <h3>Live intelligence <small>• Updating in real time</small></h3>
@@ -93,7 +93,7 @@ export function IntelligenceLoop() {
                 <div className="browser-bar">⌕ venn.ai/c/glow-aesthetics</div>
                 <div className="reader-card">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/venn-logo.svg" alt="Venn" style={{ height: 26, width: "auto", display: "block", marginBottom: 4 }} />
+                  <img src="/venn-logo.svg" alt="Venn" style={{ height: 64, width: "auto", display: "block", marginBottom: 4 }} />
                   <p className="venn-eyebrow">Personalised growth opportunity</p>
                   <h3>Glow Aesthetics</h3>
                   <p>We noticed a few things about your reviews, booking and competitors.</p>

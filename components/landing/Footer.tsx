@@ -48,7 +48,7 @@ export function Footer() {
           <div>
             <Link href="/" style={{ display: "inline-flex", marginBottom: 18, textDecoration: "none" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/venn-logo.svg" alt="Venn" style={{ height: 27, width: "auto", display: "block" }} />
+              <img src="/venn-logo.svg" alt="Venn" style={{ height: 64, width: "auto", display: "block" }} />
             </Link>
             <p className="venn-copy" style={{ color: colours.muted, fontSize: 13, maxWidth: 280 }}>
               The prospect engine that thinks before it speaks.

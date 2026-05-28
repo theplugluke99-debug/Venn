@@ -69,7 +69,7 @@ export function Comparison() {
                     >
                       {col.key === "venn" ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src="/venn-logo.svg" alt="Venn" style={{ height: 22, width: "auto", display: "inline-block" }} />
+                        <img src="/venn-logo.svg" alt="Venn" style={{ height: 54, width: "auto", display: "inline-block" }} />
                       ) : col.label}
                     </th>
                   ))}

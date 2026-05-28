@@ -54,7 +54,7 @@ export function Nav() {
         >
           <Link href="/" aria-label="Venn home" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/venn-logo.svg" alt="Venn" style={{ height: 28, width: "auto", display: "block" }} />
+            <img src="/venn-logo.svg" alt="Venn" style={{ height: 72, width: "auto", display: "block" }} />
           </Link>
 
           <div className="nav-desktop-links" style={{ display: "flex", alignItems: "center", gap: 30 }}>

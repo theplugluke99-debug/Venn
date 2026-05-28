@@ -121,7 +121,7 @@ export function Hero() {
           className="hero-brand"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/venn-logo.svg" alt="Venn" style={{ height: 33, width: "auto", display: "block" }} />
+          <img src="/venn-logo.svg" alt="Venn" style={{ height: 92, width: "auto", display: "block" }} />
         </motion.div>
 
         <div className="hero-copy">

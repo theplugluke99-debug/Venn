@@ -79,7 +79,7 @@ export function CompleteJourney() {
 
     const timer = window.setInterval(() => {
       setActive((value) => (value + 1) % STEPS.length);
-    }, 4500);
+    }, 3200);
 
     return () => window.clearInterval(timer);
   }, [reduceMotion]);
@@ -109,14 +109,14 @@ export function CompleteJourney() {
               <motion.span
                 className="cj-dot"
                 animate={reduceMotion ? false : { left: `${(activeIndex / (STEPS.length - 1)) * 100}%` }}
-                transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
               />
             </div>
             <div className="cj-mobile-line" aria-hidden>
               <motion.span
                 className="cj-dot"
                 animate={reduceMotion ? false : { top: `${(activeIndex / (STEPS.length - 1)) * 100}%` }}
-                transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
               />
             </div>
 
@@ -128,9 +128,10 @@ export function CompleteJourney() {
                     key={step.num}
                     className={`cj-card ${isActive ? "active" : ""}`}
                     animate={{
+                      backgroundColor: isActive ? "rgba(196,151,63,0.22)" : "#0F0E0B",
                       borderColor: isActive ? colours.gold : "#1E1C18",
                       boxShadow: isActive
-                        ? "0 0 34px rgba(196,151,63,0.13), inset 0 0 44px rgba(196,151,63,0.055)"
+                        ? "0 0 42px rgba(196,151,63,0.26), inset 0 0 86px rgba(196,151,63,0.24)"
                         : "0 0 0 rgba(196,151,63,0)",
                     }}
                     transition={motionPresets.soft}
@@ -241,7 +242,7 @@ export function CompleteJourney() {
           min-height: 322px;
           padding: 34px 22px 30px;
           text-align: center;
-          transition: color 700ms cubic-bezier(0.22, 1, 0.36, 1);
+          transition: background-color 700ms cubic-bezier(0.22, 1, 0.36, 1), color 700ms cubic-bezier(0.22, 1, 0.36, 1);
         }
         .cj-number {
           align-items: center;
@@ -300,10 +301,12 @@ export function CompleteJourney() {
           display: block;
         }
         .cj-card.active .cj-number {
-          background: rgba(196,151,63,0.13);
-          box-shadow: 0 0 24px rgba(196,151,63,0.2);
+          background: ${colours.gold};
+          box-shadow: 0 0 28px rgba(196,151,63,0.38);
         }
-        .cj-card.active .cj-number span,
+        .cj-card.active .cj-number span {
+          color: #0A0907;
+        }
         .cj-card.active .cj-icon {
           color: #E7B650;
         }

@@ -26,7 +26,7 @@ function EditorialCard() {
         />
         <div className="image-scrim" />
         <div className="card-brand">
-          <VennLogo size={28} variant="mark" decorative />
+          <VennLogo size={38} variant="mark" decorative />
           <span>Momentum Agency</span>
         </div>
         <span className="intent-badge"><i /> HIGH INTENT</span>
@@ -114,7 +114,7 @@ function LetterCard() {
       {/* Header */}
       <div className="lc-header">
         <div className="lc-from">
-          <VennLogo size={16} variant="mark" decorative />
+          <VennLogo size={22} variant="mark" decorative />
           <span className="lc-agency-name">Momentum Agency</span>
         </div>
         <span className="lc-date">May 2025</span>
