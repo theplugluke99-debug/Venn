@@ -33,6 +33,7 @@ interface Lead {
   phone: string | null;
   email: string | null;
   instagramHandle: string | null;
+  arsenalReady: boolean;
   card: { slug: string; viewCount: number; lastViewed: string | null } | null;
   sequence: Sequence | null;
 }
@@ -288,6 +289,52 @@ function DueTodaySection({ steps }: { steps: DueTodayStep[] }) {
   );
 }
 
+function ArsenalGenerateButton({ leadId }: { leadId: string }) {
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const generate = async () => {
+    setLoading(true);
+    try {
+      await fetch(`/api/arsenal/${leadId}`, { method: "POST" });
+      setDone(true);
+    } catch {
+      // silently ignore
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <Link
+        href={`/leads/${leadId}#arsenal`}
+        style={{
+          fontSize: 10, color: "#C4973F", background: "#C4973F15",
+          border: "0.5px solid #C4973F40", borderRadius: 10, padding: "2px 8px",
+          textDecoration: "none", fontFamily: "var(--font-inter)", fontWeight: 500,
+        }}
+      >
+        Arsenal ready
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      onClick={generate}
+      disabled={loading}
+      style={{
+        fontSize: 10, color: loading ? "#444" : "#555250",
+        background: "none", border: "none", cursor: loading ? "default" : "pointer",
+        fontFamily: "var(--font-inter)", textDecoration: "underline", padding: 0,
+      }}
+    >
+      {loading ? "Generating…" : "Generate arsenal →"}
+    </button>
+  );
+}
+
 function LeadRow({ lead }: { lead: Lead }) {
   const hot = isHot(lead.card?.lastViewed ?? null);
 
@@ -399,7 +446,22 @@ function LeadRow({ lead }: { lead: Lead }) {
         )}
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+        {lead.arsenalReady ? (
+          <Link
+            href={`/leads/${lead.id}#arsenal`}
+            style={{
+              fontSize: 10, color: "#C4973F", background: "#C4973F15",
+              border: "0.5px solid #C4973F40", borderRadius: 10, padding: "2px 8px",
+              textDecoration: "none", fontFamily: "var(--font-inter)", fontWeight: 500,
+              letterSpacing: "0.04em",
+            }}
+          >
+            Arsenal ready
+          </Link>
+        ) : (
+          <ArsenalGenerateButton leadId={lead.id} />
+        )}
         {lead.openingLine && <CopyButton text={lead.openingLine} />}
         {channelAction()}
         <GenerateCardButton leadId={lead.id} card={lead.card} />

@@ -18,6 +18,7 @@ export default async function OutreachPage() {
       where: { userId: user.id, status: "complete" },
       include: {
         card: { select: { slug: true, viewCount: true, lastViewed: true } },
+        arsenal: { select: { id: true } },
         sequence: {
           include: { steps: { orderBy: { stepNumber: "asc" } } },
         },
@@ -75,6 +76,7 @@ export default async function OutreachPage() {
           lastViewed: l.card.lastViewed?.toISOString() ?? null,
         }
       : null,
+    arsenalReady: !!l.arsenal,
     sequence: l.sequence
       ? {
           id: l.sequence.id,

@@ -59,6 +59,8 @@ export async function upsertCardIdentity(
     reportAutoSend?: boolean;
     healthAlertThreshold?: number;
     deliverableReminderDays?: number;
+    useColdCall?: boolean;
+    useVideoMessage?: boolean;
   }
 ) {
   return db.cardIdentity.upsert({

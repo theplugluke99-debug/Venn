@@ -15,7 +15,7 @@ export async function createLead(data: {
 export async function getLeadById(id: string, userId: string) {
   return db.lead.findFirst({
     where: { id, userId },
-    include: { card: true },
+    include: { card: true, arsenal: true },
   });
 }
 

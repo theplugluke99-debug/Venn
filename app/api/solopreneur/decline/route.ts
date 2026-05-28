@@ -5,6 +5,7 @@ import { getResend, FROM_ADDRESS } from "@/lib/email/resend";
 import { solopreneurDeclinedHtml } from "@/lib/email/templates";
 
 export async function POST(request: NextRequest) {
+  try {
   const adminEmail = process.env.ADMIN_EMAIL;
   const { userId: clerkId } = await auth();
 
@@ -36,5 +37,9 @@ export async function POST(request: NextRequest) {
     }).catch((err) => console.error("[decline] email failed:", err));
   }
 
-  return Response.json({ success: true });
+    return Response.json({ success: true });
+  } catch (err) {
+    console.error("[POST /api/solopreneur/decline]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

@@ -34,7 +34,18 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "User not found" }, { status: 404 });
     }
 
-    const body = await request.json();
+    const raw = await request.json() as Record<string, unknown>;
+
+    // Coerce string-encoded booleans and numbers from the form
+    const body = {
+      ...raw,
+      reportAutoSend: raw.reportAutoSend === "true" || raw.reportAutoSend === true,
+      healthAlertThreshold: raw.healthAlertThreshold ? parseInt(String(raw.healthAlertThreshold), 10) : undefined,
+      deliverableReminderDays: raw.deliverableReminderDays ? parseInt(String(raw.deliverableReminderDays), 10) : undefined,
+      useColdCall: raw.useColdCall === "true" || raw.useColdCall === true,
+      useVideoMessage: raw.useVideoMessage === "true" || raw.useVideoMessage === true,
+    };
+
     const identity = await upsertCardIdentity(user.id, body);
 
     return Response.json({ identity });

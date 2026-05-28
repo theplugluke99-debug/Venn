@@ -9,10 +9,26 @@
     },
     "app/api/worker/route.ts": {
       "maxDuration": 60
+    },
+    "app/api/reports/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/proposals/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/close/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/crons/email-queue/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/arsenal/[leadId]/route.ts": {
+      "maxDuration": 60
     }
   },
   "crons": [
     { "path": "/api/worker", "schedule": "* * * * *" },
+    { "path": "/api/crons/email-queue", "schedule": "*/5 * * * *" },
     { "path": "/api/cron/checkin", "schedule": "0 8 1,15 * *" },
     { "path": "/api/crons/engagement", "schedule": "0 9 * * *" },
     { "path": "/api/crons/anniversaries", "schedule": "0 8 * * *" },

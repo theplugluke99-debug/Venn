@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { config } from "@/lib/config";
+import { addEmailJob } from "@/lib/queue";
+import { sendWelcomeEmail } from "@/lib/email/templates/welcome";
 import { type Stripe as StripeType } from "stripe";
 
 const PRICE_TO_PLAN: Record<string, string> = {
@@ -26,11 +28,7 @@ export async function POST(request: NextRequest) {
 
   let event: StripeType.Event;
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      sig,
-      config.stripe.webhookSecret
-    );
+    event = stripe.webhooks.constructEvent(body, sig, config.stripe.webhookSecret);
   } catch (err) {
     console.error("[Stripe webhook] Invalid signature", err);
     return Response.json({ error: "Invalid signature" }, { status: 400 });
@@ -40,12 +38,16 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as StripeType.Checkout.Session;
+
+        // userId in metadata is the Prisma user ID (set by checkout API)
         const userId = session.metadata?.userId;
         if (!userId) break;
 
-        const subscription = await stripe.subscriptions.retrieve(
-          session.subscription as string
-        );
+        const customerId = session.customer as string;
+        const subscriptionId = session.subscription as string;
+        if (!subscriptionId) break;
+
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         const priceId = subscription.items.data[0]?.price.id ?? null;
         const plan = planFromPriceId(priceId);
 
@@ -53,20 +55,58 @@ export async function POST(request: NextRequest) {
           where: { userId },
           create: {
             userId,
-            stripeCustomerId: session.customer as string,
+            stripeCustomerId: customerId,
             stripeSubId: subscription.id,
             stripePriceId: priceId,
             plan,
             status: "active",
           },
           update: {
-            stripeCustomerId: session.customer as string,
+            stripeCustomerId: customerId,
             stripeSubId: subscription.id,
             stripePriceId: priceId,
             status: "active",
             plan,
           },
         });
+
+        // Log payment event
+        await db.userEvent.create({
+          data: {
+            userId,
+            type: "payment_completed",
+            title: `Started ${plan} plan`,
+            description: `Subscribed to Venn ${plan} plan`,
+          },
+        }).catch(() => null);
+
+        // Resolve user email + name for welcome sequence
+        const user = await db.user.findUnique({ where: { id: userId } });
+        const email = user?.email ?? null;
+        const fullName = user?.name ?? "";
+        const firstName = fullName.split(" ")[0] || "there";
+
+        if (email) {
+          // Send welcome email immediately
+          await sendWelcomeEmail({ email, firstName, plan }).catch((err) =>
+            console.error("[stripe/webhook] welcome email failed:", err)
+          );
+
+          // Queue 30-minute follow-up
+          await addEmailJob(
+            "thirty_minute_followup",
+            { email, firstName, userId },
+            30 * 60 * 1000
+          ).catch(() => null);
+
+          // Queue day-three check-in
+          await addEmailJob(
+            "day_three_checkin",
+            { email, firstName, userId },
+            72 * 60 * 60 * 1000
+          ).catch(() => null);
+        }
+
         break;
       }
 
@@ -74,26 +114,18 @@ export async function POST(request: NextRequest) {
         const sub = event.data.object as StripeType.Subscription;
         const priceId = sub.items.data[0]?.price.id ?? null;
         const plan = planFromPriceId(priceId);
+        const status = sub.status === "active" ? "active" : "inactive";
 
-        // Try metadata first, then fall back to DB lookup by stripeSubId
         const userId = sub.metadata?.userId;
         if (userId) {
           await db.subscription.updateMany({
             where: { userId },
-            data: {
-              status: sub.status === "active" ? "active" : "inactive",
-              stripePriceId: priceId,
-              plan,
-            },
+            data: { status, stripePriceId: priceId, plan },
           });
         } else {
           await db.subscription.updateMany({
             where: { stripeSubId: sub.id },
-            data: {
-              status: sub.status === "active" ? "active" : "inactive",
-              stripePriceId: priceId,
-              plan,
-            },
+            data: { status, stripePriceId: priceId, plan },
           });
         }
         break;

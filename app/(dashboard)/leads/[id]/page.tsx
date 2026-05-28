@@ -7,6 +7,7 @@ import { GenerateCardButton } from "./GenerateCardButton";
 import { CopyButton } from "./CopyButton";
 import { GenerateProposalButton } from "./GenerateProposalButton";
 import { SendCloseButton } from "./SendCloseButton";
+import { ArsenalSection } from "./ArsenalSection";
 import type {
   IntentScore,
   Observation,
@@ -44,6 +45,7 @@ export default async function LeadDetailPage({
   const plan = user.subscription?.plan ?? "starter";
   const canProposals = plan === "pro" || plan === "enterprise";
   const canClose = plan === "growth" || plan === "pro" || plan === "enterprise";
+  const canArsenal = plan === "growth" || plan === "pro" || plan === "enterprise" || plan === "solopreneur";
 
   const observations = lead.observations as Observation[] | null;
   const websiteAudit = lead.websiteAudit as WebsiteAudit | null;
@@ -467,6 +469,30 @@ export default async function LeadDetailPage({
           </div>
         )}
       </div>
+
+      <ArsenalSection
+        leadId={id}
+        initialArsenal={lead.arsenal ? {
+          voiceNoteScript: lead.arsenal.voiceNoteScript,
+          coldCallScript: lead.arsenal.coldCallScript as import("./ArsenalSection").ColdCallScript | null,
+          linkedinNote: lead.arsenal.linkedinNote,
+          linkedinFollowUp1: lead.arsenal.linkedinFollowUp1,
+          linkedinFollowUp2: lead.arsenal.linkedinFollowUp2,
+          emailSubject1: lead.arsenal.emailSubject1,
+          emailBody1: lead.arsenal.emailBody1,
+          emailSubject2: lead.arsenal.emailSubject2,
+          emailBody2: lead.arsenal.emailBody2,
+          emailSubject3: lead.arsenal.emailSubject3,
+          emailBody3: lead.arsenal.emailBody3,
+          videoScript: lead.arsenal.videoScript as import("./ArsenalSection").VideoScript | null,
+          channelStatus: lead.arsenal.channelStatus as Record<string, Record<string, unknown>> | null,
+        } : null}
+        businessName={lead.businessName}
+        leadEmail={lead.email}
+        useColdCall={user.cardIdentity?.useColdCall ?? true}
+        useVideoMessage={user.cardIdentity?.useVideoMessage ?? false}
+        canUse={canArsenal}
+      />
     </div>
   );
 }

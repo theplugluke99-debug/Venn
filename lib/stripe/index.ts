@@ -7,6 +7,7 @@ export const stripe = new Stripe(config.stripe.secretKey, {
 
 export async function createCheckoutSession(params: {
   userId: string;
+  clerkId: string;
   email: string;
   priceId: string;
   successUrl: string;
@@ -18,8 +19,8 @@ export async function createCheckoutSession(params: {
     line_items: [{ price: params.priceId, quantity: 1 }],
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
-    metadata: { userId: params.userId },
-    subscription_data: { metadata: { userId: params.userId } },
+    metadata: { userId: params.userId, clerkId: params.clerkId },
+    subscription_data: { metadata: { userId: params.userId, clerkId: params.clerkId } },
   });
   return session;
 }

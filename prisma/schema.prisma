@@ -11,9 +11,9 @@ model Team {
   name      String
   plan      String   @default("starter")
   ownerId   String
-  members   User[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  members   User[]
 }
 
 model User {
@@ -21,67 +21,68 @@ model User {
   clerkId         String           @unique
   email           String           @unique
   name            String?
-  teamId          String?
-  team            Team?            @relation(fields: [teamId], references: [id])
-  role            String           @default("owner")
-  seats           Int              @default(1)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
-  cardIdentity    CardIdentity?
-  leads           Lead[]
-  subscription    Subscription?
+  role            String           @default("owner")
+  seats           Int              @default(1)
+  teamId          String?
   apiKeys         ApiKey[]
-  events          UserEvent[]
+  cardIdentity    CardIdentity?
+  clients         Client[]
+  closeSessions   CloseSession[]
   feedback        Feedback[]
+  leads           Lead[]
   proposals       Proposal[]
   servicePackages ServicePackage[]
-  closeSessions   CloseSession[]
-  clients         Client[]
+  subscription    Subscription?
+  team            Team?            @relation(fields: [teamId], references: [id])
+  events          UserEvent[]
 }
 
 model ApiKey {
   id        String    @id @default(cuid())
   userId    String
-  user      User      @relation(fields: [userId], references: [id])
   key       String    @unique
   name      String
   lastUsed  DateTime?
   createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 model CardIdentity {
-  id               String   @id @default(cuid())
-  userId           String   @unique
-  user             User     @relation(fields: [userId], references: [id])
-  brandColour      String   @default("#C4973F")
-  accentColour     String   @default("#E8B44B")
-  logoUrl          String?
-  agencyName       String?
-  agencyTagline    String?
-  agencyOwnerName  String?
-  agencyOwnerPhoto String?
-  writingStyle     String?
-  defaultAngle     String   @default("pain")
-  ctaType          String   @default("reply")
-  ctaValue         String?
-  cardStyle            String   @default("editorial")
-  socialProof          Json?
-  defaultResponseTime  String   @default("24 hours")
-  closeIntroText       String?
-  agencyWebsite        String?
-  agencyEmail          String?
-  reportSchedule       String   @default("manual")
-  reportAutoSend       Boolean  @default(false)
-  healthAlertThreshold Int      @default(60)
-  deliverableReminderDays Int   @default(2)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id                      String   @id @default(cuid())
+  userId                  String   @unique
+  brandColour             String   @default("#C4973F")
+  accentColour            String   @default("#E8B44B")
+  logoUrl                 String?
+  agencyName              String?
+  agencyTagline           String?
+  writingStyle            String?
+  defaultAngle            String   @default("pain")
+  ctaType                 String   @default("reply")
+  ctaValue                String?
+  socialProof             Json?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  agencyOwnerName         String?
+  agencyOwnerPhoto        String?
+  cardStyle               String   @default("editorial")
+  closeIntroText          String?
+  defaultResponseTime     String   @default("24 hours")
+  agencyEmail             String?
+  agencyWebsite           String?
+  deliverableReminderDays Int      @default(2)
+  healthAlertThreshold    Int      @default(60)
+  reportAutoSend          Boolean  @default(false)
+  reportSchedule          String   @default("manual")
+  useColdCall             Boolean  @default(true)
+  useVideoMessage         Boolean  @default(false)
+  user                    User     @relation(fields: [userId], references: [id])
 }
 
 model Lead {
-  id                 String    @id @default(cuid())
+  id                 String         @id @default(cuid())
   userId             String
-  user               User      @relation(fields: [userId], references: [id])
   businessName       String
   ownerName          String?
   location           String
@@ -97,42 +98,43 @@ model Lead {
   instagramData      Json?
   websiteAudit       Json?
   techStack          Json?
-  intentScore        String    @default("medium")
+  intentScore        String         @default("medium")
   intentSignals      Json?
   businessBio        String?
   observations       Json?
   openingLine        String?
   recommendedChannel String?
   suggestedAngle     String?
-  status             String    @default("pending")
-  pipelineStage      String    @default("new")
+  status             String         @default("pending")
   jobId              String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  pipelineStage      String         @default("new")
   card               Card?
-  sequence           Sequence?
-  proposals          Proposal[]
-  closeSessions      CloseSession[]
+  arsenal            OutreachArsenal?
   clients            Client[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  closeSessions      CloseSession[]
+  user               User           @relation(fields: [userId], references: [id])
+  proposals          Proposal[]
+  sequence           Sequence?
 }
 
 model Sequence {
   id           String         @id @default(cuid())
   leadId       String         @unique
-  lead         Lead           @relation(fields: [leadId], references: [id])
   userId       String
   status       String         @default("active")
   currentStep  Int            @default(0)
   nextActionAt DateTime?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
+  lead         Lead           @relation(fields: [leadId], references: [id])
   steps        SequenceStep[]
 }
 
 model SequenceStep {
   id          String    @id @default(cuid())
   sequenceId  String
-  sequence    Sequence  @relation(fields: [sequenceId], references: [id])
   stepNumber  Int
   channel     String
   subject     String?
@@ -142,23 +144,17 @@ model SequenceStep {
   scheduledAt DateTime
   sentAt      DateTime?
   repliedAt   DateTime?
+  sequence    Sequence  @relation(fields: [sequenceId], references: [id])
 }
 
 model Card {
   id               String    @id @default(cuid())
   slug             String    @unique
   leadId           String    @unique
-  lead             Lead      @relation(fields: [leadId], references: [id])
   userId           String
   headline         String?
   observations     Json?
   revenueLoss      String?
-  revenueBreakdown Json?
-  approachMoves    Json?
-  minutesAnalysing Int?
-  signalBanner     String?
-  personalNote     String?
-  deliveryMessages Json?
   ctaText          String?
   ctaValue         String?
   brandColour      String?
@@ -168,32 +164,37 @@ model Card {
   lastViewed       DateTime?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  approachMoves    Json?
+  deliveryMessages Json?
+  minutesAnalysing Int?
+  personalNote     String?
+  revenueBreakdown Json?
+  signalBanner     String?
+  lead             Lead      @relation(fields: [leadId], references: [id])
 }
 
 model Subscription {
-  id                    String    @id @default(cuid())
-  userId                String    @unique
-  user                  User      @relation(fields: [userId], references: [id])
-  stripeCustomerId      String?
-  stripePriceId         String?
-  stripeSubId           String?
-  plan                  String    @default("starter")
-  status                String    @default("active")
-  // Solopreneur trial fields
-  isSolopreneur         Boolean   @default(false)
-  solopreneurApproved   Boolean   @default(false)
-  solopreneurExpiry     DateTime?
-  dealClosed            Boolean   @default(false)
-  dealClosedAt          DateTime?
-  dealValue             Float?
-  dealClientName        String?
-  dealLeadId            String?
-  // Activity tracking
-  activityQualified     Boolean   @default(false)
-  searchCount           Int       @default(0)
-  cardCount             Int       @default(0)
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  stripeCustomerId    String?
+  stripePriceId       String?
+  stripeSubId         String?
+  plan                String    @default("starter")
+  status              String    @default("active")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  activityQualified   Boolean   @default(false)
+  cardCount           Int       @default(0)
+  dealClientName      String?
+  dealClosed          Boolean   @default(false)
+  dealClosedAt        DateTime?
+  dealLeadId          String?
+  dealValue           Float?
+  isSolopreneur       Boolean   @default(false)
+  searchCount         Int       @default(0)
+  solopreneurApproved Boolean   @default(false)
+  solopreneurExpiry   DateTime?
+  user                User      @relation(fields: [userId], references: [id])
 }
 
 model SolopreneurApplication {
@@ -214,12 +215,12 @@ model SolopreneurApplication {
 model UserEvent {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
   type        String
   title       String
   description String?
   metadata    Json?
   createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, type])
 }
@@ -227,20 +228,18 @@ model UserEvent {
 model Feedback {
   id            String    @id @default(cuid())
   userId        String
-  user          User      @relation(fields: [userId], references: [id])
   message       String
   implemented   Boolean   @default(false)
   implementedAt DateTime?
   createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userId], references: [id])
 }
 
 model Proposal {
   id                String             @id @default(cuid())
   slug              String             @unique
   leadId            String
-  lead              Lead               @relation(fields: [leadId], references: [id])
   userId            String
-  user              User               @relation(fields: [userId], references: [id])
   title             String
   threadSection     String?
   currentState      String?
@@ -257,27 +256,28 @@ model Proposal {
   lastViewedAt      DateTime?
   acceptedAt        DateTime?
   paidAt            DateTime?
-  questions         ProposalQuestion[]
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
+  lead              Lead               @relation(fields: [leadId], references: [id])
+  user              User               @relation(fields: [userId], references: [id])
+  questions         ProposalQuestion[]
 }
 
 model ProposalQuestion {
   id          String    @id @default(cuid())
   proposalId  String
-  proposal    Proposal  @relation(fields: [proposalId], references: [id])
   visitorName String
   question    String
   answer      String?
   isPublic    Boolean   @default(true)
   answeredAt  DateTime?
   createdAt   DateTime  @default(now())
+  proposal    Proposal  @relation(fields: [proposalId], references: [id])
 }
 
 model ServicePackage {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
   name        String
   description String?
   price       Float
@@ -286,14 +286,13 @@ model ServicePackage {
   isDefault   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 model CloseSession {
   id                   String            @id @default(cuid())
   leadId               String
-  lead                 Lead              @relation(fields: [leadId], references: [id])
   userId               String
-  user                 User              @relation(fields: [userId], references: [id])
   slug                 String            @unique
   status               String            @default("sent")
   questions            Json
@@ -308,27 +307,27 @@ model CloseSession {
   sentMessage          String?
   sentChannel          String?
   sentAt               DateTime?
-  discoveryAnswers     DiscoveryAnswer[]
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
+  lead                 Lead              @relation(fields: [leadId], references: [id])
+  user                 User              @relation(fields: [userId], references: [id])
+  discoveryAnswers     DiscoveryAnswer[]
 }
 
 model DiscoveryAnswer {
   id             String       @id @default(cuid())
   closeSessionId String
-  closeSession   CloseSession @relation(fields: [closeSessionId], references: [id])
   questionIndex  Int
   questionText   String
   answer         String
   answeredAt     DateTime     @default(now())
+  closeSession   CloseSession @relation(fields: [closeSessionId], references: [id])
 }
 
 model Client {
-  id              String          @id @default(cuid())
+  id              String           @id @default(cuid())
   userId          String
-  user            User            @relation(fields: [userId], references: [id])
   leadId          String?
-  lead            Lead?           @relation(fields: [leadId], references: [id])
   proposalId      String?
   businessName    String
   ownerName       String?
@@ -338,29 +337,30 @@ model Client {
   niche           String?
   location        String?
   logoUrl         String?
-  status          String          @default("active")
-  startDate       DateTime        @default(now())
+  status          String           @default("active")
+  startDate       DateTime         @default(now())
   contractValue   Float?
-  billingCycle    String          @default("monthly")
+  billingCycle    String           @default("monthly")
   nextBillingDate DateTime?
   contractEndDate DateTime?
-  healthScore     Int             @default(100)
+  healthScore     Int              @default(100)
   healthSignals   Json?
   lastHealthCheck DateTime?
   notes           String?
   tags            Json?
-  deliverables    Deliverable[]
-  reports         ClientReport[]
-  checkIns        ClientCheckIn[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  lead            Lead?            @relation(fields: [leadId], references: [id])
+  user            User             @relation(fields: [userId], references: [id])
   activities      ClientActivity[]
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  checkIns        ClientCheckIn[]
+  reports         ClientReport[]
+  deliverables    Deliverable[]
 }
 
 model Deliverable {
   id          String    @id @default(cuid())
   clientId    String
-  client      Client    @relation(fields: [clientId], references: [id])
   userId      String
   title       String
   description String?
@@ -372,12 +372,12 @@ model Deliverable {
   notes       String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  client      Client    @relation(fields: [clientId], references: [id])
 }
 
 model ClientReport {
   id        String    @id @default(cuid())
   clientId  String
-  client    Client    @relation(fields: [clientId], references: [id])
   userId    String
   slug      String    @unique
   title     String
@@ -389,12 +389,12 @@ model ClientReport {
   viewCount Int       @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  client    Client    @relation(fields: [clientId], references: [id])
 }
 
 model ClientCheckIn {
   id          String    @id @default(cuid())
   clientId    String
-  client      Client    @relation(fields: [clientId], references: [id])
   userId      String
   type        String
   notes       String?
@@ -403,16 +403,39 @@ model ClientCheckIn {
   scheduledAt DateTime?
   completedAt DateTime?
   createdAt   DateTime  @default(now())
+  client      Client    @relation(fields: [clientId], references: [id])
 }
 
 model ClientActivity {
   id          String   @id @default(cuid())
   clientId    String
-  client      Client   @relation(fields: [clientId], references: [id])
   userId      String
   type        String
   title       String
   description String?
   metadata    Json?
   createdAt   DateTime @default(now())
+  client      Client   @relation(fields: [clientId], references: [id])
+}
+
+model OutreachArsenal {
+  id                 String   @id @default(cuid())
+  leadId             String   @unique
+  userId             String
+  voiceNoteScript    String?
+  coldCallScript     Json?
+  linkedinNote       String?
+  linkedinFollowUp1  String?
+  linkedinFollowUp2  String?
+  emailSubject1      String?
+  emailBody1         String?
+  emailSubject2      String?
+  emailBody2         String?
+  emailSubject3      String?
+  emailBody3         String?
+  videoScript        Json?
+  channelStatus      Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  lead               Lead     @relation(fields: [leadId], references: [id])
 }

@@ -180,6 +180,19 @@ export default async function DashboardPage() {
     db.card.count({ where: { userId: user.id, createdAt: { gte: lastWeekStart, lt: weekStart } } }),
   ]);
 
+  // Close discovery nudges — sessions sent 48h+ ago with no completion
+  const fortyEightHoursAgo = new Date(now - 48 * 60 * 60 * 1000);
+  const staleCloseSessions = await db.closeSession.findMany({
+    where: {
+      userId: user.id,
+      status: "sent",
+      createdAt: { lte: fortyEightHoursAgo },
+    },
+    include: { lead: { select: { id: true, businessName: true } } },
+    take: 3,
+    orderBy: { createdAt: "desc" },
+  });
+
   const now2 = new Date();
   const greeting = getGreeting({
     name: user.name ?? user.email,
@@ -211,6 +224,54 @@ export default async function DashboardPage() {
 
   return (
     <>
+      {staleCloseSessions.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          {staleCloseSessions.map((session) => (
+            <div
+              key={session.id}
+              style={{
+                background: "#0F0E0B",
+                border: "0.5px solid #C4973F30",
+                borderRadius: 8,
+                padding: "14px 18px",
+                marginBottom: 10,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 16,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C4973F", display: "inline-block", flexShrink: 0 }} />
+                <p style={{ fontSize: 13, color: "#9C9690", fontFamily: "var(--font-inter)", lineHeight: 1.4 }}>
+                  <span style={{ color: "#FFFDF8" }}>{session.lead.businessName}</span>
+                  {" "}hasn&apos;t completed their discovery yet. Send a nudge?
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
+                <Link
+                  href={`/leads/${session.lead.id}#arsenal`}
+                  style={{
+                    fontSize: 12, color: "#C4973F", fontFamily: "var(--font-inter)",
+                    textDecoration: "none", whiteSpace: "nowrap",
+                  }}
+                >
+                  Send voice note →
+                </Link>
+                <Link
+                  href={`/leads/${session.lead.id}#arsenal`}
+                  style={{
+                    fontSize: 12, color: "#C4973F", fontFamily: "var(--font-inter)",
+                    textDecoration: "none", whiteSpace: "nowrap",
+                  }}
+                >
+                  Send email →
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       {isSolopreneur && solopreneurData && (
         <SolopreneurTracker
           searchCount={solopreneurData.searchCount}

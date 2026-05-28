@@ -26,6 +26,8 @@ interface CardIdentity {
   reportAutoSend?: boolean | null;
   healthAlertThreshold?: number | null;
   deliverableReminderDays?: number | null;
+  useColdCall?: boolean | null;
+  useVideoMessage?: boolean | null;
 }
 
 interface ServicePackageRow {
@@ -302,6 +304,8 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
     reportAutoSend: String(initialData?.reportAutoSend ?? false),
     healthAlertThreshold: String(initialData?.healthAlertThreshold ?? 60),
     deliverableReminderDays: String(initialData?.deliverableReminderDays ?? 2),
+    useColdCall: String(initialData?.useColdCall ?? true),
+    useVideoMessage: String(initialData?.useVideoMessage ?? false),
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -691,6 +695,43 @@ export function SettingsForm({ initialData, plan, renewalDate, hasStripeCustomer
               </div>
             </Field>
           </div>
+        </section>
+
+        {/* Outreach preferences */}
+        <section style={{ background: "#0F0E0B", border: "0.5px solid #1E1C18", borderRadius: 8, padding: 20 }}>
+          {sectionTitle("Outreach Preferences")}
+          <p style={{ fontSize: 12, color: "#555250", fontFamily: "var(--font-inter)", lineHeight: 1.6, marginBottom: 16 }}>
+            These settings hide tools you don&apos;t use, so your arsenal stays focused.
+          </p>
+          {[
+            { key: "useColdCall" as const, label: "Make cold calls", description: "Includes a cold call guide in your arsenal." },
+            { key: "useVideoMessage" as const, label: "Send video messages", description: "Includes a Loom video script in your arsenal." },
+          ].map(({ key, label, description }) => (
+            <div key={key} className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <p style={{ fontSize: 13, color: "#FFFDF8", fontFamily: "var(--font-inter)", marginBottom: 2 }}>{label}</p>
+                <p style={{ fontSize: 11, color: "#555250", fontFamily: "var(--font-inter)" }}>{description}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => update(key, form[key] === "true" ? "false" : "true")}
+                style={{
+                  width: 40, height: 22, borderRadius: 11, flexShrink: 0,
+                  background: form[key] === "true" ? "#C4973F" : "#1A1814",
+                  border: `0.5px solid ${form[key] === "true" ? "#C4973F" : "#1E1C18"}`,
+                  cursor: "pointer", position: "relative", transition: "all 0.2s",
+                }}
+              >
+                <span style={{
+                  position: "absolute", top: 3,
+                  left: form[key] === "true" ? 20 : 4,
+                  width: 14, height: 14, borderRadius: "50%",
+                  background: form[key] === "true" ? "#0A0907" : "#333",
+                  transition: "left 0.2s",
+                }} />
+              </button>
+            </div>
+          ))}
         </section>
 
         {/* Account / plan */}

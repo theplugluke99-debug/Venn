@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getUserByClerkId } from "@/lib/db/queries/users";
 import { createCheckoutSession } from "@/lib/stripe";
+import { config } from "@/lib/config";
 
 export async function POST(request: NextRequest) {
   const { userId: clerkId } = await auth();
@@ -17,14 +18,15 @@ export async function POST(request: NextRequest) {
   if (!priceId) return Response.json({ error: "priceId is required" }, { status: 400 });
 
   const email = clerkUser?.emailAddresses[0]?.emailAddress ?? user.email;
-  const origin = request.headers.get("origin") ?? "https://app.venn.so";
+  const appUrl = config.app.url;
 
   const session = await createCheckoutSession({
     userId: user.id,
+    clerkId,
     email,
     priceId,
-    successUrl: `${origin}/settings?upgraded=1`,
-    cancelUrl: `${origin}/subscribe`,
+    successUrl: `${appUrl}/welcome/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancelUrl: `${appUrl}/subscribe`,
   });
 
   return Response.json({ url: session.url });

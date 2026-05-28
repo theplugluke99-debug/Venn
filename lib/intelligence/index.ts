@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { SCORING_PROMPT, DELIVERY_PROMPT, PROPOSAL_PROMPT, CLOSE_QUESTIONS_PROMPT, CLIENT_REPORT_PROMPT } from "./prompts";
+import { SCORING_PROMPT, DELIVERY_PROMPT, PROPOSAL_PROMPT, CLOSE_QUESTIONS_PROMPT, CLIENT_REPORT_PROMPT, ARSENAL_PROMPT } from "./prompts";
 import type { IntelligenceProfile } from "@/types";
 import { config } from "@/lib/config";
 
@@ -271,6 +271,86 @@ export async function generateClientReport(data: Parameters<typeof CLIENT_REPORT
     howYoureLooking: parsed.howYoureLooking ?? "",
     nextMonth: Array.isArray(parsed.nextMonth) ? parsed.nextMonth : [],
     personalNote: parsed.personalNote ?? "",
+  };
+}
+
+export interface ColdCallScript {
+  opener: string;
+  permission: string;
+  observation: string;
+  pivot: string;
+  close: string;
+  ifTheyAreInterested: string;
+  ifTheyAreNotInterested: string;
+  ifVoicemail: string;
+}
+
+export interface VideoScript {
+  intro: string;
+  whatToShow: string[];
+  whatToSay: string;
+  close: string;
+}
+
+export interface ArsenalData {
+  voiceNoteScript: string;
+  coldCallScript: ColdCallScript;
+  linkedinNote: string;
+  linkedinFollowUp1: string;
+  linkedinFollowUp2: string;
+  emailSubject1: string;
+  emailBody1: string;
+  emailSubject2: string;
+  emailBody2: string;
+  emailSubject3: string;
+  emailBody3: string;
+  videoScript: VideoScript;
+}
+
+export async function generateArsenal(
+  lead: unknown,
+  cardIdentity: {
+    agencyName?: string | null;
+    agencyOwnerName?: string | null;
+    writingStyle?: string | null;
+    defaultAngle?: string | null;
+  },
+  cardUrl: string
+): Promise<ArsenalData> {
+  const prompt = ARSENAL_PROMPT(lead, cardIdentity, cardUrl);
+
+  const message = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 4000,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const content = message.content[0];
+  if (content.type !== "text") throw new Error("Unexpected response type");
+
+  const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("No JSON in arsenal response");
+
+  const parsed = JSON.parse(jsonMatch[0]) as Partial<ArsenalData>;
+  const blankCall: ColdCallScript = {
+    opener: "", permission: "", observation: "", pivot: "", close: "",
+    ifTheyAreInterested: "", ifTheyAreNotInterested: "", ifVoicemail: "",
+  };
+  const blankVideo: VideoScript = { intro: "", whatToShow: [], whatToSay: "", close: "" };
+
+  return {
+    voiceNoteScript: parsed.voiceNoteScript ?? "",
+    coldCallScript: (parsed.coldCallScript as ColdCallScript) ?? blankCall,
+    linkedinNote: parsed.linkedinNote ?? "",
+    linkedinFollowUp1: parsed.linkedinFollowUp1 ?? "",
+    linkedinFollowUp2: parsed.linkedinFollowUp2 ?? "",
+    emailSubject1: parsed.emailSubject1 ?? "",
+    emailBody1: parsed.emailBody1 ?? "",
+    emailSubject2: parsed.emailSubject2 ?? "",
+    emailBody2: parsed.emailBody2 ?? "",
+    emailSubject3: parsed.emailSubject3 ?? "",
+    emailBody3: parsed.emailBody3 ?? "",
+    videoScript: (parsed.videoScript as VideoScript) ?? blankVideo,
   };
 }
 

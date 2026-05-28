@@ -16,6 +16,24 @@ export const scrapeQueue = new Queue("scrape", {
   },
 });
 
+export const emailQueue = new Queue("emails", {
+  connection: redis,
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: { type: "exponential", delay: 5000 },
+    removeOnComplete: 200,
+    removeOnFail: 100,
+  },
+});
+
+export async function addEmailJob(
+  type: string,
+  data: { email: string; firstName: string; userId: string; plan?: string },
+  delayMs = 0
+) {
+  return emailQueue.add(type, { type, ...data }, { delay: delayMs });
+}
+
 export async function addScrapeJob(data: {
   leadId: string;
   businessName: string;

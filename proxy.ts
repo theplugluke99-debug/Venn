@@ -4,15 +4,26 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/card/(.*)",
   "/subscribe(.*)",
   "/solopreneur(.*)",
+  // Prospect-facing public pages
+  "/card/(.*)",
+  "/cards/(.*)",
+  "/proposal/(.*)",
+  "/close/(.*)",
+  "/reports/(.*)",
+  // Public API routes (called by prospects, no auth)
+  "/api/close/(.*)/answer",
+  "/api/close/(.*)/complete",
+  "/api/proposals/(.*)/questions",
+  "/api/reports/(.*)/feedback",
+  // Webhooks and system
   "/api/webhooks/(.*)",
   "/api/worker(.*)",
   "/api/solopreneur/apply(.*)",
 ]);
 
-export const proxy = clerkMiddleware(async (auth, request) => {
+export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     await auth.protect();
   }

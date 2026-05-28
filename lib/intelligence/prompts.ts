@@ -324,3 +324,93 @@ Write a client report in JSON with this EXACT structure:
 Respond ONLY with valid JSON. No markdown. No explanation. No preamble.
 `;
 
+export const ARSENAL_PROMPT = (
+  lead: unknown,
+  cardIdentity: {
+    agencyName?: string | null;
+    agencyOwnerName?: string | null;
+    writingStyle?: string | null;
+    defaultAngle?: string | null;
+  },
+  cardUrl: string
+) => {
+  const firstName = cardIdentity.agencyOwnerName?.split(" ")[0] ?? "the agency owner";
+  return `You are generating a complete outreach toolkit for an agency owner pursuing this prospect.
+
+Every piece of content must:
+- Sound like the agency owner wrote it personally (use their writing style sample)
+- Reference something specific from the lead intelligence — never generic
+- Feel human not automated
+- Be low pressure, not salesy
+- Be genuinely useful to the prospect, not just to the agency owner
+
+LEAD INTELLIGENCE:
+${JSON.stringify(lead, null, 2)}
+
+AGENCY IDENTITY:
+Name: ${cardIdentity.agencyName ?? "the agency"}
+Owner: ${cardIdentity.agencyOwnerName ?? "the owner"}
+First name only: ${firstName}
+Writing style: ${cardIdentity.writingStyle ?? "professional and direct"}
+Default angle: ${cardIdentity.defaultAngle ?? "pain"}
+
+PROSPECT CARD URL (already built — this is what they share):
+${cardUrl}
+
+Respond ONLY with valid JSON in this exact structure. No markdown. No preamble.
+
+{
+  "voiceNoteScript": "A 30-second voice note script. Written to be spoken not read. Conversational. Natural pauses indicated with ellipses. References one specific signal from the intelligence. Ends by mentioning the card link will follow in a message. Maximum 80 words when spoken aloud.",
+
+  "coldCallScript": {
+    "opener": "The first thing to say. Respectful of their time. Not how are you today. Direct and human. One sentence.",
+    "permission": "Ask if now is a bad time. One sentence.",
+    "observation": "The single most specific thing worth mentioning from the real intelligence. Not three things — one. Maximum two sentences.",
+    "pivot": "Transition to the card or next step. Low pressure. One sentence.",
+    "close": "Simple ask. Either permission to send the card or a next step. One sentence.",
+    "ifTheyAreInterested": "What to say if they engage positively. Two sentences.",
+    "ifTheyAreNotInterested": "How to respond gracefully if they decline. One sentence. Leaves the door open.",
+    "ifVoicemail": "What to say if it goes to voicemail. Maximum 20 seconds spoken. Leaves the card URL at the end."
+  },
+
+  "linkedinNote": "Connection request note. Maximum 290 characters strictly enforced. References something specific about their business. No pitch. Mentions having something to share. Ends with no pressure.",
+
+  "linkedinFollowUp1": "Day 3 follow-up if connected but no reply. Maximum 200 characters. Casual. References the connection. Offers to share what was found.",
+
+  "linkedinFollowUp2": "Day 7 final LinkedIn touch. Maximum 150 characters. Leaves the card URL. Genuinely final. No pressure.",
+
+  "emailSubject1": "First email subject line. Specific to their business. Not generic. Maximum 8 words.",
+
+  "emailBody1": "First email body. Three sentences maximum. First sentence: why you are emailing and one specific thing noticed. Second sentence: what you have put together. Third sentence: the card URL with zero pressure. Sign off with ${firstName} only.",
+
+  "emailSubject2": "Day 5 follow-up subject. Different angle from email 1. References a specific signal. Maximum 8 words.",
+
+  "emailBody2": "Day 5 follow-up. Two sentences. One new specific observation not mentioned in email 1. Card URL again. Acknowledges they may have missed the first one. No guilt.",
+
+  "emailSubject3": "Final email subject. Signals this is the last one. Warm not passive aggressive. Maximum 6 words.",
+
+  "emailBody3": "Final email. One sentence acknowledging this is the last message. One sentence leaving the door open for when the time is right. Card URL. ${firstName} sign off.",
+
+  "videoScript": {
+    "intro": "First 10 seconds. Who you are and that you looked at their business. Natural and conversational.",
+    "whatToShow": [
+      "Their Google Maps listing — show the rating and scroll to the reviews",
+      "Highlight the specific negative theme if present",
+      "Their website — show the specific issue found",
+      "The prospect card — open it and scroll briefly"
+    ],
+    "whatToSay": "The narration for the screen recording. 60 seconds maximum. One observation per section. Specific. Calm. No pitch.",
+    "close": "Final 10 seconds. What you would like to happen next. Low pressure. Specific."
+  }
+}
+
+Rules:
+- Never use: solution, leverage, synergy, game-changer, take to the next level, partnership, touch base, circle back, reach out
+- Never use more than one exclamation mark anywhere in any piece
+- Every piece references something real and specific from the intelligence
+- The voice note and call script sound natural when spoken aloud — read them back in your head
+- The emails get progressively shorter, not longer
+- LinkedIn character limits are hard limits — count carefully
+- Everything sounds like one specific person talking to one specific business owner
+`;
+};

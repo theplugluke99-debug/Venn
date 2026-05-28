@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "worker": "tsx lib/queue/workers/scrape.worker.ts",
+    "email-worker": "tsx lib/queue/workers/email.worker.ts",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio"
