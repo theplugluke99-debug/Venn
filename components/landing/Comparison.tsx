@@ -22,6 +22,8 @@ const ROWS = [
   { feature: "Generate opening line", venn: <Check />, apollo: <Cross />, clay: <Partial>Template logic</Partial>, rooms: <Cross /> },
   { feature: "Create a private prospect card", venn: <Check />, apollo: <Cross />, clay: <Cross />, rooms: <Partial>Manual build</Partial> },
   { feature: "Works without spreadsheets", venn: <Check />, apollo: <Cross />, clay: <Cross />, rooms: <Partial>After setup</Partial> },
+  { feature: "Async close — no Zoom required", venn: <Check />, apollo: <Cross />, clay: <Cross />, rooms: <Cross /> },
+  { feature: "Proposals with embedded payment", venn: <Check />, apollo: <Cross />, clay: <Cross />, rooms: <Partial>Manual only</Partial> },
 ];
 
 const COLS = [

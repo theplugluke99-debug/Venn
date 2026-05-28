@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { CTA, VennLogo, colours, motionPresets } from "./system";
 
 const NAV_LINKS = [
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#the-card", label: "The card" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#compare", label: "Compare" },
-];
+  { sectionId: "how-it-works", label: "How it works" },
+  { sectionId: "prospect-card", label: "The card" },
+  { sectionId: "pricing",       label: "Pricing" },
+  { sectionId: "compare",       label: "Compare" },
+] as const;
+
+function scrollTo(sectionId: string) {
+  const el = document.getElementById(sectionId);
+  if (el) el.scrollIntoView({ behavior: "smooth" });
+}
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -21,6 +26,11 @@ export function Nav() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const handleMobileLink = useCallback((sectionId: string) => {
+    setMobile(false);
+    setTimeout(() => scrollTo(sectionId), 300);
   }, []);
 
   return (
@@ -47,10 +57,15 @@ export function Nav() {
           </Link>
 
           <div className="nav-desktop-links" style={{ display: "flex", alignItems: "center", gap: 30 }}>
-            {NAV_LINKS.map(({ href, label }) => (
-              <a key={href} href={href} style={{ color: colours.secondary, fontSize: 13, textDecoration: "none", transition: "color 220ms var(--venn-ease)" }}>
+            {NAV_LINKS.map(({ sectionId, label }) => (
+              <button
+                key={sectionId}
+                onClick={() => scrollTo(sectionId)}
+                className="nav-link-btn"
+                style={{ color: colours.secondary, fontSize: 13 }}
+              >
                 {label}
-              </a>
+              </button>
             ))}
           </div>
 
@@ -64,7 +79,7 @@ export function Nav() {
           <button
             className="nav-hamburger"
             type="button"
-            onClick={() => setMobile((value) => !value)}
+            onClick={() => setMobile((v) => !v)}
             aria-label="Menu"
             aria-expanded={mobile}
             style={{
@@ -104,27 +119,29 @@ export function Nav() {
               zIndex: 199,
             }}
           >
-            {NAV_LINKS.map(({ href, label }, index) => (
-              <motion.a
-                key={href}
-                href={href}
-                onClick={() => setMobile(false)}
+            {NAV_LINKS.map(({ sectionId, label }, index) => (
+              <motion.button
+                key={sectionId}
+                onClick={() => handleMobileLink(sectionId)}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...motionPresets.soft, delay: index * 0.04 }}
                 style={{
+                  background: "transparent",
+                  border: "none",
                   borderBottom: `0.5px solid ${colours.border}`,
                   color: colours.ivory,
+                  cursor: "pointer",
                   fontFamily: "var(--font-instrument-serif), Georgia, serif",
                   fontSize: 34,
                   lineHeight: 1,
-                  padding: "0 0 22px",
                   marginBottom: 22,
-                  textDecoration: "none",
+                  padding: "0 0 22px",
+                  textAlign: "left",
                 }}
               >
                 {label}
-              </motion.a>
+              </motion.button>
             ))}
             <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
               <Link className="venn-cta" href="/sign-in" onClick={() => setMobile(false)} style={{ border: `0.5px solid ${colours.border}`, color: colours.secondary }}>
@@ -139,7 +156,16 @@ export function Nav() {
       </AnimatePresence>
 
       <style>{`
-        .nav-desktop-links a:hover,
+        .nav-link-btn {
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          font-family: var(--font-inter), Inter, system-ui, sans-serif;
+          padding: 0;
+          text-decoration: none;
+          transition: color 220ms var(--venn-ease);
+        }
+        .nav-desktop-links .nav-link-btn:hover,
         .nav-desktop-cta a:hover { color: ${colours.ivory} !important; }
         @media (max-width: 820px) {
           .nav-desktop-links, .nav-desktop-cta { display: none !important; }

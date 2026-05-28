@@ -110,49 +110,40 @@ function EditorialCard() {
 
 function LetterCard() {
   return (
-    <article className="letter-card">
-      <header className="letter-header">
-        <div className="letter-from">
-          <span className="letter-agency">Momentum Agency</span>
-          <span className="letter-for">For Glow Aesthetics · Manchester</span>
+    <article className="lc-wrap">
+      {/* Header */}
+      <div className="lc-header">
+        <div className="lc-from">
+          <VennLogo size={16} variant="mark" decorative />
+          <span className="lc-agency-name">Momentum Agency</span>
         </div>
-        <span className="letter-intent-badge">HIGH INTENT</span>
-      </header>
-
-      <div className="letter-body">
-        <h3 className="letter-business-name">Glow<br />Aesthetics</h3>
-
-        <p className="letter-para">We spent some time looking at your business this week.</p>
-        <p className="letter-para">The results speak for themselves — clients love the treatments, the atmosphere, the team. But there&apos;s a pattern running through your reviews that&apos;s quietly costing you bookings every month.</p>
-
-        <div className="letter-finding">
-          <p className="letter-finding-label">What we noticed</p>
-          <p className="letter-para">Wait times. Your reviews mention it <strong>six times this month alone</strong> — words like &ldquo;wait&rdquo;, &ldquo;delay&rdquo;, &ldquo;running late&rdquo;, &ldquo;queue&rdquo;. The experience is genuinely good, but the wait is leaving a mark.</p>
-        </div>
-
-        <div className="letter-finding">
-          <p className="letter-finding-label">What it&apos;s costing</p>
-          <p className="letter-para">Based on your booking volume and local competitor data, we estimate this friction is costing around <strong>£2,400 per month</strong> in lost or deterred bookings. Not from bad reviews — just from a fixable frustration.</p>
-        </div>
-
-        <div className="letter-finding">
-          <p className="letter-finding-label">What we&apos;d suggest</p>
-          <p className="letter-para">The fix isn&apos;t complicated. A simple expectation reset — letting clients know before they arrive — usually removes the frustration that shows up in reviews. We&apos;ve seen it work for clinics exactly like yours.</p>
-        </div>
-
-        <p className="letter-close">Worth a conversation?</p>
-        <p className="letter-sig">Luke<br /><span>Momentum Agency</span></p>
+        <span className="lc-date">May 2025</span>
       </div>
 
-      <footer className="letter-footer">
-        <a
-          className="letter-cta"
-          href="#"
-          onClick={(e) => e.preventDefault()}
-        >
-          Reply to this insight →
-        </a>
-      </footer>
+      <div className="lc-rule" />
+
+      {/* Salutation */}
+      <p className="lc-salutation">To the team at Glow Aesthetics,</p>
+
+      {/* Body */}
+      <div className="lc-body">
+        <p>We spent some time with your business this week. Not a cursory glance — fourteen minutes of genuine attention. Your reviews, your website, your booking experience, your position in the Manchester market.</p>
+        <p>What we found was encouraging and specific. Your Google rating of 4.1 is stronger than most clinics in your area. The gap isn&apos;t quality — it&apos;s a friction point that keeps showing up. Wait times are mentioned six times in your reviews this month. That&apos;s not a coincidence.</p>
+        <p>We think there&apos;s approximately £2,400 per month sitting in that gap. Not a projection — a calculation based on your review patterns and local competitor data.</p>
+        <p>If this resonates — we&apos;d love to show you exactly how we&apos;d approach it. No pressure. Just a conversation.</p>
+      </div>
+
+      {/* Sign off */}
+      <div className="lc-signoff">
+        <p className="lc-close-line">With respect,</p>
+        <div style={{ height: 8 }} />
+        <p className="lc-name">Luke K.</p>
+        <p className="lc-org">Momentum Agency</p>
+      </div>
+
+      <div className="lc-rule" style={{ marginTop: 32 }} />
+
+      <p className="lc-private">Private and personalised · Prepared specifically for Glow Aesthetics</p>
     </article>
   );
 }
@@ -184,7 +175,7 @@ export function CardExperience() {
         {/* Style selector tabs */}
         <Reveal delay={0.04}>
           <div className="style-tabs-row">
-            <div className="style-tabs">
+            <div className="style-pill">
               <button
                 className={`style-tab${activeTab === "editorial" ? " style-tab-active" : ""}`}
                 onClick={() => switchTab("editorial")}
@@ -197,12 +188,13 @@ export function CardExperience() {
               >
                 Letter
               </button>
-              <div className="style-tab-minimal">
+              <div className="style-tab-minimal" title="Coming soon">
                 Minimal
+                <span className="soon-badge">Soon</span>
                 <span className="minimal-tooltip">Coming soon</span>
               </div>
             </div>
-            <p className="style-hint">Every card is uniquely generated. Style selected in your dashboard settings.</p>
+            <p className="style-hint">Style selected in your dashboard settings. Each card uniquely generated.</p>
           </div>
         </Reveal>
 
@@ -249,69 +241,63 @@ export function CardExperience() {
           line-height: 0.95;
           margin-bottom: 18px;
         }
-        .card-section-title p:last-child {
-          color: #77716a;
-          font-size: 16px;
-        }
+        .card-section-title p:last-child { color: #77716a; font-size: 16px; }
 
-        /* ── Style selector tabs ── */
+        /* ── Style selector ── */
         .style-tabs-row {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
           margin-bottom: 28px;
         }
-        .style-tabs {
-          display: flex;
+        .style-pill {
           align-items: center;
-          gap: 0;
-          background: rgba(10,9,7,0.05);
-          border: 0.5px solid #E5D9C6;
-          border-radius: 999px;
+          background: #1A1814;
+          border: 0.5px solid #1E1C18;
+          border-radius: 40px;
+          display: inline-flex;
           padding: 4px;
         }
         .style-tab {
           background: transparent;
           border: none;
-          border-radius: 999px;
-          color: #77716a;
+          border-radius: 36px;
+          color: #888580;
           cursor: pointer;
           font-family: var(--font-inter), Inter, system-ui, sans-serif;
           font-size: 13px;
           font-weight: 500;
           padding: 8px 20px;
-          position: relative;
-          transition: color 180ms ease, background 180ms ease;
+          transition: color 180ms ease;
         }
-        .style-tab:hover {
-          color: #2d2923;
-        }
+        .style-tab:hover:not(.style-tab-active) { color: ${colours.ivory}; }
         .style-tab-active {
-          background: #FFFDF8;
-          box-shadow: 0 1px 4px rgba(10,9,7,0.10);
+          background: #C4973F;
           color: #0A0907 !important;
         }
-        .style-tab-active::after {
-          background: #B8872E;
-          border-radius: 999px;
-          bottom: 4px;
-          content: '';
-          height: 2px;
-          left: 50%;
-          position: absolute;
-          transform: translateX(-50%);
-          width: 24px;
-        }
         .style-tab-minimal {
-          border-radius: 999px;
-          color: #bbb3a8;
-          cursor: default;
+          align-items: center;
+          border-radius: 36px;
+          color: #444440;
+          cursor: not-allowed;
+          display: inline-flex;
           font-family: var(--font-inter), Inter, system-ui, sans-serif;
           font-size: 13px;
           font-weight: 500;
+          gap: 5px;
           padding: 8px 20px;
           position: relative;
+        }
+        .soon-badge {
+          border: 0.5px solid rgba(196,151,63,0.45);
+          border-radius: 4px;
+          color: rgba(196,151,63,0.7);
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 0.07em;
+          padding: 2px 5px;
+          text-transform: uppercase;
         }
         .style-tab-minimal:hover .minimal-tooltip {
           opacity: 1;
@@ -325,12 +311,11 @@ export function CardExperience() {
           font-size: 11px;
           font-weight: 500;
           left: 50%;
-          letter-spacing: 0.04em;
           opacity: 0;
           padding: 6px 10px;
           pointer-events: none;
           position: absolute;
-          transform: translateX(-50%) translateY(0px);
+          transform: translateX(-50%) translateY(0);
           transition: opacity 160ms ease, transform 160ms ease;
           white-space: nowrap;
         }
@@ -344,18 +329,14 @@ export function CardExperience() {
           transform: translateX(-50%);
         }
         .style-hint {
-          color: #a09a91;
+          color: #444440;
           font-family: var(--font-inter), Inter, system-ui, sans-serif;
-          font-size: 12px;
+          font-size: 11px;
           text-align: center;
         }
+        .card-fade-wrap { will-change: opacity; }
 
-        /* ── Card fade wrapper ── */
-        .card-fade-wrap {
-          will-change: opacity;
-        }
-
-        /* ── Editorial card (dark) ── */
+        /* ── Editorial card ── */
         .editorial-card {
           background: #080806;
           border: 0.5px solid rgba(196,151,63,0.22);
@@ -379,21 +360,9 @@ export function CardExperience() {
           inset: 0;
           position: absolute;
         }
-        .card-brand,
-        .intent-badge,
-        .hero-copy-card {
-          position: relative;
-          z-index: 1;
-        }
-        .card-brand {
-          align-items: center;
-          display: flex;
-          gap: 9px;
-        }
-        .card-brand span {
-          color: ${colours.gold};
-          font-size: 13px;
-        }
+        .card-brand, .intent-badge, .hero-copy-card { position: relative; z-index: 1; }
+        .card-brand { align-items: center; display: flex; gap: 9px; }
+        .card-brand span { color: ${colours.gold}; font-size: 13px; }
         .intent-badge {
           align-items: center;
           border: 0.5px solid ${colours.goldBorder};
@@ -407,19 +376,14 @@ export function CardExperience() {
           letter-spacing: 0.12em;
           padding: 10px 14px;
         }
-        .intent-badge i,
-        .live-strip i {
+        .intent-badge i, .live-strip i {
           background: #56d15f;
           border-radius: 50%;
           display: inline-block;
           height: 9px;
           width: 9px;
         }
-        .hero-copy-card {
-          clear: both;
-          max-width: 420px;
-          padding-top: 70px;
-        }
+        .hero-copy-card { clear: both; max-width: 420px; padding-top: 70px; }
         .hero-copy-card h3 {
           font-family: var(--font-instrument-serif), Georgia, serif;
           font-size: clamp(58px, 8vw, 88px);
@@ -427,20 +391,9 @@ export function CardExperience() {
           line-height: 0.95;
           margin-bottom: 28px;
         }
-        .hero-copy-card > p:not(.venn-eyebrow) {
-          font-size: 17px;
-          margin: 26px 0 48px;
-        }
-        .loss-block {
-          display: grid;
-          gap: 8px;
-        }
-        .loss-block span {
-          color: ${colours.secondary};
-          font-size: 11px;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-        }
+        .hero-copy-card > p:not(.venn-eyebrow) { font-size: 17px; margin: 26px 0 48px; }
+        .loss-block { display: grid; gap: 8px; }
+        .loss-block span { color: ${colours.secondary}; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; }
         .loss-block strong {
           color: ${colours.gold};
           font-family: var(--font-instrument-serif), Georgia, serif;
@@ -448,10 +401,7 @@ export function CardExperience() {
           font-weight: 400;
           line-height: 0.9;
         }
-        .loss-block small {
-          color: ${colours.ivory};
-          font-size: 13px;
-        }
+        .loss-block small { color: ${colours.ivory}; font-size: 13px; }
         .live-strip {
           align-items: center;
           border: 0.5px solid rgba(86,209,95,0.28);
@@ -464,15 +414,8 @@ export function CardExperience() {
           padding: 13px 18px;
           transform: translateY(-26px);
         }
-        .live-strip span {
-          align-items: center;
-          display: flex;
-          gap: 12px;
-          font-size: 13px;
-        }
-        .live-strip small {
-          color: ${colours.secondary};
-        }
+        .live-strip span { align-items: center; display: flex; gap: 12px; font-size: 13px; }
+        .live-strip small { color: ${colours.secondary}; }
         .insight-row {
           border-top: 0.5px solid rgba(255,253,248,0.1);
           display: grid;
@@ -481,48 +424,22 @@ export function CardExperience() {
           margin: 0 46px;
           padding: 48px 0;
         }
-        .row-copy {
-          display: grid;
-          gap: 34px;
-          grid-template-columns: 52px 1fr;
-        }
-        .row-copy > span {
-          color: ${colours.gold};
-          font-size: 18px;
-          font-weight: 700;
-        }
-        .row-copy h4,
-        .card-footer h4 {
+        .row-copy { display: grid; gap: 34px; grid-template-columns: 52px 1fr; }
+        .row-copy > span { color: ${colours.gold}; font-size: 18px; font-weight: 700; }
+        .row-copy h4, .card-footer h4 {
           font-family: var(--font-instrument-serif), Georgia, serif;
           font-size: 34px;
           font-weight: 400;
           line-height: 1.05;
           margin-bottom: 24px;
         }
-        .row-copy p,
-        .card-footer p,
-        .evidence-box p:last-child {
-          color: rgba(255,253,248,0.82);
-          font-size: 15px;
-          line-height: 1.65;
+        .row-copy p, .card-footer p, .evidence-box p:last-child {
+          color: rgba(255,253,248,0.82); font-size: 15px; line-height: 1.65;
         }
-        .row-copy em {
-          color: ${colours.gold};
-          font-style: normal;
-        }
-        .row-copy small {
-          color: ${colours.secondary};
-          display: block;
-          font-size: 13px;
-          line-height: 1.6;
-          margin-top: 16px;
-        }
-        .review-stack {
-          display: grid;
-          gap: 12px;
-        }
-        .review-stack blockquote,
-        .evidence-box {
+        .row-copy em { color: ${colours.gold}; font-style: normal; }
+        .row-copy small { color: ${colours.secondary}; display: block; font-size: 13px; line-height: 1.6; margin-top: 16px; }
+        .review-stack { display: grid; gap: 12px; }
+        .review-stack blockquote, .evidence-box {
           background: rgba(255,253,248,0.035);
           border: 0.5px solid ${colours.goldBorder};
           border-radius: 10px;
@@ -532,21 +449,9 @@ export function CardExperience() {
           margin: 0;
           padding: 18px;
         }
-        .review-stack b {
-          color: ${colours.gold};
-          display: block;
-          font-size: 12px;
-          margin-bottom: 8px;
-        }
-        .review-stack small {
-          color: ${colours.secondary};
-          font-size: 12px;
-          padding-left: 18px;
-        }
-        .evidence-box .venn-eyebrow {
-          color: #76c878;
-          margin-bottom: 14px;
-        }
+        .review-stack b { color: ${colours.gold}; display: block; font-size: 12px; margin-bottom: 8px; }
+        .review-stack small { color: ${colours.secondary}; font-size: 12px; padding-left: 18px; }
+        .evidence-box .venn-eyebrow { color: #76c878; margin-bottom: 14px; }
         .card-footer {
           align-items: end;
           border-top: 0.5px solid rgba(255,253,248,0.1);
@@ -556,131 +461,77 @@ export function CardExperience() {
           margin: 0 46px;
           padding: 42px 0 52px;
         }
-        .card-footer .venn-cta {
-          flex: 0 0 auto;
-        }
+        .card-footer .venn-cta { flex: 0 0 auto; }
 
-        /* ── Letter card (light) ── */
-        .letter-card {
+        /* ── Letter card ── */
+        .lc-wrap {
           background: #FFFDF8;
-          border: 0.5px solid #E5D9C6;
-          border-radius: 18px;
-          box-shadow: 0 12px 56px rgba(10,9,7,0.10);
-          color: #0A0907;
+          border: 0.5px solid #E8E4DC;
+          border-radius: 8px;
+          box-shadow: 0 4px 40px rgba(0,0,0,0.15);
           margin: 0 auto;
           max-width: 980px;
-          overflow: hidden;
+          padding: 40px;
         }
-        .letter-header {
+        .lc-header {
           align-items: center;
-          border-bottom: 0.5px solid #E5D9C6;
           display: flex;
           justify-content: space-between;
-          padding: 24px 48px;
+          margin-bottom: 20px;
         }
-        .letter-agency {
-          color: #B8872E;
-          display: block;
-          font-family: var(--font-inter), Inter, system-ui, sans-serif;
-          font-size: 13px;
-          font-weight: 600;
-          letter-spacing: 0.05em;
-        }
-        .letter-for {
-          color: #77716a;
-          display: block;
+        .lc-from { align-items: center; display: flex; gap: 8px; }
+        .lc-agency-name {
+          color: #888580;
           font-family: var(--font-inter), Inter, system-ui, sans-serif;
           font-size: 12px;
-          margin-top: 3px;
         }
-        .letter-intent-badge {
-          background: #FFFBF0;
-          border: 0.5px solid rgba(184,135,46,0.4);
-          border-radius: 999px;
-          color: #B8872E;
+        .lc-date {
+          color: #888580;
           font-family: var(--font-inter), Inter, system-ui, sans-serif;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.12em;
-          padding: 8px 14px;
+          font-size: 12px;
         }
-        .letter-body {
-          max-width: 680px;
-          padding: 52px 48px 40px;
-        }
-        .letter-business-name {
+        .lc-rule { background: #E8E4DC; height: 0.5px; margin-bottom: 28px; }
+        .lc-salutation {
           color: #0A0907;
           font-family: var(--font-instrument-serif), Georgia, serif;
-          font-size: clamp(44px, 6vw, 72px);
+          font-size: 20px;
+          font-style: italic;
           font-weight: 400;
-          line-height: 0.95;
-          margin-bottom: 36px;
+          margin-bottom: 24px;
         }
-        .letter-para {
-          color: #2D2923;
+        .lc-body p {
+          color: #333;
           font-family: var(--font-inter), Inter, system-ui, sans-serif;
           font-size: 16px;
-          line-height: 1.78;
+          line-height: 1.9;
           margin-bottom: 18px;
         }
-        .letter-para strong {
-          color: #0A0907;
-          font-weight: 600;
-        }
-        .letter-finding {
-          border-left: 2px solid #E5D9C6;
-          margin: 30px 0;
-          padding-left: 22px;
-        }
-        .letter-finding-label {
-          color: #B8872E;
+        .lc-signoff { margin-top: 8px; }
+        .lc-close-line {
+          color: #333;
           font-family: var(--font-inter), Inter, system-ui, sans-serif;
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
-          margin-bottom: 8px;
-          text-transform: uppercase;
+          font-size: 14px;
         }
-        .letter-finding .letter-para {
-          margin-bottom: 0;
-        }
-        .letter-close {
+        .lc-name {
           color: #0A0907;
-          font-family: var(--font-instrument-serif), Georgia, serif;
-          font-size: 24px;
-          font-weight: 400;
-          margin-bottom: 20px;
-          margin-top: 40px;
-        }
-        .letter-sig {
-          color: #2D2923;
-          font-family: var(--font-inter), Inter, system-ui, sans-serif;
-          font-size: 15px;
-          line-height: 1.6;
-        }
-        .letter-sig span {
-          color: #77716a;
-          font-size: 13px;
-        }
-        .letter-footer {
-          border-top: 0.5px solid #E5D9C6;
-          padding: 28px 48px;
-        }
-        .letter-cta {
-          background: #0A0907;
-          border-radius: 8px;
-          color: #FFFDF8 !important;
-          display: inline-block;
           font-family: var(--font-inter), Inter, system-ui, sans-serif;
           font-size: 14px;
           font-weight: 500;
-          padding: 13px 24px;
-          text-decoration: none;
-          transition: opacity 150ms ease;
         }
-        .letter-cta:hover { opacity: 0.88; }
+        .lc-org {
+          color: #888580;
+          font-family: var(--font-inter), Inter, system-ui, sans-serif;
+          font-size: 13px;
+        }
+        .lc-private {
+          color: #888580;
+          font-family: var(--font-inter), Inter, system-ui, sans-serif;
+          font-size: 11px;
+          margin-top: 16px;
+          text-align: center;
+        }
 
-        /* ── Below-card proof row ── */
+        /* ── Proof row ── */
         .card-proof-row {
           color: ${colours.bg};
           display: grid;
@@ -690,15 +541,8 @@ export function CardExperience() {
           max-width: 760px;
           text-align: center;
         }
-        .card-proof-row span {
-          border-left: 0.5px solid #e5d9c6;
-          color: #2d2923;
-          font-size: 13px;
-          padding: 0 16px;
-        }
-        .card-proof-row span:first-child {
-          border-left: 0;
-        }
+        .card-proof-row span { border-left: 0.5px solid #e5d9c6; color: #2d2923; font-size: 13px; padding: 0 16px; }
+        .card-proof-row span:first-child { border-left: 0; }
         .built-line {
           color: ${colours.bg};
           font-family: var(--font-instrument-serif), Georgia, serif;
@@ -706,86 +550,28 @@ export function CardExperience() {
           line-height: 1.15;
           text-align: center;
         }
-        .built-line em {
-          color: #B8872E;
-          font-style: normal;
-        }
+        .built-line em { color: #B8872E; font-style: normal; }
 
         /* ── Responsive ── */
         @media (max-width: 860px) {
-          .editorial-hero {
-            min-height: 560px;
-            padding: 30px;
-          }
-          .insight-row,
-          .card-footer {
-            grid-template-columns: 1fr;
-            margin-left: 24px;
-            margin-right: 24px;
-          }
-          .card-footer {
-            align-items: start;
-            flex-direction: column;
-          }
-          .live-strip {
-            align-items: flex-start;
-            border-radius: 12px;
-            flex-direction: column;
-            margin-left: 24px;
-            margin-right: 24px;
-          }
-          .card-proof-row {
-            grid-template-columns: repeat(2, 1fr);
-          }
-          .letter-header {
-            padding: 20px 24px;
-          }
-          .letter-body {
-            padding: 36px 24px 28px;
-          }
-          .letter-footer {
-            padding: 22px 24px;
-          }
+          .editorial-hero { min-height: 560px; padding: 30px; }
+          .insight-row, .card-footer { grid-template-columns: 1fr; margin-left: 24px; margin-right: 24px; }
+          .card-footer { align-items: start; flex-direction: column; }
+          .live-strip { align-items: flex-start; border-radius: 12px; flex-direction: column; margin-left: 24px; margin-right: 24px; }
+          .card-proof-row { grid-template-columns: repeat(2, 1fr); }
+          .lc-wrap { padding: 28px; }
         }
         @media (max-width: 560px) {
-          .editorial-card {
-            border-radius: 12px;
-            margin-left: -10px;
-            margin-right: -10px;
-          }
-          .editorial-hero {
-            min-height: 520px;
-            padding: 24px;
-          }
-          .image-scrim {
-            background: linear-gradient(180deg, rgba(8,8,6,0.74), rgba(8,8,6,0.96));
-          }
-          .intent-badge {
-            float: none;
-            margin-top: 20px;
-          }
-          .hero-copy-card {
-            padding-top: 42px;
-          }
-          .row-copy {
-            grid-template-columns: 1fr;
-            gap: 14px;
-          }
-          .card-proof-row {
-            grid-template-columns: 1fr;
-          }
-          .card-proof-row span {
-            border-left: 0;
-          }
-          .letter-card {
-            border-radius: 12px;
-            margin-left: -10px;
-            margin-right: -10px;
-          }
-          .style-tabs {
-            flex-wrap: wrap;
-            justify-content: center;
-          }
+          .editorial-card { border-radius: 12px; margin-left: -10px; margin-right: -10px; }
+          .editorial-hero { min-height: 520px; padding: 24px; }
+          .image-scrim { background: linear-gradient(180deg, rgba(8,8,6,0.74), rgba(8,8,6,0.96)); }
+          .intent-badge { float: none; margin-top: 20px; }
+          .hero-copy-card { padding-top: 42px; }
+          .row-copy { grid-template-columns: 1fr; gap: 14px; }
+          .card-proof-row { grid-template-columns: 1fr; }
+          .card-proof-row span { border-left: 0; }
+          .lc-wrap { margin-left: -10px; margin-right: -10px; padding: 24px; }
+          .lc-body p { font-size: 15px; }
         }
       `}</style>
     </Section>

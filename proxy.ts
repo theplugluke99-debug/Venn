@@ -18,11 +18,13 @@ const isPublicRoute = createRouteMatcher([
   "/proposal/(.*)",
   "/close/(.*)",
   "/reports/(.*)",
+  "/welcome/success",
   // Public API routes (called by prospects, no auth)
-  "/api/close/(.*)/answer",
-  "/api/close/(.*)/complete",
-  "/api/proposals/(.*)/questions",
+  "/api/close/(.*)",
+  "/api/proposals/(.*)",
+  "/api/cards/(.*)",
   "/api/reports/(.*)/feedback",
+  "/api/stripe/(.*)",
   // Webhooks and system
   "/api/webhooks/(.*)",
   "/api/worker(.*)",
