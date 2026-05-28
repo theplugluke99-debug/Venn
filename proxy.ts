@@ -6,6 +6,12 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/subscribe(.*)",
   "/solopreneur(.*)",
+  // Legal pages
+  "/terms",
+  "/privacy",
+  "/cookies",
+  "/acceptable-use",
+  "/refunds",
   // Prospect-facing public pages
   "/card/(.*)",
   "/cards/(.*)",
