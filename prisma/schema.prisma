@@ -110,6 +110,48 @@ model Lead {
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
   pipelineStage      String         @default("new")
+
+  // Email enrichment
+  ownerEmail              String?
+  ownerEmailConfidence    String?
+  ownerEmailSource        String?
+  ownerEmailVerified      Boolean  @default(false)
+  emailPatternsTried      Json?
+
+  // LinkedIn
+  linkedInUrl             String?
+  linkedInConfidence      String?
+  ownerNameSource         String?
+
+  // Instagram enrichment (extended from instagramData)
+  instagramFollowers      Int?
+  instagramPostCount      Int?
+  instagramLastPost       DateTime?
+  instagramEngagement     Float?
+  instagramBio            String?
+
+  // Companies House
+  companiesHouseNumber    String?
+  companyStatus           String?
+  employeeBand            String?
+  sicCode                 String?
+  incorporationDate       DateTime?
+  directorName            String?
+
+  // Extended technographics
+  bookingPlatform         String?
+  emailPlatform           String?
+  chatPlatform            String?
+  reviewPlatform          String?
+  hasLiveChat             Boolean?
+  hasCookieBanner         Boolean?
+  hasPrivacyPolicy        Boolean?
+
+  // Enrichment metadata
+  enrichmentRunAt         DateTime?
+  enrichmentSources       Json?
+  enrichmentScore         Int?
+
   card               Card?
   arsenal            OutreachArsenal?
   clients            Client[]

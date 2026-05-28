@@ -1,11 +1,49 @@
-export const SCORING_PROMPT = (data: unknown, cardIdentity: unknown) => `
+type EnrichmentContext = {
+  ownerEmail?: string | null;
+  ownerEmailConfidence?: string | null;
+  ownerEmailSource?: string | null;
+  ownerName?: string | null;
+  linkedInUrl?: string | null;
+  instagramHandle?: string | null;
+  instagramFollowers?: number | null;
+  instagramLastPost?: Date | null;
+  bookingPlatform?: string | null;
+  directorName?: string | null;
+};
+
+function buildEnrichmentBlock(e: EnrichmentContext | null | undefined): string {
+  if (!e?.ownerEmail && !e?.linkedInUrl && !e?.instagramHandle && !e?.directorName) return "";
+  const lines: string[] = ["ENRICHMENT DATA (verified from public sources):"];
+  if (e.ownerEmail) {
+    lines.push(`Email: ${e.ownerEmail} (confidence: ${e.ownerEmailConfidence ?? "unknown"}, source: ${e.ownerEmailSource ?? "unknown"})`);
+  }
+  if (e.ownerName ?? e.directorName) {
+    lines.push(`Owner name: ${e.ownerName ?? e.directorName}`);
+  }
+  if (e.linkedInUrl) lines.push(`LinkedIn: ${e.linkedInUrl}`);
+  if (e.instagramHandle) {
+    const daysAgo = e.instagramLastPost
+      ? Math.floor((Date.now() - e.instagramLastPost.getTime()) / 86_400_000)
+      : null;
+    lines.push(
+      `Instagram: @${e.instagramHandle}${e.instagramFollowers ? ` (${e.instagramFollowers} followers)` : ""}${daysAgo !== null ? `, last post ${daysAgo}d ago` : ""}`
+    );
+  }
+  if (e.bookingPlatform) lines.push(`Booking platform: ${e.bookingPlatform}`);
+  lines.push(
+    "\nUse this data to: personalise the opening line with the owner name if found; reference their booking platform specifically; note Instagram engagement as a signal; adjust recommended channel based on what contact data was found."
+  );
+  return "\n" + lines.join("\n");
+}
+
+export const SCORING_PROMPT = (data: unknown, cardIdentity: unknown, enrichment?: EnrichmentContext | null) => `
 You are an expert business analyst and outreach strategist.
 
 Analyse this business and produce a structured intelligence report INCLUDING a four-step outreach sequence.
 
 BUSINESS DATA:
 ${JSON.stringify(data, null, 2)}
-
+${buildEnrichmentBlock(enrichment)}
 AGENCY CONTEXT:
 Agency name: ${(cardIdentity as { agencyName?: string } | null)?.agencyName || "the agency"}
 Default angle: ${(cardIdentity as { defaultAngle?: string } | null)?.defaultAngle || "pain"}

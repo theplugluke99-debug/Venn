@@ -8,6 +8,7 @@ import { CopyButton } from "./CopyButton";
 import { GenerateProposalButton } from "./GenerateProposalButton";
 import { SendCloseButton } from "./SendCloseButton";
 import { ArsenalSection } from "./ArsenalSection";
+import { EnrichmentPanel } from "./EnrichmentPanel";
 import type {
   IntentScore,
   Observation,
@@ -469,6 +470,38 @@ export default async function LeadDetailPage({
           </div>
         )}
       </div>
+
+      <EnrichmentPanel
+        leadId={id}
+        initialData={lead.enrichmentRunAt ? {
+          ownerEmail: lead.ownerEmail,
+          ownerEmailConfidence: lead.ownerEmailConfidence,
+          ownerEmailSource: lead.ownerEmailSource,
+          ownerEmailVerified: lead.ownerEmailVerified,
+          linkedInUrl: lead.linkedInUrl,
+          linkedInConfidence: lead.linkedInConfidence,
+          ownerName: lead.ownerName,
+          ownerNameSource: lead.ownerNameSource,
+          instagramHandle: lead.instagramHandle,
+          instagramFollowers: lead.instagramFollowers,
+          instagramPostCount: lead.instagramPostCount,
+          instagramLastPost: lead.instagramLastPost?.toISOString() ?? null,
+          instagramBio: lead.instagramBio,
+          companiesHouseNumber: lead.companiesHouseNumber,
+          companyStatus: lead.companyStatus,
+          sicCode: lead.sicCode,
+          incorporationDate: lead.incorporationDate?.toISOString() ?? null,
+          directorName: lead.directorName,
+          bookingPlatform: lead.bookingPlatform,
+          emailPlatform: lead.emailPlatform,
+          chatPlatform: lead.chatPlatform,
+          reviewPlatform: lead.reviewPlatform,
+          hasLiveChat: lead.hasLiveChat,
+          enrichmentRunAt: lead.enrichmentRunAt.toISOString(),
+          enrichmentSources: lead.enrichmentSources as string[] | null,
+          enrichmentScore: lead.enrichmentScore,
+        } : null}
+      />
 
       <ArsenalSection
         leadId={id}

@@ -16,6 +16,23 @@ export const scrapeQueue = new Queue("scrape", {
   },
 });
 
+export const enrichmentQueue = new Queue("enrichment", {
+  connection: redis,
+  defaultJobOptions: {
+    attempts: 2,
+    backoff: { type: "exponential", delay: 5000 },
+    removeOnComplete: 200,
+    removeOnFail: 100,
+  },
+});
+
+export async function addEnrichmentJob(leadId: string, delayMs = 0) {
+  return enrichmentQueue.add("enrich_lead", { leadId }, {
+    jobId: `enrich-${leadId}`,
+    delay: delayMs,
+  });
+}
+
 export const emailQueue = new Queue("emails", {
   connection: redis,
   defaultJobOptions: {

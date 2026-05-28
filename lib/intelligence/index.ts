@@ -3,6 +3,19 @@ import { SCORING_PROMPT, DELIVERY_PROMPT, PROPOSAL_PROMPT, CLOSE_QUESTIONS_PROMP
 import type { IntelligenceProfile } from "@/types";
 import { config } from "@/lib/config";
 
+export interface EnrichmentContext {
+  ownerEmail?: string | null;
+  ownerEmailConfidence?: string | null;
+  ownerEmailSource?: string | null;
+  ownerName?: string | null;
+  linkedInUrl?: string | null;
+  instagramHandle?: string | null;
+  instagramFollowers?: number | null;
+  instagramLastPost?: Date | null;
+  bookingPlatform?: string | null;
+  directorName?: string | null;
+}
+
 const anthropic = new Anthropic({ apiKey: config.anthropic.apiKey });
 
 interface ScrapeData {
@@ -31,9 +44,10 @@ const DEFAULT_PROFILE = (data: ScrapeData): IntelligenceProfile => ({
 
 export async function generateIntelligence(
   data: ScrapeData,
-  cardIdentity: CardIdentityData | null | undefined
+  cardIdentity: CardIdentityData | null | undefined,
+  enrichment?: EnrichmentContext | null
 ): Promise<IntelligenceProfile> {
-  const prompt = SCORING_PROMPT(data, cardIdentity);
+  const prompt = SCORING_PROMPT(data, cardIdentity, enrichment);
 
   for (let attempt = 0; attempt < 2; attempt++) {
     try {

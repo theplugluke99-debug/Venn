@@ -8,6 +8,7 @@ import { findEmail } from "@/lib/scraper/email";
 import { generateIntelligence } from "@/lib/intelligence";
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { addEnrichmentJob } from "@/lib/queue";
 
 function parseDayOffset(scheduledAt: string): Date {
   const match = scheduledAt.match(/day\s+(\d+)/i);
@@ -122,6 +123,9 @@ export async function processLeadJob(
       console.error(`[Processor] Sequence save failed for ${leadId}:`, err);
     }
   }
+
+  // Auto-trigger enrichment 5s after intelligence completes
+  addEnrichmentJob(leadId, 5000).catch(() => null);
 
   await updateProgress(100);
   return { leadId, status: "complete" };
