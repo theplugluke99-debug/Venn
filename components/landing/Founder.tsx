@@ -19,9 +19,9 @@ export function Founder() {
     <Section id="founder" tone="primary" style={{ borderTop: `0.5px solid ${colours.border}` }}>
       <div className="venn-container-narrow">
         <Reveal>
-          <div style={{ alignItems: "center", display: "flex", gap: 18, marginBottom: 44 }}>
-            <div style={{ border: `0.5px solid ${colours.border}`, borderRadius: "50%", height: 72, overflow: "hidden", position: "relative", width: 72 }}>
-              <Image src="/founder-headshot.png" alt="Luke K., founder of Venn" fill sizes="72px" style={{ objectFit: "cover" }} />
+          <div className="founder-intro" style={{ alignItems: "center", display: "flex", gap: 28, marginBottom: 50 }}>
+            <div style={{ border: `0.5px solid ${colours.goldBorder}`, borderRadius: "50%", boxShadow: "0 0 44px rgba(196,151,63,0.12)", height: 148, overflow: "hidden", position: "relative", width: 148 }}>
+              <Image src="/founder-headshot.png" alt="Luke K., founder of Venn" fill sizes="148px" style={{ objectFit: "cover" }} />
             </div>
             <div>
               <p className="venn-eyebrow" style={{ marginBottom: 8 }}>From the founder</p>
@@ -47,6 +47,14 @@ export function Founder() {
           </div>
         </Reveal>
       </div>
+      <style>{`
+        @media (max-width: 560px) {
+          .founder-intro {
+            align-items: flex-start !important;
+            flex-direction: column;
+          }
+        }
+      `}</style>
     </Section>
   );
 }

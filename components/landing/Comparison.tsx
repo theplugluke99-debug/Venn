@@ -33,7 +33,7 @@ const COLS = [
 
 export function Comparison() {
   return (
-    <Section id="compare" tone="primary">
+    <Section id="compare" tone="primary" className="comparison-cinema">
       <div className="venn-container">
         <SectionHeader
           eyebrow="Comparison"
@@ -48,7 +48,7 @@ export function Comparison() {
         />
 
         <Reveal>
-          <div className="comparison-table" style={{ border: `0.5px solid ${colours.border}`, borderRadius: 8, overflow: "hidden" }}>
+          <div className="comparison-table" style={{ border: `0.5px solid ${colours.goldBorder}`, borderRadius: 10, overflow: "hidden", boxShadow: "0 30px 100px rgba(196,151,63,0.10)" }}>
             <table style={{ borderCollapse: "collapse", minWidth: 720, width: "100%" }}>
               <thead>
                 <tr style={{ background: colours.bgSecondary }}>
@@ -96,6 +96,11 @@ export function Comparison() {
       </div>
 
       <style>{`
+        .comparison-cinema {
+          background:
+            radial-gradient(circle at 50% 45%, rgba(196,151,63,0.12), transparent 32%),
+            ${colours.bg} !important;
+        }
         @media (max-width: 760px) {
           .comparison-table { overflow-x: auto !important; }
         }
