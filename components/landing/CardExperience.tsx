@@ -10,7 +10,7 @@ const REVIEWS = [
   "Treatment was great, but waiting around too long.",
 ];
 
-type Tab = "editorial" | "letter";
+type Tab = "editorial" | "letter" | "minimal";
 
 function EditorialCard() {
   return (
@@ -148,6 +148,45 @@ function LetterCard() {
   );
 }
 
+function MinimalCard() {
+  return (
+    <article className="mc-wrap">
+      {/* Header */}
+      <p className="mc-prepared">Prepared for</p>
+      <h3 className="mc-business">Glow Aesthetics</h3>
+      <p className="mc-location">Manchester</p>
+      <div className="mc-rule" />
+
+      {/* Data point 1 */}
+      <p className="mc-label">Review Signal</p>
+      <p className="mc-body">
+        Wait times mentioned 6 times this month — 5x the local average.
+      </p>
+      <div className="mc-divider" />
+
+      {/* Data point 2 */}
+      <p className="mc-label">Revenue Impact</p>
+      <p className="mc-body">
+        Estimated £2,400 per month in lost bookings.
+      </p>
+      <div className="mc-divider" />
+
+      {/* Data point 3 */}
+      <p className="mc-label">Website</p>
+      <p className="mc-body">
+        Booking link broken on mobile. 23% of visitors drop off.
+      </p>
+
+      {/* Footer */}
+      <div className="mc-footer">
+        <p className="mc-cta">Worth a conversation?</p>
+        <p className="mc-sig">— Luke K. Momentum Agency</p>
+        <p className="mc-url">getvenn.agency/c/glow-aesthetics</p>
+      </div>
+    </article>
+  );
+}
+
 export function CardExperience() {
   const [activeTab, setActiveTab] = useState<Tab>("editorial");
   const [visible, setVisible] = useState(true);
@@ -188,11 +227,12 @@ export function CardExperience() {
               >
                 Letter
               </button>
-              <div className="style-tab-minimal" title="Coming soon">
+              <button
+                className={`style-tab${activeTab === "minimal" ? " style-tab-active" : ""}`}
+                onClick={() => switchTab("minimal")}
+              >
                 Minimal
-                <span className="soon-badge">Soon</span>
-                <span className="minimal-tooltip">Coming soon</span>
-              </div>
+              </button>
             </div>
             <p className="style-hint">Style selected in your dashboard settings. Each card uniquely generated.</p>
           </div>
@@ -206,7 +246,7 @@ export function CardExperience() {
               transition: visible ? "opacity 300ms ease" : "opacity 200ms ease",
             }}
           >
-            {activeTab === "editorial" ? <EditorialCard /> : <LetterCard />}
+            {activeTab === "editorial" ? <EditorialCard /> : activeTab === "letter" ? <LetterCard /> : <MinimalCard />}
           </div>
         </Reveal>
 
@@ -276,57 +316,85 @@ export function CardExperience() {
           background: #C4973F;
           color: #0A0907 !important;
         }
-        .style-tab-minimal {
-          align-items: center;
-          border-radius: 36px;
-          color: #444440;
-          cursor: not-allowed;
-          display: inline-flex;
-          font-family: var(--font-inter), Inter, system-ui, sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          gap: 5px;
-          padding: 8px 20px;
-          position: relative;
+        /* ── Minimal card ── */
+        .mc-wrap {
+          background: #0A0907;
+          border: 0.5px solid #C4973F;
+          border-radius: 16px;
+          margin: 0 auto;
+          max-width: 480px;
+          padding: 48px;
         }
-        .soon-badge {
-          border: 0.5px solid rgba(196,151,63,0.45);
-          border-radius: 4px;
-          color: rgba(196,151,63,0.7);
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.07em;
-          padding: 2px 5px;
+        .mc-prepared {
+          color: #C4973F;
+          font-family: var(--font-inter), Inter, system-ui, sans-serif;
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.15em;
+          margin-bottom: 12px;
           text-transform: uppercase;
         }
-        .style-tab-minimal:hover .minimal-tooltip {
-          opacity: 1;
-          transform: translateX(-50%) translateY(-4px);
+        .mc-business {
+          color: #FFFDF8;
+          font-family: var(--font-instrument-serif), Georgia, serif;
+          font-size: 52px;
+          font-weight: 400;
+          line-height: 1.0;
         }
-        .minimal-tooltip {
-          background: #1A1610;
-          border-radius: 6px;
-          bottom: calc(100% + 8px);
+        .mc-location {
+          color: #888580;
+          font-family: var(--font-inter), Inter, system-ui, sans-serif;
+          font-size: 14px;
+          margin-top: 8px;
+        }
+        .mc-rule {
+          background: #C4973F;
+          height: 0.5px;
+          margin: 24px 0 32px;
+          width: 40px;
+        }
+        .mc-label {
           color: #C4973F;
-          font-size: 11px;
+          font-family: var(--font-inter), Inter, system-ui, sans-serif;
+          font-size: 10px;
           font-weight: 500;
-          left: 50%;
-          opacity: 0;
-          padding: 6px 10px;
-          pointer-events: none;
-          position: absolute;
-          transform: translateX(-50%) translateY(0);
-          transition: opacity 160ms ease, transform 160ms ease;
-          white-space: nowrap;
+          letter-spacing: 0.12em;
+          margin-bottom: 10px;
+          text-transform: uppercase;
         }
-        .minimal-tooltip::after {
-          border: 5px solid transparent;
-          border-top-color: #1A1610;
-          bottom: -10px;
-          content: '';
-          left: 50%;
-          position: absolute;
-          transform: translateX(-50%);
+        .mc-body {
+          color: #FFFDF8;
+          font-family: var(--font-inter), Inter, system-ui, sans-serif;
+          font-size: 16px;
+          line-height: 1.6;
+        }
+        .mc-divider {
+          background: #1E1C18;
+          height: 0.5px;
+          margin: 24px 0;
+          width: 100%;
+        }
+        .mc-footer {
+          margin-top: 40px;
+        }
+        .mc-cta {
+          color: #FFFDF8;
+          font-family: var(--font-instrument-serif), Georgia, serif;
+          font-size: 22px;
+          font-style: italic;
+          font-weight: 400;
+        }
+        .mc-sig {
+          color: #888580;
+          font-family: var(--font-inter), Inter, system-ui, sans-serif;
+          font-size: 14px;
+          margin-top: 8px;
+        }
+        .mc-url {
+          color: #C4973F;
+          font-family: 'Courier New', monospace;
+          font-size: 12px;
+          margin-top: 16px;
         }
         .style-hint {
           color: #444440;
@@ -572,6 +640,10 @@ export function CardExperience() {
           .card-proof-row span { border-left: 0; }
           .lc-wrap { margin-left: -10px; margin-right: -10px; padding: 24px; }
           .lc-body p { font-size: 15px; }
+          .mc-wrap { border-radius: 12px; padding: 28px; }
+          .mc-business { font-size: 36px; }
+          .mc-body { font-size: 15px; }
+          .mc-cta { font-size: 18px; }
         }
       `}</style>
     </Section>
