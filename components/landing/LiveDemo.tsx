@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { CTA, Reveal, Section, VennLogo, colours, motionPresets } from "./system";
 
 const LOGS = [
@@ -22,35 +22,38 @@ const SIGNALS = [
 ];
 
 export function LiveDemo() {
-  const [active, setActive] = useState(0);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(sectionRef, { once: true, margin: "-24% 0px -18% 0px" });
+  const [active, setActive] = useState(-1);
   const [complete, setComplete] = useState(false);
   const reduceMotion = useReducedMotion();
+  const demoComplete = Boolean(reduceMotion) || complete;
 
   useEffect(() => {
-    if (reduceMotion) {
-      setComplete(true);
-      return;
-    }
-    setActive(0);
-    setComplete(false);
+    if (reduceMotion) return;
+    if (!inView) return;
+    const start = window.setTimeout(() => setActive(0), 360);
     const timer = window.setInterval(() => {
       setActive((value) => {
         if (value >= LOGS.length - 1) {
           window.clearInterval(timer);
-          window.setTimeout(() => setComplete(true), 420);
+          window.setTimeout(() => setComplete(true), 780);
           return value;
         }
         return value + 1;
       });
-    }, 620);
-    return () => window.clearInterval(timer);
-  }, [reduceMotion]);
+    }, 1050);
+    return () => {
+      window.clearTimeout(start);
+      window.clearInterval(timer);
+    };
+  }, [inView, reduceMotion]);
 
-  const progress = reduceMotion ? 100 : Math.min(100, Math.round(((active + 1) / LOGS.length) * 100));
+  const progress = reduceMotion ? 100 : Math.max(0, Math.min(100, Math.round(((active + 1) / LOGS.length) * 100)));
 
   return (
     <Section id="the-card" tone="primary" className="live-demo-cinema">
-      <div className="venn-container">
+      <div className="venn-container" ref={sectionRef}>
         <Reveal>
           <div className="section-title">
             <p className="venn-eyebrow">03 / The live intelligence demo</p>
@@ -94,8 +97,8 @@ export function LiveDemo() {
               className="signal-arrow"
               aria-hidden
               initial={{ opacity: 0, scaleX: 0.4 }}
-              animate={complete ? { opacity: 1, scaleX: 1 } : { opacity: 0, scaleX: 0.4 }}
-              transition={{ ...motionPresets.soft, duration: 0.7 }}
+              animate={demoComplete ? { opacity: 1, scaleX: 1 } : { opacity: 0, scaleX: 0.4 }}
+              transition={{ ...motionPresets.soft, duration: 0.9, delay: 0.08 }}
             >
               →
             </motion.div>
@@ -104,11 +107,11 @@ export function LiveDemo() {
               className="crystal-panel"
               initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
               animate={
-                complete
+                demoComplete
                   ? { opacity: 1, y: 0, filter: "blur(0px)" }
                   : { opacity: 0, y: 24, filter: "blur(10px)" }
               }
-              transition={{ ...motionPresets.slow, delay: 0.1 }}
+              transition={{ ...motionPresets.slow, delay: 0.22 }}
             >
               <div className="crystal-head">
                 <VennLogo size={34} variant="horizontal" />
@@ -175,7 +178,7 @@ export function LiveDemo() {
           border: 0.5px solid rgba(255,253,248,0.16);
           border-radius: 12px;
           box-shadow: 0 30px 110px rgba(0,0,0,0.34);
-          min-height: 520px;
+          min-height: 500px;
           overflow: hidden;
         }
         .terminal-top {
@@ -201,8 +204,8 @@ export function LiveDemo() {
         }
         .terminal-body {
           display: grid;
-          gap: 17px;
-          padding: 30px 32px 22px;
+          gap: 18px;
+          padding: 30px 32px 18px;
         }
         .terminal-body p {
           color: ${colours.ivory};
@@ -295,7 +298,7 @@ export function LiveDemo() {
           display: grid;
           gap: 18px;
           grid-template-columns: repeat(3, 1fr);
-          margin-bottom: 30px;
+          margin-bottom: 20px;
         }
         .signal-grid div {
           display: grid;
@@ -315,9 +318,10 @@ export function LiveDemo() {
           background: #f8f0e2;
           border-radius: 10px 10px 0 0;
           color: ${colours.bg};
-          margin-top: 10px;
-          padding: 22px 28px;
-          transform: translateY(24px);
+          margin-top: 6px;
+          max-height: 166px;
+          overflow: hidden;
+          padding: 18px 24px 0;
         }
         .card-peek span {
           color: #4c4337;
@@ -327,12 +331,12 @@ export function LiveDemo() {
         .card-peek strong {
           display: block;
           font-family: var(--font-instrument-serif), Georgia, serif;
-          font-size: 42px;
+          font-size: 34px;
           font-weight: 400;
-          margin-top: 12px;
+          margin-top: 10px;
         }
         .crystal-panel .venn-cta {
-          margin-top: 8px;
+          margin-top: 0;
           position: relative;
           width: 100%;
           z-index: 1;

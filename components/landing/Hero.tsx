@@ -19,9 +19,9 @@ export function Hero() {
     offset: ["start start", "end start"],
   });
 
-  const leftScrollX = useTransform(scrollYProgress, [0, 0.82], [0, -46]);
-  const rightScrollX = useTransform(scrollYProgress, [0, 0.82], [0, 46]);
-  const lensScrollOpacity = useTransform(scrollYProgress, [0, 0.46, 0.84], [1, 0.72, 0]);
+  const leftScrollX = useTransform(scrollYProgress, [0, 0.84], [0, -58]);
+  const rightScrollX = useTransform(scrollYProgress, [0, 0.84], [0, 58]);
+  const lensScrollOpacity = useTransform(scrollYProgress, [0, 0.38, 0.72], [1, 0.62, 0]);
   const flareScrollScale = useTransform(scrollYProgress, [0, 0.84], [1, 0.12]);
   const fieldScrollOpacity = useTransform(scrollYProgress, [0, 0.86], [1, 0.24]);
 
@@ -30,7 +30,7 @@ export function Hero() {
       <motion.svg
         aria-hidden
         className="hero-venn-field"
-        viewBox="0 0 160 90"
+        viewBox="0 0 180 92"
         preserveAspectRatio="xMidYMid meet"
         initial={reduceMotion ? false : "start"}
         animate={reduceMotion ? "settled" : "settled"}
@@ -38,7 +38,7 @@ export function Hero() {
       >
         <defs>
           <clipPath id="hero-left-circle-clip">
-            <circle cx="56" cy="45" r="43" />
+            <circle cx="58" cy="46" r="43" />
           </clipPath>
           <radialGradient id="hero-lens-gold" cx="50%" cy="50%" r="65%">
             <stop offset="0%" stopColor="#FFF5CD" />
@@ -58,38 +58,38 @@ export function Hero() {
 
         <motion.g style={{ x: reduceMotion ? 0 : leftScrollX }}>
           <motion.circle
-            cx="56"
-            cy="45"
+            cx="58"
+            cy="46"
             r="43"
             fill="none"
             stroke={colours.gold}
             strokeWidth="0.34"
-            variants={{ start: { x: -86, opacity: 0.36 }, settled: { x: 0, opacity: 0.92 } }}
+            variants={{ start: { x: -88, opacity: 0.34 }, settled: { x: 0, opacity: 0.92 } }}
             transition={{ duration: 2.6, ease: [0.22, 1, 0.36, 1], delay: 0.16 }}
           />
         </motion.g>
         <motion.g style={{ x: reduceMotion ? 0 : rightScrollX }}>
           <motion.circle
-            cx="104"
-            cy="45"
-            r="36"
+            cx="118"
+            cy="46"
+            r="35"
             fill="none"
             stroke={colours.gold}
             strokeWidth="0.34"
-            variants={{ start: { x: 86, opacity: 0.36 }, settled: { x: 0, opacity: 0.92 } }}
+            variants={{ start: { x: 88, opacity: 0.34 }, settled: { x: 0, opacity: 0.92 } }}
             transition={{ duration: 2.6, ease: [0.22, 1, 0.36, 1], delay: 0.16 }}
           />
         </motion.g>
         <motion.g
           variants={{ start: { opacity: 0, scale: 0.55 }, settled: { opacity: 1, scale: 1 } }}
           transition={{ duration: 1.25, ease: [0.22, 1, 0.36, 1], delay: 2.12 }}
-          style={{ opacity: reduceMotion ? 1 : lensScrollOpacity, transformOrigin: "82px 45px" }}
+          style={{ opacity: reduceMotion ? 1 : lensScrollOpacity, transformOrigin: "89px 46px" }}
         >
-          <circle cx="82" cy="45" r="22" fill="url(#hero-ambient)" />
+          <circle cx="89" cy="46" r="11" fill="url(#hero-ambient)" />
           <circle
-            cx="104"
-            cy="45"
-            r="36"
+            cx="118"
+            cy="46"
+            r="35"
             fill="url(#hero-lens-gold)"
             clipPath="url(#hero-left-circle-clip)"
             filter="url(#hero-lens-glow)"
@@ -101,12 +101,12 @@ export function Hero() {
           style={{ opacity: reduceMotion ? 0.82 : lensScrollOpacity }}
         >
           <motion.rect
-            x="34"
-            y="44.82"
-            width="92"
+            x="64"
+            y="45.82"
+            width="50"
             height="0.34"
             fill="url(#hero-ambient)"
-            style={{ scaleX: reduceMotion ? 1 : flareScrollScale, transformOrigin: "82px 45px" }}
+            style={{ scaleX: reduceMotion ? 1 : flareScrollScale, transformOrigin: "89px 46px" }}
           />
         </motion.g>
       </motion.svg>
@@ -128,7 +128,7 @@ export function Hero() {
             {HEADLINE_LINES.map((line, index) => (
               <span key={line} style={{ display: "block", overflow: "hidden" }}>
                 <motion.span
-                  initial={false}
+                  initial={reduceMotion ? false : { opacity: 0, y: 28 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ ...motionPresets.slow, delay: reduceMotion ? 0 : 1.15 + index * 0.08 }}
                   style={{ display: "block" }}
@@ -141,7 +141,7 @@ export function Hero() {
 
           <motion.p
             className="venn-copy hero-subcopy"
-            initial={false}
+            initial={reduceMotion ? false : { opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...motionPresets.soft, delay: reduceMotion ? 0 : 1.55 }}
           >
@@ -152,7 +152,7 @@ export function Hero() {
 
           <motion.div
             className="hero-actions"
-            initial={false}
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...motionPresets.soft, delay: reduceMotion ? 0 : 1.8 }}
           >
@@ -167,19 +167,19 @@ export function Hero() {
           align-items: stretch;
           background: radial-gradient(circle at 50% 45%, rgba(196,151,63,0.08), transparent 34%), ${colours.bg};
           display: flex;
-          min-height: 100svh;
+          min-height: 108svh;
           overflow: hidden;
-          padding: 96px 24px 58px;
+          padding: 118px 24px 70px;
           position: relative;
           text-align: center;
         }
         .hero-venn-field {
-          height: min(46svh, 440px);
+          height: min(42svh, 390px);
           left: 50%;
           position: absolute;
-          top: clamp(86px, 12vh, 128px);
+          top: clamp(126px, 15vh, 160px);
           transform: translateX(-50%);
-          width: min(1380px, 118vw);
+          width: min(1360px, 116vw);
           z-index: 0;
         }
         .hero-noise {
@@ -204,7 +204,7 @@ export function Hero() {
         .hero-brand {
           display: flex;
           justify-content: center;
-          margin-bottom: clamp(300px, 43vh, 420px);
+          margin-bottom: clamp(280px, 34vh, 350px);
         }
         .hero-copy {
           margin: 0 auto;
@@ -227,20 +227,20 @@ export function Hero() {
         }
         @media (max-width: 760px) {
           .hero-cinematic {
-            min-height: 860px;
-            padding-top: 74px;
+            min-height: 900px;
+            padding-top: 92px;
           }
           .hero-brand {
-            margin-bottom: 300px;
+            margin-bottom: 288px;
           }
           .hero-venn-field {
-            height: 300px;
-            top: 116px;
+            height: 260px;
+            top: 128px;
             transform: translateX(-50%);
-            width: 760px;
+            width: 640px;
           }
           .hero-title {
-            font-size: clamp(42px, 12vw, 58px);
+            font-size: clamp(34px, 10vw, 44px);
           }
           .hero-subcopy {
             max-width: 320px;

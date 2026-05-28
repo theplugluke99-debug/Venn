@@ -157,6 +157,12 @@ p, h1, h2, h3 {
 
 .venn-cta-primary:hover {
   background: var(--venn-ivory);
+  color: var(--venn-bg);
+}
+
+.venn-cta-primary:hover *,
+.venn-cta:hover * {
+  color: inherit;
 }
 
 .venn-cta-secondary {

@@ -26,7 +26,12 @@ function TruthRow({
     [0.32, 0.48, 0.64],
     [0.64, 0.8, 1],
   ];
-  const opacity = useTransform(progress, ranges[index], [0.26, 1, index === 2 ? 1 : 0.26]);
+  const opacity = useTransform(progress, ranges[index], [0.2, 1, index === 2 ? 1 : 0.22]);
+  const glow = useTransform(progress, ranges[index], [
+    "0 0 0 rgba(255,253,248,0)",
+    "0 0 28px rgba(255,253,248,0.28)",
+    "0 0 0 rgba(255,253,248,0)",
+  ]);
 
   return (
     <motion.div
@@ -37,13 +42,16 @@ function TruthRow({
       }}
     >
       <div style={{ alignItems: "flex-start", display: "grid", gap: 20, gridTemplateColumns: "36px 1fr" }}>
-        <span style={{ color: colours.muted, fontSize: 12, paddingTop: 9 }}>{String(index + 1).padStart(2, "0")}</span>
+        <motion.span style={{ color: colours.ivory, filter: reduceMotion ? "none" : glow, fontSize: 12, opacity: reduceMotion ? 1 : opacity, paddingTop: 9 }}>
+          {String(index + 1).padStart(2, "0")}
+        </motion.span>
         <p
           style={{
             color: colours.ivory,
             fontFamily: "var(--font-instrument-serif), Georgia, serif",
             fontSize: "clamp(31px, 4.2vw, 50px)",
             lineHeight: 1.05,
+            textShadow: reduceMotion ? "none" : "0 0 18px rgba(255,253,248,0.18)",
           }}
         >
           {truth}
@@ -108,7 +116,7 @@ export function NamedPain() {
           {TRUTHS.map((truth, index) => (
             <Reveal key={truth} delay={index * 0.08}>
               <div style={{ borderTop: `0.5px solid ${index === 0 ? colours.goldBorder : colours.border}`, paddingTop: 22 }}>
-                <span style={{ color: colours.muted, display: "block", fontSize: 12, marginBottom: 12 }}>
+                <span style={{ color: colours.ivory, display: "block", fontSize: 12, marginBottom: 12 }}>
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <p style={{ color: colours.ivory, fontFamily: "var(--font-instrument-serif), Georgia, serif", fontSize: 32, lineHeight: 1.08 }}>

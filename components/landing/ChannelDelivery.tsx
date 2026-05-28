@@ -1,25 +1,40 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { Reveal, Section, colours } from "./system";
 
-const CHANNELS = ["WhatsApp", "Instagram", "Email", "LinkedIn"];
+const CHANNELS = [
+  { name: "WhatsApp", tone: "Personal. Direct. Conversational.", handle: "Momentum Agency", meta: "online" },
+  { name: "Instagram", tone: "Visual. Casual. Curiosity-led.", handle: "momentum.agency", meta: "Active now" },
+  { name: "Email", tone: "Professional. Clear. Considered.", handle: "Momentum Agency", meta: "A quick note for Glow" },
+  { name: "LinkedIn", tone: "Relevant. Professional. Trusted.", handle: "Momentum Agency", meta: "Active now" },
+];
 
-function MiniPhone({ channel }: { channel: string }) {
+function MiniPhone({ channel }: { channel: (typeof CHANNELS)[number] }) {
   return (
-    <div className="mini-phone">
-      <div className="mini-top">{channel}</div>
+    <motion.div
+      key={channel.name}
+      className="mini-phone"
+      initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <div className="mini-top">{channel.name}</div>
       <div className="mini-bubble">Put something together specifically for you —</div>
       <div className="mini-card-preview">
-        <Image src="/landing/glow-aesthetics-reception.png" alt="" fill sizes="220px" style={{ objectFit: "cover" }} />
+        <Image src="/landing/glow-aesthetics-reception.png" alt="" fill sizes="360px" style={{ objectFit: "cover" }} />
       </div>
       <p>Glow Aesthetics</p>
       <small>Manchester</small>
-    </div>
+    </motion.div>
   );
 }
 
 export function ChannelDelivery() {
+  const [selected, setSelected] = useState(CHANNELS[0]);
+
   return (
     <Section id="delivery" tone="primary" className="delivery-cinema">
       <div className="venn-container">
@@ -39,8 +54,8 @@ export function ChannelDelivery() {
                 <div className="chat-head">
                   <span />
                   <div>
-                    <b>Momentum Agency</b>
-                    <small>online</small>
+                    <b>{selected.handle}</b>
+                    <small>{selected.meta}</small>
                   </div>
                 </div>
                 <div className="day-pill">Today</div>
@@ -67,17 +82,24 @@ export function ChannelDelivery() {
 
         <Reveal delay={0.16}>
           <div className="channel-pills">
-            {CHANNELS.map((channel) => <button key={channel}>{channel}</button>)}
+            {CHANNELS.map((channel) => (
+              <button
+                key={channel.name}
+                className={selected.name === channel.name ? "active" : ""}
+                onClick={() => setSelected(channel)}
+                type="button"
+              >
+                {channel.name}
+              </button>
+            ))}
           </div>
           <p className="native-line">One message. Four channels. Each one feels native.</p>
           <div className="mini-phone-grid">
-            {CHANNELS.map((channel) => (
-              <div key={channel}>
-                <MiniPhone channel={channel} />
-                <h4>{channel}</h4>
-                <p>{channel === "WhatsApp" ? "Personal. Direct. Conversational." : channel === "Instagram" ? "Visual. Casual. Curiosity-led." : channel === "Email" ? "Professional. Clear. Considered." : "Relevant. Professional. Trusted."}</p>
-              </div>
-            ))}
+            <div>
+              <MiniPhone channel={selected} />
+              <h4>{selected.name}</h4>
+              <p>{selected.tone}</p>
+            </div>
           </div>
         </Reveal>
       </div>
@@ -116,8 +138,33 @@ export function ChannelDelivery() {
           border-radius: 44px;
           box-shadow: 0 34px 120px rgba(196,151,63,0.24);
           justify-self: end;
-          padding: 12px;
+          padding: 13px;
+          position: relative;
           width: min(340px, 82vw);
+        }
+        .main-phone::before {
+          background: #050504;
+          border-radius: 0 0 18px 18px;
+          content: "";
+          height: 24px;
+          left: 50%;
+          position: absolute;
+          top: 13px;
+          transform: translateX(-50%);
+          width: 118px;
+          z-index: 2;
+        }
+        .main-phone::after {
+          background: rgba(255,253,248,0.22);
+          border-radius: 999px;
+          bottom: 20px;
+          content: "";
+          height: 4px;
+          left: 50%;
+          position: absolute;
+          transform: translateX(-50%);
+          width: 104px;
+          z-index: 2;
         }
         .phone-screen {
           background: #070706;
@@ -232,8 +279,9 @@ export function ChannelDelivery() {
         }
         .delivery-note p {
           color: ${colours.secondary};
-          font-size: 18px;
-          line-height: 1.55;
+          font-family: var(--font-inter), Inter, sans-serif;
+          font-size: 15px;
+          line-height: 1.7;
         }
         .channel-pills {
           display: flex;
@@ -247,13 +295,15 @@ export function ChannelDelivery() {
           border: 0.5px solid ${colours.border};
           border-radius: 999px;
           color: ${colours.ivory};
+          cursor: pointer;
           font-size: 15px;
           min-width: 150px;
           padding: 14px 26px;
         }
-        .channel-pills button:first-child {
+        .channel-pills button.active {
           border-color: ${colours.gold};
           color: ${colours.gold};
+          box-shadow: inset 0 0 34px rgba(196,151,63,0.08), 0 0 24px rgba(196,151,63,0.12);
         }
         .native-line {
           color: ${colours.secondary};
@@ -264,13 +314,14 @@ export function ChannelDelivery() {
         .mini-phone-grid {
           display: grid;
           gap: 22px;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: minmax(260px, 420px);
+          justify-content: center;
         }
         .mini-phone {
           background: rgba(10,9,7,0.72);
           border: 0.5px solid ${colours.border};
           border-radius: 16px;
-          min-height: 300px;
+          min-height: 330px;
           overflow: hidden;
           padding: 14px;
         }
@@ -291,7 +342,7 @@ export function ChannelDelivery() {
         }
         .mini-card-preview {
           border-radius: 10px;
-          height: 100px;
+          height: 138px;
           margin-bottom: 12px;
           overflow: hidden;
           position: relative;
@@ -321,9 +372,7 @@ export function ChannelDelivery() {
           .delivery-note {
             margin: 28px 0 0;
           }
-          .mini-phone-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
+          .mini-phone-grid { grid-template-columns: minmax(250px, 420px); }
         }
         @media (max-width: 560px) {
           .phone-screen { min-height: 560px; }

@@ -12,10 +12,10 @@ export function ADifferentWay() {
             style={{
               color: colours.ivory,
               fontFamily: "var(--font-instrument-serif), Georgia, serif",
-              fontSize: "clamp(54px, 8vw, 112px)",
+              fontSize: "clamp(48px, 6.8vw, 92px)",
               fontWeight: 400,
               lineHeight: 0.9,
-              margin: "0 auto clamp(58px, 8vw, 92px)",
+              margin: "0 auto clamp(50px, 7vw, 78px)",
               maxWidth: 980,
               textAlign: "center",
             }}
@@ -68,20 +68,21 @@ export function ADifferentWay() {
           display: grid;
           gap: 18px;
           margin: 0 auto;
-          max-width: 650px;
+          max-width: 590px;
         }
         .manifesto-copy p,
         .manifesto-copy strong {
           color: ${colours.secondary};
-          font-size: clamp(17px, 2vw, 21px);
+          font-family: var(--font-inter), Inter, sans-serif;
+          font-size: clamp(14px, 1.35vw, 16px);
           font-weight: 400;
-          line-height: 1.65;
+          line-height: 1.9;
         }
         .manifesto-copy strong,
         .manifesto-copy em {
           color: ${colours.gold};
           font-family: var(--font-instrument-serif), Georgia, serif;
-          font-size: clamp(25px, 3vw, 34px);
+          font-size: clamp(22px, 2.4vw, 28px);
           font-style: normal;
           line-height: 1.15;
         }

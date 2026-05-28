@@ -55,9 +55,13 @@ export function IntelligenceLoop() {
                   {LEADS.map(([name, viewed, state, score], index) => (
                     <motion.div
                       key={name}
-                      animate={{ opacity: index === pulse ? 1 : index === 0 ? 0.92 : 0.64 }}
+                      animate={{
+                        opacity: index === pulse ? 1 : index === 0 ? 0.92 : 0.64,
+                        y: index === pulse ? -2 : 0,
+                        scale: index === pulse ? 1.015 : 1,
+                      }}
                       transition={motionPresets.soft}
-                      className={index === 0 ? "lead-row featured" : "lead-row"}
+                      className={index === pulse ? "lead-row featured" : "lead-row"}
                     >
                       <div className="avatar">{name.split(" ").map((word) => word[0]).join("")}</div>
                       <div>
@@ -73,9 +77,16 @@ export function IntelligenceLoop() {
               </main>
             </div>
 
-            <div className="bridge-signal" aria-hidden>
+            <motion.div
+              className="bridge-signal"
+              aria-hidden
+              initial={false}
+              animate={reduceMotion ? undefined : { opacity: [0.72, 1, 0.72] }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+            >
               <span />
-            </div>
+              <i />
+            </motion.div>
 
             <div className="reader-phone">
               <div className="reader-screen">
@@ -88,10 +99,15 @@ export function IntelligenceLoop() {
                   <div className="reader-image">
                     <Image src="/landing/glow-aesthetics-reception.png" alt="Glow Aesthetics reception" fill sizes="320px" style={{ objectFit: "cover" }} />
                   </div>
-                  <div className="reader-stats">
+                  <motion.div
+                    className="reader-stats"
+                    initial={false}
+                    animate={reduceMotion ? undefined : { opacity: [0.78, 1, 0.78] }}
+                    transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+                  >
                     <span>Reading time <b>1m 42s</b></span>
                     <span>Scroll depth <b>68%</b></span>
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             </div>
@@ -188,6 +204,17 @@ export function IntelligenceLoop() {
           font-family: var(--font-inter), Inter, sans-serif;
           font-size: 13px;
         }
+        .dashboard-ui h3 small::before {
+          animation: pulse-dot 1.8s ease-in-out infinite;
+          background: ${colours.gold};
+          border-radius: 50%;
+          box-shadow: 0 0 18px rgba(196,151,63,0.6);
+          content: "";
+          display: inline-block;
+          height: 7px;
+          margin: 0 8px 1px 2px;
+          width: 7px;
+        }
         .stats-row {
           display: flex;
           flex-wrap: wrap;
@@ -220,7 +247,7 @@ export function IntelligenceLoop() {
         }
         .lead-row.featured {
           border-color: ${colours.gold};
-          box-shadow: inset 0 0 50px rgba(196,151,63,0.08);
+          box-shadow: inset 0 0 58px rgba(196,151,63,0.1), 0 0 34px rgba(196,151,63,0.12);
         }
         .avatar {
           align-items: center;
@@ -286,6 +313,21 @@ export function IntelligenceLoop() {
           box-shadow: 0 0 34px rgba(196,151,63,0.72);
           height: 58px;
           width: 58px;
+        }
+        .bridge-signal i {
+          animation: bridge-travel 2.8s ease-in-out infinite;
+          background: ${colours.gold};
+          border-radius: 50%;
+          box-shadow: 0 0 18px rgba(196,151,63,0.9);
+          height: 8px;
+          position: absolute;
+          width: 8px;
+        }
+        @keyframes bridge-travel {
+          0% { transform: translateX(-78px); opacity: 0; }
+          18% { opacity: 1; }
+          82% { opacity: 1; }
+          100% { transform: translateX(78px); opacity: 0; }
         }
         .reader-phone {
           background: linear-gradient(145deg, #2a2824, #050504);

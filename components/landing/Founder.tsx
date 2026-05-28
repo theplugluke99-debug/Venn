@@ -21,11 +21,11 @@ export function Founder() {
         <Reveal>
           <div className="founder-intro" style={{ alignItems: "center", display: "flex", gap: 28, marginBottom: 50 }}>
             <div style={{ border: `0.5px solid ${colours.goldBorder}`, borderRadius: "50%", boxShadow: "0 0 44px rgba(196,151,63,0.12)", height: 148, overflow: "hidden", position: "relative", width: 148 }}>
-              <Image src="/founder-headshot.png" alt="Luke K., founder of Venn" fill sizes="148px" style={{ objectFit: "cover" }} />
+              <Image src="/founder-headshot.png" alt="Luke S., founder of Venn" fill sizes="148px" style={{ objectFit: "cover" }} />
             </div>
             <div>
               <p className="venn-eyebrow" style={{ marginBottom: 8 }}>From the founder</p>
-              <p style={{ color: colours.secondary, fontSize: 13 }}>Luke K.</p>
+              <p style={{ color: colours.secondary, fontSize: 13 }}>Luke S.</p>
             </div>
           </div>
 

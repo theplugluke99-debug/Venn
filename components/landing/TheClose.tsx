@@ -21,7 +21,7 @@ export function TheClose() {
 
   return (
     <section id="close" ref={ref} className="closing-cinematic">
-      <motion.svg className="closing-field" aria-hidden viewBox="0 0 120 80" preserveAspectRatio="xMidYMid slice">
+      <motion.svg className="closing-field" aria-hidden viewBox="0 0 120 80" preserveAspectRatio="xMidYMid meet">
         <defs>
           <radialGradient id="close-gold" cx="50%" cy="50%" r="65%">
             <stop offset="0%" stopColor="#FFF5CD" />
@@ -90,10 +90,12 @@ export function TheClose() {
           text-align: center;
         }
         .closing-field {
-          height: 100%;
-          inset: 0;
+          height: min(82%, 680px);
+          left: 50%;
           position: absolute;
-          width: 100%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: min(1380px, 112vw);
           z-index: 0;
         }
         .closing-content {

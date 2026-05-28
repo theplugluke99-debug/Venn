@@ -52,7 +52,7 @@ export function Comparison() {
             <table style={{ borderCollapse: "collapse", minWidth: 720, width: "100%" }}>
               <thead>
                 <tr style={{ background: colours.bgSecondary }}>
-                  <th style={{ color: colours.muted, fontSize: 12, fontWeight: 400, padding: "20px 22px", textAlign: "left", width: "38%" }}>Capability</th>
+                  <th style={{ color: colours.ivory, fontSize: 13, fontWeight: 500, lineHeight: 1.2, padding: "24px 22px", textAlign: "left", width: "38%" }}>Capability</th>
                   {COLS.map((col) => (
                     <th
                       key={col.key}
