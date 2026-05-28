@@ -26,6 +26,9 @@ const COLS = [
     links: [
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
+      { label: "Cookies", href: "/cookies" },
+      { label: "Acceptable Use", href: "/acceptable-use" },
+      { label: "Refunds", href: "/refunds" },
     ],
   },
 ];
@@ -67,9 +70,29 @@ export function Footer() {
           ))}
         </div>
 
-        <div style={{ alignItems: "center", borderTop: `0.5px solid ${colours.border}`, display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between", paddingTop: 24 }}>
+        <div style={{ alignItems: "center", borderTop: `0.5px solid ${colours.border}`, display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between", paddingTop: 24, marginBottom: 16 }}>
           <p style={{ color: colours.muted, fontSize: 12 }}>© {new Date().getFullYear()} Venn. Built for agency owners.</p>
           <p style={{ color: "#2A2826", fontSize: 12 }}>luke@venn.so</p>
+        </div>
+
+        {/* Legal links strip */}
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 12, borderTop: `0.5px solid #141210` }}>
+          {[
+            { label: "Terms", href: "/terms" },
+            { label: "Privacy", href: "/privacy" },
+            { label: "Cookies", href: "/cookies" },
+            { label: "Acceptable Use", href: "/acceptable-use" },
+            { label: "Refunds", href: "/refunds" },
+          ].map(({ label, href }, i, arr) => (
+            <span key={href} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Link href={href} style={{ fontSize: 12, color: "#444440", textDecoration: "none" }}>
+                {label}
+              </Link>
+              {i < arr.length - 1 && (
+                <span style={{ color: "#2A2826", fontSize: 12 }}>·</span>
+              )}
+            </span>
+          ))}
         </div>
       </div>
 
