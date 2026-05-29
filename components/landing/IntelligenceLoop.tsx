@@ -42,7 +42,7 @@ export function IntelligenceLoop() {
               <main>
                 <div className="dash-brand">
                   <VennLogo size={38} variant="mark" decorative />
-                  <span>Momentum Agency</span>
+                  <span className="agency-brand">thrive online.</span>
                 </div>
                 <h3>Live intelligence <small>• Updating in real time</small></h3>
                 <div className="stats-row">
@@ -412,22 +412,31 @@ export function IntelligenceLoop() {
           .dashboard-ui {
             grid-template-columns: 1fr;
           }
-          .dash-rail {
-            display: none;
+          .dash-rail { display: none; }
+          .dashboard-ui main { padding: 14px 16px 14px; }
+          .dash-brand { padding-bottom: 14px; }
+          .dash-brand span { font-size: 13px; }
+          .dashboard-ui h3 {
+            font-size: 16px;
+            margin: 16px 0 12px;
           }
-          .dashboard-ui main {
-            padding: 22px;
-          }
+          .dashboard-ui h3 small { font-size: 11px; }
+          .stats-row { gap: 8px; margin-bottom: 14px; }
+          .stats-row span { font-size: 11px; }
+          .stats-row b { font-size: 11px; margin-left: 3px; padding: 2px 5px; }
+          .lead-list { gap: 8px; }
           .lead-row {
-            grid-template-columns: 42px 1fr;
+            gap: 8px;
+            grid-template-columns: 34px 1fr;
+            padding: 10px 12px;
           }
-          .lead-row .state,
-          .lead-row > b {
-            grid-column: 2;
-          }
-          .reader-screen {
-            min-height: 560px;
-          }
+          .lead-row strong { font-size: 13px; }
+          .lead-row small { font-size: 10px; }
+          .lead-row > b { font-size: 12px; }
+          .lead-row .state, .lead-row > b { grid-column: 2; }
+          .avatar { font-size: 11px; height: 34px; width: 34px; }
+          .state { font-size: 10px; letter-spacing: 0.06em; padding: 5px 8px; }
+          .reader-screen { min-height: 500px; }
         }
       `}</style>
     </Section>

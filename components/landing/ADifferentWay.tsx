@@ -38,7 +38,9 @@ export function ADifferentWay() {
             <span />
             <p>Venn starts from a different place.<br />Real context. Real attention.<br />Something built from the reality of a business —<br />not a template pretending to understand it.</p>
             <span />
-            <p>Not pressure.<br />Not urgency.<br /><em>Just the feeling that someone actually looked.</em></p>
+            <p>Not pressure.</p>
+            <p>Not urgency.</p>
+            <p><em>Just the feeling that someone actually looked.</em></p>
           </div>
         </Reveal>
 
@@ -95,6 +97,11 @@ export function ADifferentWay() {
         }
         @media (max-width: 620px) {
           .manifesto-copy p br { display: none; }
+          .manifesto-copy em {
+            display: block;
+            font-size: clamp(16px, 5vw, 22px) !important;
+            width: 100%;
+          }
         }
       `}</style>
     </Section>

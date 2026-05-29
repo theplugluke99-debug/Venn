@@ -27,7 +27,7 @@ function EditorialCard() {
         <div className="image-scrim" />
         <div className="card-brand">
           <VennLogo size={38} variant="mark" decorative />
-          <span>Momentum Agency</span>
+          <span className="agency-brand">thrive online.</span>
         </div>
         <span className="intent-badge"><i /> HIGH INTENT</span>
         <div className="hero-copy-card">
@@ -115,7 +115,7 @@ function LetterCard() {
       <div className="lc-header">
         <div className="lc-from">
           <VennLogo size={22} variant="mark" decorative />
-          <span className="lc-agency-name">Momentum Agency</span>
+          <span className="lc-agency-name agency-brand">thrive online.</span>
         </div>
         <span className="lc-date">May 2025</span>
       </div>
@@ -138,7 +138,7 @@ function LetterCard() {
         <p className="lc-close-line">With respect,</p>
         <div style={{ height: 8 }} />
         <p className="lc-name">Luke K.</p>
-        <p className="lc-org">Momentum Agency</p>
+        <p className="lc-org agency-brand">thrive online.</p>
       </div>
 
       <div className="lc-rule" style={{ marginTop: 32 }} />
@@ -180,7 +180,7 @@ function MinimalCard() {
       {/* Footer */}
       <div className="mc-footer">
         <p className="mc-cta">Worth a conversation?</p>
-        <p className="mc-sig">— Luke K. Momentum Agency</p>
+        <p className="mc-sig">— Luke K. <span className="agency-brand">thrive online.</span></p>
         <p className="mc-url">getvenn.agency/c/glow-aesthetics</p>
       </div>
     </article>

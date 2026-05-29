@@ -142,7 +142,7 @@ export function LiveDemo() {
               <div className="card-peek">
                 <div className="card-peek-meta">
                   <VennLogo size={22} variant="mark" decorative />
-                  <span>Momentum Agency</span>
+                  <span className="agency-brand">thrive online.</span>
                 </div>
                 <strong>Glow Aesthetics</strong>
                 <small>Personalised growth opportunity · Manchester</small>
@@ -381,6 +381,9 @@ export function LiveDemo() {
           .signal-arrow {
             transform: rotate(90deg);
           }
+          .terminal-panel { order: 1; }
+          .signal-arrow { order: 2; }
+          .crystal-panel { order: 3; }
         }
         @media (max-width: 620px) {
           .terminal-panel,
@@ -396,6 +399,9 @@ export function LiveDemo() {
           .signal-grid {
             grid-template-columns: 1fr;
           }
+          .crystal-panel { padding: 16px; }
+          .card-peek { padding: 12px 16px 10px; }
+          .card-peek strong { font-size: 24px; }
         }
       `}</style>
     </Section>

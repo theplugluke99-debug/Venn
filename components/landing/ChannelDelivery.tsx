@@ -6,31 +6,96 @@ import { motion } from "framer-motion";
 import { Reveal, Section, colours } from "./system";
 
 const CHANNELS = [
-  { name: "WhatsApp", tone: "Personal. Direct. Conversational.", handle: "Momentum Agency", meta: "online" },
-  { name: "Instagram", tone: "Visual. Casual. Curiosity-led.", handle: "momentum.agency", meta: "Active now" },
-  { name: "Email", tone: "Professional. Clear. Considered.", handle: "Momentum Agency", meta: "A quick note for Glow" },
-  { name: "LinkedIn", tone: "Relevant. Professional. Trusted.", handle: "Momentum Agency", meta: "Active now" },
+  { name: "WhatsApp", tone: "Personal. Direct. Conversational." },
+  { name: "Instagram", tone: "Visual. Casual. Curiosity-led." },
+  { name: "Email", tone: "Professional. Clear. Considered." },
+  { name: "LinkedIn", tone: "Relevant. Professional. Trusted." },
 ];
 
-function MiniPhone({ channel }: { channel: (typeof CHANNELS)[number] }) {
+function WAPreview() {
   return (
-    <motion.div
-      key={channel.name}
-      className="mini-phone"
-      initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <div className="mini-top">{channel.name}</div>
-      <div className="mini-bubble">Put something together specifically for you —</div>
-      <div className="mini-card-preview">
-        <Image src="/landing/glow-aesthetics-reception.png" alt="" fill sizes="360px" style={{ objectFit: "cover" }} />
+    <div className="cprev cprev-wa">
+      <div className="cprev-head">
+        <span className="cprev-avatar wa-avatar" />
+        <div className="cprev-head-info">
+          <span className="agency-brand cprev-name">thrive online.</span>
+          <small>online · 9:41 AM</small>
+        </div>
       </div>
-      <p>Glow Aesthetics</p>
-      <small>Manchester</small>
-    </motion.div>
+      <div className="cprev-bubble">
+        Put something together specifically for you —
+      </div>
+      <a className="cprev-link">getvenn.agency/c/glow-aesthetics</a>
+      <div className="cprev-richcard">
+        <div className="cprev-richimg">
+          <Image src="/landing/glow-aesthetics-reception.png" alt="" fill sizes="240px" style={{ objectFit: "cover" }} />
+        </div>
+        <p className="cprev-richname">Glow Aesthetics</p>
+      </div>
+      <p className="cprev-tick">✓✓ Delivered</p>
+    </div>
   );
 }
+
+function IGPreview() {
+  return (
+    <div className="cprev cprev-ig">
+      <div className="cprev-head">
+        <span className="cprev-avatar ig-avatar" />
+        <div className="cprev-head-info">
+          <span className="agency-brand cprev-name">thriveonline_</span>
+          <small>Instagram · Active now</small>
+        </div>
+      </div>
+      <div className="cprev-bubble">
+        Hey Glow 👋<br />
+        Put something together specifically for you —
+      </div>
+      <a className="cprev-link">getvenn.agency/c/glow-aesthetics</a>
+      <p className="cprev-tick">Seen</p>
+    </div>
+  );
+}
+
+function EmailPreview() {
+  return (
+    <div className="cprev cprev-email">
+      <div className="cprev-email-header">
+        <div><span className="cprev-field">From</span> <span className="agency-brand">Luke at thrive online.</span></div>
+        <div><span className="cprev-field">To</span> Glow Aesthetics</div>
+        <div className="cprev-subject">Something specific to Glow Aesthetics</div>
+      </div>
+      <div className="cprev-bubble">Thought you might find this useful.</div>
+      <a className="cprev-link">getvenn.agency/c/glow-aesthetics</a>
+    </div>
+  );
+}
+
+function LIPreview() {
+  return (
+    <div className="cprev cprev-li">
+      <div className="cprev-head">
+        <span className="cprev-avatar li-avatar" />
+        <div className="cprev-head-info">
+          <span className="agency-brand cprev-name">Luke K.</span>
+          <span className="cprev-name-sub"> · thrive online.</span>
+          <small>LinkedIn · 2nd</small>
+        </div>
+      </div>
+      <div className="cprev-bubble">
+        Hi there, saw your clinic and wanted to share something that might be helpful. Put something together specifically for you —
+      </div>
+      <a className="cprev-link">getvenn.agency/c/glow-aesthetics</a>
+    </div>
+  );
+}
+
+const PREVIEWS = [
+  { channel: "WhatsApp", label: "WhatsApp", node: <WAPreview /> },
+  { channel: "Instagram", label: "Instagram", node: <IGPreview /> },
+  { channel: "Email", label: "Email", node: <EmailPreview /> },
+  { channel: "LinkedIn", label: "LinkedIn", node: <LIPreview /> },
+];
 
 export function ChannelDelivery() {
   const [selected, setSelected] = useState(CHANNELS[0]);
@@ -54,13 +119,13 @@ export function ChannelDelivery() {
                 <div className="chat-head">
                   <span />
                   <div>
-                    <b>{selected.handle}</b>
-                    <small>{selected.meta}</small>
+                    <b className="agency-brand">{selected.name === "Instagram" ? "thriveonline_" : selected.name === "Email" ? "Luke at thrive online." : "thrive online."}</b>
+                    <small>{selected.name === "Email" ? "Glow Aesthetics" : selected.name === "LinkedIn" ? "2nd · Connected" : "online"}</small>
                   </div>
                 </div>
                 <div className="day-pill">Today</div>
                 <div className="chat-bubble">Put something together specifically for you —</div>
-                <a>venn.ai/c/glow-aesthetics</a>
+                <a>getvenn.agency/c/glow-aesthetics</a>
                 <div className="message-card">
                   <div className="message-image">
                     <Image src="/landing/glow-aesthetics-reception.png" alt="Glow Aesthetics reception" fill sizes="280px" style={{ objectFit: "cover" }} />
@@ -94,12 +159,19 @@ export function ChannelDelivery() {
             ))}
           </div>
           <p className="native-line">One message. Four channels. Each one feels native.</p>
-          <div className="mini-phone-grid">
-            <div>
-              <MiniPhone channel={selected} />
-              <h4>{selected.name}</h4>
-              <p>{selected.tone}</p>
-            </div>
+
+          <div className="cprev-grid">
+            {PREVIEWS.map(({ channel, label, node }) => (
+              <motion.div
+                key={channel}
+                className="cprev-cell"
+                animate={{ opacity: selected.name === channel ? 1 : 0.6, scale: selected.name === channel ? 1 : 0.98 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {node}
+                <p className="cprev-label">{label}</p>
+              </motion.div>
+            ))}
           </div>
         </Reveal>
       </div>
@@ -175,28 +247,10 @@ export function ChannelDelivery() {
           padding: 22px;
           position: relative;
         }
-        .phone-status {
-          font-size: 12px;
-          font-weight: 700;
-          margin-bottom: 20px;
-        }
-        .chat-head {
-          align-items: center;
-          display: flex;
-          gap: 10px;
-          margin-bottom: 18px;
-        }
-        .chat-head span {
-          background: ${colours.gold};
-          border-radius: 50%;
-          height: 26px;
-          width: 26px;
-        }
-        .chat-head b,
-        .chat-head small {
-          display: block;
-          font-size: 12px;
-        }
+        .phone-status { font-size: 12px; font-weight: 700; margin-bottom: 20px; }
+        .chat-head { align-items: center; display: flex; gap: 10px; margin-bottom: 18px; }
+        .chat-head span { background: #00E676; border-radius: 50%; height: 26px; width: 26px; }
+        .chat-head b, .chat-head small { display: block; font-size: 12px; }
         .chat-head small { color: ${colours.secondary}; }
         .day-pill {
           background: rgba(255,253,248,0.08);
@@ -230,18 +284,9 @@ export function ChannelDelivery() {
           overflow: hidden;
           padding-bottom: 16px;
         }
-        .message-image {
-          height: 145px;
-          margin-bottom: 16px;
-          position: relative;
-        }
-        .message-card p,
-        .message-card h3,
-        .message-card small,
-        .message-card strong {
-          display: block;
-          margin-left: 16px;
-          margin-right: 16px;
+        .message-image { height: 145px; margin-bottom: 16px; position: relative; }
+        .message-card p, .message-card h3, .message-card small, .message-card strong {
+          display: block; margin-left: 16px; margin-right: 16px;
         }
         .message-card h3 {
           font-family: var(--font-instrument-serif), Georgia, serif;
@@ -249,46 +294,20 @@ export function ChannelDelivery() {
           font-weight: 400;
           margin-bottom: 6px;
         }
-        .message-card small {
-          color: ${colours.secondary};
-          font-size: 12px;
-          line-height: 1.5;
-          margin-bottom: 14px;
-        }
-        .message-card strong {
-          color: ${colours.gold};
-          font-size: 12px;
-          font-weight: 500;
-        }
-        .phone-input {
-          bottom: 20px;
-          color: ${colours.secondary};
-          font-size: 28px;
-          left: 22px;
-          position: absolute;
-        }
-        .delivery-note {
-          align-items: center;
-          display: flex;
-          gap: 20px;
-          margin-left: 40px;
-        }
-        .delivery-note span {
-          color: ${colours.gold};
-          font-size: 34px;
-        }
-        .delivery-note p {
-          color: ${colours.secondary};
-          font-family: var(--font-inter), Inter, sans-serif;
-          font-size: 15px;
-          line-height: 1.7;
-        }
+        .message-card small { color: ${colours.secondary}; font-size: 12px; line-height: 1.5; margin-bottom: 14px; }
+        .message-card strong { color: ${colours.gold}; font-size: 12px; font-weight: 500; }
+        .phone-input { bottom: 20px; color: ${colours.secondary}; font-size: 28px; left: 22px; position: absolute; }
+        .delivery-note { align-items: center; display: flex; gap: 20px; margin-left: 40px; }
+        .delivery-note span { color: ${colours.gold}; font-size: 34px; }
+        .delivery-note p { color: ${colours.secondary}; font-size: 15px; line-height: 1.7; }
+
+        /* ── Channel pills ── */
         .channel-pills {
           display: flex;
-          flex-wrap: wrap;
           gap: 18px;
           justify-content: center;
           margin: 0 auto 26px;
+          flex-wrap: wrap;
         }
         .channel-pills button {
           background: rgba(255,253,248,0.02);
@@ -299,85 +318,105 @@ export function ChannelDelivery() {
           font-size: 15px;
           min-width: 150px;
           padding: 14px 26px;
+          white-space: nowrap;
         }
         .channel-pills button.active {
           border-color: ${colours.gold};
           color: ${colours.gold};
           box-shadow: inset 0 0 34px rgba(196,151,63,0.08), 0 0 24px rgba(196,151,63,0.12);
         }
-        .native-line {
+        .native-line { color: ${colours.secondary}; font-size: 15px; margin-bottom: 28px; text-align: center; }
+
+        /* ── 4 channel previews ── */
+        .cprev-grid {
+          display: grid;
+          gap: 16px;
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .cprev-cell { display: flex; flex-direction: column; }
+        .cprev-label {
           color: ${colours.secondary};
-          font-size: 15px;
-          margin-bottom: 28px;
+          font-family: var(--font-inter), Inter, sans-serif;
+          font-size: 12px;
+          margin-top: 10px;
           text-align: center;
         }
-        .mini-phone-grid {
-          display: grid;
-          gap: 22px;
-          grid-template-columns: minmax(260px, 420px);
-          justify-content: center;
-        }
-        .mini-phone {
-          background: rgba(10,9,7,0.72);
+        .cprev {
+          background: #0F0E0B;
           border: 0.5px solid ${colours.border};
-          border-radius: 16px;
-          min-height: 330px;
-          overflow: hidden;
+          border-radius: 12px;
+          flex: 1;
           padding: 14px;
         }
-        .mini-top,
-        .mini-phone small,
-        .mini-phone-grid > div > p {
-          color: ${colours.secondary};
-          font-size: 12px;
-        }
-        .mini-bubble {
-          background: #242320;
-          border-radius: 10px;
-          color: ${colours.ivory};
-          font-size: 12px;
-          line-height: 1.4;
-          margin: 14px 0;
-          padding: 10px;
-        }
-        .mini-card-preview {
-          border-radius: 10px;
-          height: 138px;
+        .cprev-head {
+          align-items: center;
+          display: flex;
+          gap: 8px;
           margin-bottom: 12px;
+        }
+        .cprev-avatar {
+          border-radius: 50%;
+          flex-shrink: 0;
+          height: 28px;
+          width: 28px;
+        }
+        .wa-avatar { background: #00E676; }
+        .ig-avatar { background: linear-gradient(135deg, #f9ce34, #ee2a7b, #6228d7); }
+        .li-avatar { background: #0a66c2; }
+        .cprev-head-info { min-width: 0; }
+        .cprev-name { display: block; font-size: 12px; line-height: 1.2; }
+        .cprev-name-sub { color: ${colours.secondary}; font-size: 11px; }
+        .cprev-head-info small { color: ${colours.secondary}; display: block; font-size: 10px; margin-top: 1px; }
+        .cprev-bubble {
+          background: #1A1814;
+          border-radius: 8px;
+          color: ${colours.ivory};
+          font-size: 11px;
+          line-height: 1.5;
+          margin-bottom: 8px;
+          padding: 8px 10px;
+        }
+        .cprev-link { color: #69a7ff; display: block; font-size: 10px; margin-bottom: 8px; word-break: break-all; }
+        .cprev-richcard {
+          background: #141210;
+          border: 0.5px solid ${colours.border};
+          border-radius: 8px;
+          margin-bottom: 6px;
           overflow: hidden;
-          position: relative;
         }
-        .mini-phone p {
-          color: ${colours.ivory};
-          font-family: var(--font-instrument-serif), Georgia, serif;
-          font-size: 22px;
+        .cprev-richimg { height: 70px; position: relative; }
+        .cprev-richname { color: ${colours.ivory}; font-size: 11px; padding: 6px 8px; }
+        .cprev-tick { color: ${colours.secondary}; font-size: 10px; }
+        .cprev-email-header {
+          border-bottom: 0.5px solid ${colours.border};
+          font-size: 11px;
+          line-height: 1.6;
+          margin-bottom: 10px;
+          padding-bottom: 8px;
         }
-        .mini-phone-grid h4 {
-          color: ${colours.ivory};
-          font-size: 14px;
-          margin: 18px 0 8px;
-          text-align: center;
-        }
-        .mini-phone-grid > div > p {
-          text-align: center;
-        }
+        .cprev-email-header > div { color: ${colours.ivory}; }
+        .cprev-field { color: ${colours.secondary}; }
+        .cprev-subject { color: ${colours.ivory}; font-weight: 500; font-size: 11px; margin-top: 4px; }
+
+        /* ── Responsive ── */
         @media (max-width: 980px) {
-          .phone-stage {
-            grid-template-columns: 1fr;
-            justify-items: center;
-          }
-          .main-phone {
-            justify-self: center;
-          }
-          .delivery-note {
-            margin: 28px 0 0;
-          }
-          .mini-phone-grid { grid-template-columns: minmax(250px, 420px); }
+          .phone-stage { grid-template-columns: 1fr; justify-items: center; }
+          .main-phone { justify-self: center; }
+          .delivery-note { margin: 28px 0 0; }
+          .cprev-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 560px) {
           .phone-screen { min-height: 560px; }
-          .mini-phone-grid { grid-template-columns: 1fr; }
-          .channel-pills button { min-width: 0; width: calc(50% - 9px); }
+          .channel-pills {
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+          }
+          .channel-pills::-webkit-scrollbar { display: none; }
+          .channel-pills button { flex-shrink: 0; min-width: auto; padding: 10px 20px; }
         }
       `}</style>
     </Section>

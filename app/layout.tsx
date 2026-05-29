@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter, Instrument_Serif, League_Spartan } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
@@ -12,6 +12,12 @@ const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
   subsets: ["latin"],
   weight: "400",
+});
+
+const leagueSpartan = League_Spartan({
+  variable: "--font-league-spartan",
+  subsets: ["latin"],
+  weight: "700",
 });
 
 export const metadata: Metadata = {
@@ -35,7 +41,7 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${inter.variable} ${instrumentSerif.variable} h-full`}>
+      <html lang="en" className={`${inter.variable} ${instrumentSerif.variable} ${leagueSpartan.variable} h-full`}>
         <body className="min-h-full">{children}</body>
       </html>
     </ClerkProvider>
