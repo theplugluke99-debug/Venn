@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId } from "@/lib/db/queries/users";
 import { getClientsByUser } from "@/lib/db/queries/clients";
 import { calculateClientHealth, getHealthColour } from "@/lib/agency/health";
+import { getHealthNarrative, getHealthNarrativeColour } from "@/lib/agency/colours";
 import { AddClientModal } from "./AddClientModal";
 
 export const metadata = { title: "Clients — Venn" };
@@ -187,6 +188,18 @@ export default async function ClientsPage() {
                   </p>
                 </div>
               </div>
+
+              {/* Health narrative */}
+              <p style={{
+                fontSize: 12,
+                color: getHealthNarrativeColour(client.healthScore),
+                fontFamily: "var(--font-inter)",
+                lineHeight: 1.4,
+                fontStyle: "italic",
+                marginTop: -4,
+              }}>
+                {getHealthNarrative(client.healthScore, client.businessName)}
+              </p>
 
               {/* Value */}
               {client.contractValue && (

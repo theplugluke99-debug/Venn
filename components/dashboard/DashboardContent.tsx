@@ -7,7 +7,11 @@ import { FocusMode } from "./FocusMode";
 import { IntelMode } from "./IntelMode";
 import { MilestoneToast } from "./MilestoneToast";
 import { StuckPanel } from "./StuckPanel";
+import { AgencyBriefing } from "./AgencyBriefing";
+import { AgencyFocusMode } from "./AgencyFocusMode";
+import { AgencyTodayMode } from "./AgencyTodayMode";
 import type { IntentScore } from "@/types";
+import type { AgencyIntelligence } from "@/lib/agency/intelligence";
 
 interface Lead {
   id: string;
@@ -29,6 +33,7 @@ interface ActivityItem {
   timestamp: string;
   leadId: string | null;
   isHot: boolean;
+  annotation?: string;
 }
 
 interface Stats {
@@ -36,6 +41,13 @@ interface Stats {
   highIntentLeads: number;
   cardsSent: number;
   replyRate: number;
+}
+
+interface AgencyStats {
+  clientCount: number;
+  atRisk: number;
+  deliverablesThisWeek: number;
+  unreportedClients: number;
 }
 
 interface DashboardContentProps {
@@ -46,12 +58,17 @@ interface DashboardContentProps {
   recentActivity: ActivityItem[];
   greeting?: { headline: string; subline?: string };
   isStuck?: boolean;
+  agencyIntelligence: AgencyIntelligence | null;
+  agencyStats: AgencyStats | null;
+  firstName: string;
 }
 
 const ACTIVITY_DOT: Record<string, string> = {
   lead_ready: "#4CAF50",
   card_generated: "#C4973F",
   card_viewed: "#C4973F",
+  proposal_viewed: "#C4973F",
+  contract_approaching: "#888580",
 };
 
 function timeLabel(iso: string): string {
@@ -64,6 +81,184 @@ function timeLabel(iso: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
+function ActivityFeed({ items }: { items: ActivityItem[] }) {
+  if (items.length === 0) return null;
+  return (
+    <div className="mt-10 max-w-2xl">
+      <p
+        style={{
+          fontSize: 10,
+          color: "#444",
+          textTransform: "uppercase",
+          letterSpacing: "0.1em",
+          fontWeight: 500,
+          fontFamily: "var(--font-inter)",
+          marginBottom: 12,
+        }}
+      >
+        Recent activity
+      </p>
+      <div style={{ background: "#0F0E0B", border: "0.5px solid #1E1C18", borderRadius: 8 }}>
+        {items.map((item, i) => (
+          <div
+            key={i}
+            style={{
+              padding: "12px 16px",
+              borderBottom: i < items.length - 1 ? "0.5px solid #1E1C18" : "none",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: item.isHot ? "#C4973F" : (ACTIVITY_DOT[item.type] ?? "#444"),
+                  flexShrink: 0,
+                }}
+              />
+              <p
+                style={{
+                  flex: 1,
+                  fontSize: 13,
+                  color: item.isHot ? "#C4973F" : "#888",
+                  fontFamily: "var(--font-inter)",
+                }}
+              >
+                {item.message}
+                {item.isHot && (
+                  <span
+                    style={{
+                      marginLeft: 6,
+                      fontSize: 9,
+                      fontWeight: 700,
+                      background: "#C4973F",
+                      color: "#0A0907",
+                      padding: "1px 5px",
+                      borderRadius: 8,
+                    }}
+                  >
+                    HOT
+                  </span>
+                )}
+              </p>
+              <span style={{ fontSize: 11, color: "#333230", fontFamily: "var(--font-inter)", flexShrink: 0 }}>
+                {timeLabel(item.timestamp)}
+              </span>
+              {item.leadId && (
+                <Link
+                  href={`/leads/${item.leadId}`}
+                  style={{ fontSize: 11, color: "#C4973F", textDecoration: "none", flexShrink: 0 }}
+                >
+                  →
+                </Link>
+              )}
+            </div>
+            {/* Intelligence annotation */}
+            {item.annotation && (
+              <p
+                style={{
+                  fontSize: 11,
+                  color: "#C4973F",
+                  fontFamily: "var(--font-inter)",
+                  fontStyle: "italic",
+                  marginTop: 6,
+                  paddingLeft: 18,
+                  lineHeight: 1.5,
+                }}
+              >
+                {item.annotation}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AgencyStatsSection({ stats }: { stats: AgencyStats }) {
+  return (
+    <div style={{ marginTop: 40, paddingTop: 32, borderTop: "0.5px solid #1A1814" }}>
+      <p style={{
+        fontSize: 10, color: "#2A2826", textTransform: "uppercase", letterSpacing: "0.12em",
+        fontFamily: "var(--font-inter)", marginBottom: 16,
+      }}>
+        Your agency
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+        <Link href="/clients?filter=at-risk" style={{ textDecoration: "none" }}>
+          <div style={{
+            background: "#0F0E0B",
+            border: `0.5px solid ${stats.atRisk > 0 ? "#C0392B30" : "#1E1C18"}`,
+            borderRadius: 8, padding: "16px 18px",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+              {stats.atRisk > 0 && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C0392B", display: "inline-block" }} />}
+              <p style={{ fontSize: 20, fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif", color: stats.atRisk > 0 ? "#C0392B" : "#FFFDF8" }}>
+                {stats.atRisk}
+              </p>
+            </div>
+            <p style={{ fontSize: 11, color: "#555250", fontFamily: "var(--font-inter)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              Clients needing attention
+            </p>
+          </div>
+        </Link>
+        <Link href="/deliverables" style={{ textDecoration: "none" }}>
+          <div style={{
+            background: "#0F0E0B",
+            border: `0.5px solid ${stats.deliverablesThisWeek > 0 ? "#C4973F30" : "#1E1C18"}`,
+            borderRadius: 8, padding: "16px 18px",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+              {stats.deliverablesThisWeek > 0 && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C4973F", display: "inline-block" }} />}
+              <p style={{ fontSize: 20, fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif", color: stats.deliverablesThisWeek > 0 ? "#C4973F" : "#FFFDF8" }}>
+                {stats.deliverablesThisWeek}
+              </p>
+            </div>
+            <p style={{ fontSize: 11, color: "#555250", fontFamily: "var(--font-inter)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              Deliverables due this week
+            </p>
+          </div>
+        </Link>
+        <Link href="/reports" style={{ textDecoration: "none" }}>
+          <div style={{
+            background: "#0F0E0B",
+            border: `0.5px solid ${stats.unreportedClients > 0 ? "#C4973F30" : "#1E1C18"}`,
+            borderRadius: 8, padding: "16px 18px",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+              {stats.unreportedClients > 0 && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C4973F", display: "inline-block" }} />}
+              <p style={{ fontSize: 20, fontFamily: "var(--font-instrument-serif), 'Instrument Serif', Georgia, serif", color: stats.unreportedClients > 0 ? "#C4973F" : "#FFFDF8" }}>
+                {stats.unreportedClients}
+              </p>
+            </div>
+            <p style={{ fontSize: 11, color: "#555250", fontFamily: "var(--font-inter)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              Reports to send this month
+            </p>
+          </div>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function NoAgencySection() {
+  return (
+    <div style={{ marginTop: 40, paddingTop: 32, borderTop: "0.5px solid #1A1814" }}>
+      <p style={{
+        fontSize: 10, color: "#2A2826", textTransform: "uppercase", letterSpacing: "0.12em",
+        fontFamily: "var(--font-inter)", marginBottom: 12,
+      }}>
+        Your agency
+      </p>
+      <p style={{ fontSize: 13, color: "#2A2826", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}>
+        When you win your first client through Venn — they appear here.
+      </p>
+    </div>
+  );
+}
+
 export function DashboardContent({
   leads,
   totalLeads,
@@ -72,9 +267,37 @@ export function DashboardContent({
   recentActivity,
   greeting,
   isStuck = false,
+  agencyIntelligence,
+  agencyStats,
+  firstName,
 }: DashboardContentProps) {
   const { mode } = useMode();
 
+  const hasClients = agencyIntelligence?.hasClients ?? false;
+
+  // In Focus mode with clients: show only the priority card
+  if (mode === "focus" && hasClients && agencyIntelligence) {
+    return (
+      <div>
+        <AgencyBriefing intelligence={agencyIntelligence} firstName={firstName} />
+        <AgencyFocusMode intelligence={agencyIntelligence} />
+        <MilestoneToast />
+      </div>
+    );
+  }
+
+  // In Today mode with clients: show sectioned compact view
+  if (mode === "today" && hasClients && agencyIntelligence) {
+    return (
+      <div>
+        <AgencyBriefing intelligence={agencyIntelligence} firstName={firstName} />
+        <AgencyTodayMode intelligence={agencyIntelligence} />
+        <MilestoneToast />
+      </div>
+    );
+  }
+
+  // Full mode (or no clients): show everything
   return (
     <div>
       {/* Contextual greeting */}
@@ -97,129 +320,39 @@ export function DashboardContent({
         </div>
       )}
 
+      {/* Briefing (only in full mode with clients) */}
+      {hasClients && agencyIntelligence && mode === "full" && (
+        <AgencyBriefing intelligence={agencyIntelligence} firstName={firstName} />
+      )}
+
       {/* Stuck detection panel */}
       <StuckPanel isStuck={isStuck} />
 
       {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <KPICard
-          label="High intent leads"
-          value={stats.highIntentLeads}
-          subtext="ready to contact"
-          goldTopBorder
-        />
-        <KPICard
-          label="Total leads"
-          value={stats.totalLeads}
-          subtext="in pipeline"
-        />
-        <KPICard
-          label="Cards sent"
-          value={stats.cardsSent}
-          subtext="prospect cards"
-        />
-        <KPICard
-          label="Reply rate"
-          value={stats.replyRate}
-          delta="—"
-          subtext="track in outreach"
-          goldTopBorder
-        />
+        <KPICard label="High intent leads" value={stats.highIntentLeads} subtext="ready to contact" goldTopBorder />
+        <KPICard label="Total leads" value={stats.totalLeads} subtext="in pipeline" />
+        <KPICard label="Cards sent" value={stats.cardsSent} subtext="prospect cards" />
+        <KPICard label="Reply rate" value={stats.replyRate} delta="—" subtext="track in outreach" goldTopBorder />
       </div>
 
-      {/* Mode content */}
-      {mode === "focus" ? (
-        <FocusMode leads={leads} totalLeads={totalLeads} />
-      ) : (
+      {/* Leads view — IntelMode in full mode, FocusMode when no clients */}
+      {hasClients ? (
         <IntelMode leads={leads} />
+      ) : (
+        <FocusMode leads={leads} totalLeads={totalLeads} />
       )}
 
-      {/* Activity feed — only show if there's activity */}
-      {recentActivity.length > 0 && (
-        <div className="mt-10 max-w-2xl">
-          <p
-            style={{
-              fontSize: 10,
-              color: "#444",
-              textTransform: "uppercase",
-              letterSpacing: "0.1em",
-              fontWeight: 500,
-              fontFamily: "var(--font-inter)",
-              marginBottom: 12,
-            }}
-          >
-            Recent activity
-          </p>
-          <div
-            style={{
-              background: "#0F0E0B",
-              border: "0.5px solid #1E1C18",
-              borderRadius: 8,
-            }}
-          >
-            {recentActivity.map((item, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  padding: "12px 16px",
-                  borderBottom: i < recentActivity.length - 1 ? "0.5px solid #1E1C18" : "none",
-                }}
-              >
-                <div
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: item.isHot ? "#C4973F" : (ACTIVITY_DOT[item.type] ?? "#444"),
-                    flexShrink: 0,
-                  }}
-                />
-                <p
-                  style={{
-                    flex: 1,
-                    fontSize: 13,
-                    color: item.isHot ? "#C4973F" : "#888",
-                    fontFamily: "var(--font-inter)",
-                  }}
-                >
-                  {item.message}
-                  {item.isHot && (
-                    <span
-                      style={{
-                        marginLeft: 6,
-                        fontSize: 9,
-                        fontWeight: 700,
-                        background: "#C4973F",
-                        color: "#0A0907",
-                        padding: "1px 5px",
-                        borderRadius: 8,
-                      }}
-                    >
-                      HOT
-                    </span>
-                  )}
-                </p>
-                <span style={{ fontSize: 11, color: "#333230", fontFamily: "var(--font-inter)", flexShrink: 0 }}>
-                  {timeLabel(item.timestamp)}
-                </span>
-                {item.leadId && (
-                  <Link
-                    href={`/leads/${item.leadId}`}
-                    style={{ fontSize: 11, color: "#C4973F", textDecoration: "none", flexShrink: 0 }}
-                  >
-                    →
-                  </Link>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* Activity feed */}
+      <ActivityFeed items={recentActivity} />
+
+      {/* Agency stats */}
+      {agencyStats ? (
+        <AgencyStatsSection stats={agencyStats} />
+      ) : (
+        <NoAgencySection />
       )}
 
-      {/* Milestone toast */}
       <MilestoneToast />
     </div>
   );

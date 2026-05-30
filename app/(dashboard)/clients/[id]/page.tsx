@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId } from "@/lib/db/queries/users";
 import { getClientById } from "@/lib/db/queries/clients";
 import { calculateClientHealth, getHealthColour } from "@/lib/agency/health";
+import { getHealthNarrative, getHealthNarrativeColour } from "@/lib/agency/colours";
 import { ClientTabs } from "./ClientTabs";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -145,6 +146,16 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
               </span>
             </div>
           </div>
+          <p style={{
+            fontSize: 13,
+            color: getHealthNarrativeColour(score),
+            fontFamily: "var(--font-inter)",
+            fontStyle: "italic",
+            marginBottom: 6,
+            lineHeight: 1.4,
+          }}>
+            {getHealthNarrative(score, client.businessName)}
+          </p>
           <div style={{ display: "flex", gap: 16, fontSize: 12, color: "#555250", fontFamily: "var(--font-inter)", flexWrap: "wrap" }}>
             {client.contractValue && (
               <span style={{ color: "#C4973F", fontWeight: 500 }}>£{client.contractValue.toLocaleString()}/mo</span>

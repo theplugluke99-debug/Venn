@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSidebar, useMode } from "./DashboardProvider";
+import { useSidebar, useMode, type DashboardMode } from "./DashboardProvider";
 import { IconMenu, IconSearch } from "./icons";
 
 const PAGE_TITLES: Record<string, string> = {
@@ -22,6 +22,12 @@ function getTitle(pathname: string): string {
   if (pathname.startsWith("/cards/")) return "Prospect Card";
   return "Venn";
 }
+
+const MODES: { key: DashboardMode; label: string }[] = [
+  { key: "focus", label: "Focus" },
+  { key: "today", label: "Today" },
+  { key: "full", label: "Full" },
+];
 
 export function TopBar() {
   const { toggle } = useSidebar();
@@ -58,34 +64,26 @@ export function TopBar() {
 
       {/* Right side */}
       <div className="flex items-center gap-2">
-        {/* Focus / Intel mode toggle — only on dashboard */}
+        {/* Focus / Today / Full mode switcher — only on dashboard */}
         {isDashboard && (
           <div
             className="flex items-center rounded-full p-0.5"
             style={{ background: "#0F0E0B", border: "0.5px solid #1E1C18" }}
           >
-            <button
-              onClick={() => setMode("focus")}
-              className="px-3 py-1 rounded-full text-[11px] font-medium transition-all"
-              style={{
-                background: mode === "focus" ? "#C4973F" : "transparent",
-                color: mode === "focus" ? "#0A0907" : "#555250",
-                fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
-              }}
-            >
-              Focus
-            </button>
-            <button
-              onClick={() => setMode("intel")}
-              className="px-3 py-1 rounded-full text-[11px] font-medium transition-all"
-              style={{
-                background: mode === "intel" ? "#C4973F" : "transparent",
-                color: mode === "intel" ? "#0A0907" : "#555250",
-                fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
-              }}
-            >
-              Intel
-            </button>
+            {MODES.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setMode(key)}
+                className="px-3 py-1 rounded-full text-[11px] font-medium transition-all"
+                style={{
+                  background: mode === key ? "#C4973F" : "transparent",
+                  color: mode === key ? "#0A0907" : "#555250",
+                  fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
+                }}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         )}
 
